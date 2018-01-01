@@ -3,7 +3,7 @@
 
 <img src="imgs/hdl_graph_slam.png" width="712pix" />
 
-<a href="https://drive.google.com/open?id=0B9f5zFkpn4soSG96Tkt4SFFTbms">video</a> (TODO: upload this video to youtube!)
+<a href="https://drive.google.com/open?id=0B9f5zFkpn4soSG96Tkt4SFFTbms">video</a>
 
 ## Nodelets
 ***hdl_graph_slam*** consists of four nodelets. 
