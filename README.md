@@ -1,5 +1,5 @@
 # hdl_graph_slam
-***hdl_graph_slam*** is an open source ROS package for real-time 3D slam using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also utilizes floor plane detection to generate an environmental map with a completely flat floor. This package also contains an implementation of multi-threaded NDT (10 times faster than the normal NDT in PCL!). We have tested this packaged mainly in indoor environments, but it can be applied to outdoor environment mapping as well.
+***hdl_graph_slam*** is an open source ROS package for real-time 3D slam using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also utilizes floor plane detection to generate an environmental map with a completely flat floor. We have tested this packaged mainly in indoor environments, but it can be applied to outdoor environment mapping as well.
 
 <img src="imgs/hdl_graph_slam.png" width="712pix" />
 
@@ -95,7 +95,7 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
 
 ## Papers
-Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System for Long-term and Wide-area People Behavior Measurement, Robotics and Autonomous Systems (under review) [PDF].
+Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System for Long-term and Wide-area People Behavior Measurement, IEEE Transactions on Human-Machine Systems (under review) [PDF].
 
 ## Contact
 Kenji Koide, Active Intelligent Systems Laboratory, Toyohashi University of Technology <a href="http://www.aisl.cs.tut.ac.jp">[URL]</a> <br>
