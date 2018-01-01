@@ -26,14 +26,12 @@ All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 - */hdl_graph_slam/dump*  (std_srvs/Empty)
   - save all data (point clouds, floor coeffs, odoms, and pose graph) to the current directory.
 
-## Multi-threaded Scan Matching Algorithms
-This package contains implementations of multi-threaded and SSE friendly NDT and GICP algorithms. They are derived from the implementations in PCL. With recent multi-core processors, they may show ten times faster processing speed than the NDT and the GICP in PCL. See *include/pclomp* and *src/pclomp* to use the boosted scan matching algorithms.
-
 ## Requirements
 ***hdl_graph_slam*** requires the following libraries:
 - OpenMP
 - PCL 1.7
 - g2o
+- <a href="https://github.com/koide3/ndt_omp">ndt_omp</a>
 
 Note that ***hdl_graph_slam*** cannot be built with older g2o libraries (such as ros-indigo-libg2o). Install the latest g2o:
 ```bash
