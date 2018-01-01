@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>hdl_graph_slam</name>
+  <version>0.0.0</version>
+  <description>The hdl_scan_matching_odometry package</description>
+
+  <maintainer email="koide@aisl.cs.tut.ac.jp">koide</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>geodesy</build_depend>
+  <build_depend>nmea_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <run_depend>pcl_ros</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>geodesy</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>nmea_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
+</package>
