@@ -25,6 +25,8 @@ All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 ### Services
 - */hdl_graph_slam/dump*  (std_srvs/Empty)
   - save all data (point clouds, floor coeffs, odoms, and pose graph) to the current directory.
+- */hdl_graph_slam/save_map*  (hdl_graph_slam/SaveMap)
+  - save generated map as a PCD file.
 
 ## Requirements
 ***hdl_graph_slam*** requires the following libraries:
@@ -43,14 +45,20 @@ make -j8
 sudo make install
 ```
 
-The following ros packages are required:
+The following ROS packages are required:
 - geodesy
+- nmea_msgs
 - pcl_ros
 ```bash
-sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros
+sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
 ```
 
-## Example
+**[optional]** *bag_player.py* script requires ProgressBar2.
+```bash
+sudo pip install ProgressBar2
+```
+
+## Example1 (Indoor)
 
 Example bag files (recorded in a small room): 
 - [hdl_501.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501.bag.tar.gz) (raw data, 344MB)
@@ -79,6 +87,35 @@ rosrun hdl_graph_slam bag_player.py hdl_501_filtered.bag
 You'll see a generated point cloud like:
 
 <img src="imgs/top.png" height="256pix" /> <img src="imgs/birds.png" height="256pix" /> 
+
+You can save the generated map by:
+```bash
+rosservice call /hdl_graph_slam/save_map "resolution: 0.05
+destination: '/full_path_directory/map.pcd'"
+```
+
+## Example2 (Outdoor)
+
+Bag file (recorded in an outdoor environment): 
+- [hdl_400.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_400.bag.tar.gz) (raw data, about 900MB)
+
+
+```bash
+rosparam set use_sim_time true
+roslaunch hdl_graph_slam hdl_graph_slam_400.launch
+```
+
+```bash
+roscd hdl_graph_slam/rviz
+rviz -d hdl_graph_slam.rviz
+```
+
+```bash
+rosbag play --clock hdl_400.bag
+```
+
+
+<img src="imgs/hdl_400_points.png" height="256pix" /> <img src="imgs/hdl_400_graph.png" height="256pix" /> 
 
 
 ## Example with GPS feature

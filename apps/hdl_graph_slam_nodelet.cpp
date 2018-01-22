@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <Eigen/Dense>
+#include <pcl/io/pcd_io.h>
 
 #include <ros/ros.h>
 #include <geodesy/utm.h>
@@ -28,6 +29,7 @@
 #include <hdl_graph_slam/FloorCoeffs.h>
 
 #include <std_srvs/Empty.h>
+#include <hdl_graph_slam/SaveMap.h>
 
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
@@ -92,8 +94,11 @@ public:
     sync.reset(new message_filters::TimeSynchronizer<nav_msgs::Odometry, sensor_msgs::PointCloud2>(*odom_sub, *cloud_sub, 32));
     sync->registerCallback(boost::bind(&HdlGraphSlamNodelet::cloud_callback, this, _1, _2));
     floor_sub = nh.subscribe("/floor_detection/floor_coeffs", 32, &HdlGraphSlamNodelet::floor_coeffs_callback, this);
-    gps_sub = nh.subscribe("/gps/geopoint", 32, &HdlGraphSlamNodelet::gps_callback, this);
-    nmea_sub = nh.subscribe("/gpsimu_driver/nmea_sentence", 32, &HdlGraphSlamNodelet::nmea_callback, this);
+
+    if(private_nh.param<bool>("enable_gps", true)) {
+      gps_sub = nh.subscribe("/gps/geopoint", 32, &HdlGraphSlamNodelet::gps_callback, this);
+      nmea_sub = nh.subscribe("/gpsimu_driver/nmea_sentence", 32, &HdlGraphSlamNodelet::nmea_callback, this);
+    }
 
     // publishers
     markers_pub = nh.advertise<visualization_msgs::MarkerArray>("/hdl_graph_slam/markers", 16);
@@ -102,6 +107,7 @@ public:
     read_until_pub = nh.advertise<std_msgs::Header>("/hdl_graph_slam/read_until", 32);
 
     dump_service_server = nh.advertiseService("/hdl_graph_slam/dump", &HdlGraphSlamNodelet::dump_service, this);
+    save_map_service_server = nh.advertiseService("/hdl_graph_slam/save_map", &HdlGraphSlamNodelet::save_map_service, this);
 
     double graph_update_interval = private_nh.param<double>("graph_update_interval", 3.0);
     double map_cloud_update_interval = private_nh.param<double>("map_cloud_update_interval", 10.0);
@@ -621,6 +627,33 @@ private:
     return true;
   }
 
+  /**
+   * @brief save map data as pcd
+   * @param req
+   * @param res
+   * @return
+   */
+  bool save_map_service(hdl_graph_slam::SaveMapRequest& req, hdl_graph_slam::SaveMapResponse& res) {
+    std::vector<KeyFrameSnapshot::Ptr> snapshot;
+
+    keyframes_snapshot_mutex.lock();
+    snapshot = keyframes_snapshot;
+    keyframes_snapshot_mutex.unlock();
+
+    auto cloud = map_cloud_generator->generate(snapshot, req.resolution);
+    if(!cloud) {
+      res.success = false;
+      return true;
+    }
+
+    cloud->header.frame_id = map_frame_id;
+    cloud->header.stamp = snapshot.back()->cloud->header.stamp;
+
+    int ret = pcl::io::savePCDFileBinary(req.destination, *cloud);
+    res.success = ret == 0;
+
+    return true;
+  }
 private:
   // ROS
   ros::NodeHandle nh;
@@ -649,8 +682,8 @@ private:
   ros::Publisher read_until_pub;
   ros::Publisher map_points_pub;
 
-  std::atomic_bool dump_request;
   ros::ServiceServer dump_service_server;
+  ros::ServiceServer save_map_service_server;
 
   // keyframe queue
   std::mutex keyframe_queue_mutex;

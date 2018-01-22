@@ -3,6 +3,7 @@
   <!-- arguments -->
   <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
   <arg name="enable_floor_detection" default="true" />
+  <arg name="enable_gps" default="true" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
@@ -53,6 +54,7 @@
   <!-- hdl_graph_slam_nodelet -->
   <node pkg="nodelet" type="nodelet" name="hdl_graph_slam_nodelet" args="load hdl_graph_slam/HdlGraphSlamNodelet $(arg nodelet_manager)">
     <!-- keyframe registration params -->
+    <param name="enable_gps" value="$(arg enable_gps)" />
     <param name="max_keyframes_per_update" value="10" />
     <param name="keyframe_delta_trans" value="10.0" />
     <param name="keyframe_delta_angle" value="3.0" />
