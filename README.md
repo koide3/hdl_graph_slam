@@ -131,6 +131,14 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
 
+## Related packages
+
+- <a href="https://github.com/koide3/hdl_graph_slam">hdl_graph_slam</a>
+- <a href="https://github.com/koide3/hdl_localization">hdl_localization</a>
+- <a href="https://github.com/koide3/hdl_people_tracking">hdl_people_tracking</a>
+
+<img src="imgs/packages.png"/>
+
 ## Papers
 Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System for Long-term and Wide-area People Behavior Measurement, IEEE Transactions on Human-Machine Systems (under review) [PDF].
 
