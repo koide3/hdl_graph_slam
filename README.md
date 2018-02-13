@@ -33,7 +33,6 @@ All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 - OpenMP
 - PCL 1.7
 - g2o
-- <a href="https://github.com/koide3/ndt_omp">ndt_omp</a>
 
 Note that ***hdl_graph_slam*** cannot be built with older g2o libraries (such as ros-indigo-libg2o). Install the latest g2o:
 ```bash
@@ -49,8 +48,12 @@ The following ROS packages are required:
 - geodesy
 - nmea_msgs
 - pcl_ros
+- <a href="https://github.com/koide3/ndt_omp">ndt_omp</a>
 ```bash
 sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
+
+cd catkin_ws/src
+git clone https://github.com/koide3/ndt_omp.git
 ```
 
 **[optional]** *bag_player.py* script requires ProgressBar2.
