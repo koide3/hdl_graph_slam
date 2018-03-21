@@ -34,10 +34,13 @@ All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 - PCL 1.7
 - g2o
 
-Note that ***hdl_graph_slam*** cannot be built with older g2o libraries (such as ros-indigo-libg2o). Install the latest g2o:
+Note that ***hdl_graph_slam*** cannot be built with older g2o libraries (such as ros-indigo-libg2o). ~~Install the latest g2o:~~
+The latest g2o causes segfault. Use commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* instead of the latest one:
+
 ```bash
 git clone https://github.com/RainerKuemmerle/g2o.git
 cd g2o
+git checkout a48ff8c42136f18fbe215b02bfeca48fa0c67507
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make -j8

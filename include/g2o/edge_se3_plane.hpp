@@ -26,8 +26,8 @@ namespace g2o {
 			_measurement = m;
 		}
 
-		virtual bool read(std::istream& is) override {
-			Vector4D v;
+    virtual bool read(std::istream& is) override {
+      Vector4D v;
 			is >> v(0) >> v(1) >> v(2) >> v(3);
 			setMeasurement(Plane3D(v));
 			for (int i = 0; i < information().rows(); ++i)
@@ -39,7 +39,7 @@ namespace g2o {
 			return true;
 		}
 		virtual bool write(std::ostream& os) const override {
-			Vector4D v = _measurement.toVector();
+      Vector4D v = _measurement.toVector();
 			os << v(0) << " " << v(1) << " " << v(2) << " " << v(3) << " ";
 			for (int i = 0; i < information().rows(); ++i)
 				for (int j = i; j < information().cols(); ++j)

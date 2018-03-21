@@ -5,11 +5,11 @@
 #include <g2o/types/slam3d_addons/types_slam3d_addons.h>
 
 namespace g2o {
-	class EdgeSE3PriorXYZ : public g2o::BaseUnaryEdge<3, g2o::Vector3D, g2o::VertexSE3> {
+  class EdgeSE3PriorXYZ : public g2o::BaseUnaryEdge<3, g2o::Vector3D, g2o::VertexSE3> {
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		EdgeSE3PriorXYZ()
-			: g2o::BaseUnaryEdge<3, g2o::Vector3D, g2o::VertexSE3>()
+      : g2o::BaseUnaryEdge<3, g2o::Vector3D, g2o::VertexSE3>()
 		{}
 
 		void computeError() override {
@@ -19,14 +19,14 @@ namespace g2o {
 			_error = estimate - _measurement;
 		}
 
-		void setMeasurement(const g2o::Vector3D& m) override {
+    void setMeasurement(const g2o::Vector3D& m) override {
 			_measurement = m;
 		}
 
 		virtual bool read(std::istream& is) override {
-			Vector3D v;
+      Vector3D v;
 			is >> v(0) >> v(1) >> v(2);
-			setMeasurement(Vector3D(v));
+      setMeasurement(Vector3D(v));
 			for (int i = 0; i < information().rows(); ++i)
 				for (int j = i; j < information().cols(); ++j) {
 					is >> information()(i, j);
@@ -36,7 +36,7 @@ namespace g2o {
 			return true;
 		}
 		virtual bool write(std::ostream& os) const override {
-			Vector3D v = _measurement;
+      Vector3D v = _measurement;
 			os << v(0) << " " << v(1) << " " << v(2) << " ";
 			for (int i = 0; i < information().rows(); ++i)
 				for (int j = i; j < information().cols(); ++j)
