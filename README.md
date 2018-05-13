@@ -137,6 +137,38 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
 
+## Common Problems
+
+### hdl_graph_slam_nodelet causes memory error
+
+It has been reported that *hdl_graph_slam_nodelet* causes a memory error in some environments. I found that this is caused by a variable (*color*) in g2o::VertexPlane. Since this field is used for only visualization, we can remove it from vertex_plane.h and vertex_plane.cpp in g2o. I made a clone repository of g2o, in which I just removed it
+ from the commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* of g2o. If you face this memory error problem, try to install it instead of the original g2o repository. Do not forget to checkout *hdl_graph_slam* branch.
+
+```bash
+git clone https://github.com/koide3/g2o.git
+cd g2o
+git checkout hdl_graph_slam
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+make -j8
+sudo make install
+```
+
+### hdl_graph_slam in docker
+
+If you still face the error, try our docker environment. You can build the docker image for *hdl_graph_slam* with: 
+
+```bash
+roscd hdl_graph_slam/docker
+sudo docker build --tag hdl_graph_slam .
+```
+
+After building the image, you can launch hdl_graph_slam with:
+
+```bash
+sudo docker run -it --net=host rm --entrypoint /ros_entrypoint.sh hdl_graph_slam /ros_entrypoint.sh && roslaunch hdl_graph_slam hdl_graph_slam.launch
+```
+
 ## Related packages
 
 - <a href="https://github.com/koide3/hdl_graph_slam">hdl_graph_slam</a>
@@ -144,6 +176,7 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 - <a href="https://github.com/koide3/hdl_people_tracking">hdl_people_tracking</a>
 
 <img src="imgs/packages.png"/>
+
 
 ## Papers
 Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System for Long-term and Wide-area People Behavior Measurement, IEEE Transactions on Human-Machine Systems (under review) [PDF].
