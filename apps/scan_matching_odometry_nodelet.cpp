@@ -51,7 +51,6 @@ private:
   void initialize_params() {
     auto& pnh = private_nh;
     odom_frame_id = pnh.param<std::string>("odom_frame_id", "odom");
-    base_frame_id = pnh.param<std::string>("base_frame_id", "velodyne");
 
     // The minimum tranlational distance and rotation angle between keyframes.
     // If this value is zero, frames are always compared with the previous frame
@@ -103,7 +102,7 @@ private:
     pcl::fromROSMsg(*cloud_msg, *cloud);
 
     Eigen::Matrix4f pose = matching(cloud_msg->header.stamp, cloud);
-    publish_odometry(cloud_msg->header.stamp, pose);
+    publish_odometry(cloud_msg->header.stamp, cloud_msg->header.frame_id, pose);
 
     // In offline estimation, point clouds until the published time will be supplied
     std_msgs::HeaderPtr read_until(new std_msgs::Header());
@@ -201,7 +200,7 @@ private:
    * @param stamp  timestamp
    * @param pose   odometry pose to be published
    */
-  void publish_odometry(const ros::Time& stamp, const Eigen::Matrix4f& pose) {
+  void publish_odometry(const ros::Time& stamp, const std::string& base_frame_id, const Eigen::Matrix4f& pose) {
     // broadcast the transform over tf
     geometry_msgs::TransformStamped odom_trans = matrix2transform(stamp, pose, odom_frame_id, base_frame_id);
     odom_broadcaster.sendTransform(odom_trans);
@@ -237,7 +236,6 @@ private:
   tf::TransformBroadcaster keyframe_broadcaster;
 
   std::string odom_frame_id;
-  std::string base_frame_id;
   ros::Publisher read_until_pub;
 
   // keyframe parameters
