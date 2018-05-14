@@ -166,7 +166,7 @@ sudo docker build --tag hdl_graph_slam .
 After building the image, you can launch hdl_graph_slam with:
 
 ```bash
-sudo docker run -it --net=host rm --entrypoint /ros_entrypoint.sh hdl_graph_slam /ros_entrypoint.sh && roslaunch hdl_graph_slam hdl_graph_slam.launch
+sudo docker run -it --net=host rm hdl_graph_slam /ros_entrypoint.sh && roslaunch hdl_graph_slam hdl_graph_slam.launch
 ```
 
 ## Related packages
