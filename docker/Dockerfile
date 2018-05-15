@@ -33,4 +33,4 @@ RUN sed -i "6i source \"/root/catkin_ws/devel/setup.bash\"" /ros_entrypoint.sh
 WORKDIR /
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
-CMD ["cmd"]
+CMD ["bash"]
