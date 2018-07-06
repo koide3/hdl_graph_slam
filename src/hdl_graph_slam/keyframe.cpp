@@ -27,6 +27,9 @@ void KeyFrame::dump(const std::string& directory) {
   std::ofstream ofs(directory + "/data");
   ofs << "stamp " << stamp.sec << " " << stamp.nsec << "\n";
 
+  ofs << "estimate\n";
+  ofs << node->estimate().matrix() << "\n";
+
   ofs << "odom\n";
   ofs << odom.matrix() << "\n";
 

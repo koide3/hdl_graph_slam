@@ -5,6 +5,7 @@
 #include <g2o/core/block_solver.h>
 #include <g2o/core/linear_solver.h>
 #include <g2o/core/sparse_optimizer.h>
+#include <g2o/core/robust_kernel_factory.h>
 #include <g2o/core/optimization_algorithm_factory.h>
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
 #include <g2o/types/slam3d/types_slam3d.h>
@@ -13,13 +14,19 @@
 #include <g2o/edge_se3_plane.hpp>
 #include <g2o/edge_se3_priorxy.hpp>
 #include <g2o/edge_se3_priorxyz.hpp>
+#include <g2o/edge_se3_priorvec.hpp>
+#include <g2o/edge_se3_priorquat.hpp>
 
+G2O_USE_OPTIMIZATION_LIBRARY(pcg)
+G2O_USE_OPTIMIZATION_LIBRARY(cholmod)
 G2O_USE_OPTIMIZATION_LIBRARY(csparse)
 
 namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE3_PLANE, EdgeSE3Plane)
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORXY, EdgeSE3PriorXY)
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORXYZ, EdgeSE3PriorXYZ)
+  G2O_REGISTER_TYPE(EDGE_SE3_PRIORVEC, EdgeSE3PriorVec)
+  G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
 }
 
 namespace hdl_graph_slam {
@@ -27,14 +34,13 @@ namespace hdl_graph_slam {
 /**
  * @brief constructor
  */
-GraphSLAM::GraphSLAM() {
+GraphSLAM::GraphSLAM(const std::string& solver_type) {
   graph.reset(new g2o::SparseOptimizer());
 
-  std::string g2o_solver_name = "lm_var";
   std::cout << "construct solver... " << std::endl;
   g2o::OptimizationAlgorithmFactory* solver_factory = g2o::OptimizationAlgorithmFactory::instance();
   g2o::OptimizationAlgorithmProperty solver_property;
-  g2o::OptimizationAlgorithm* solver = solver_factory->construct(g2o_solver_name, solver_property);
+  g2o::OptimizationAlgorithm* solver = solver_factory->construct(solver_type, solver_property);
   graph->setAlgorithm(solver);
 
   if (!graph->solver()) {
@@ -47,8 +53,7 @@ GraphSLAM::GraphSLAM() {
   }
   std::cout << "done" << std::endl;
 
-  floor_plane_node = add_plane_node(Eigen::Vector4d(0.0, 0.0, 1.0, 0.0));
-  floor_plane_node->setFixed(true);
+  robust_kernel_factory = g2o::RobustKernelFactory::instance();
 }
 
 /**
@@ -139,8 +144,46 @@ g2o::EdgeSE3PriorXYZ* GraphSLAM::add_se3_prior_xyz_edge(g2o::VertexSE3* v_se3, c
   return edge;
 }
 
+g2o::EdgeSE3PriorVec* GraphSLAM::add_se3_prior_vec_edge(g2o::VertexSE3* v_se3, const Eigen::Vector3d& direction, const Eigen::Vector3d& measurement, const Eigen::MatrixXd& information_matrix) {
+  Eigen::Matrix<double, 6, 1> m;
+  m.head<3>() = direction;
+  m.tail<3>() = measurement;
 
-void GraphSLAM::optimize() {
+  g2o::EdgeSE3PriorVec* edge(new g2o::EdgeSE3PriorVec());
+  edge->setMeasurement(m);
+  edge->setInformation(information_matrix);
+  edge->vertices()[0] = v_se3;
+  graph->addEdge(edge);
+
+  return edge;
+}
+
+g2o::EdgeSE3PriorQuat* GraphSLAM::add_se3_prior_quat_edge(g2o::VertexSE3* v_se3, const Eigen::Quaterniond& quat, const Eigen::MatrixXd& information_matrix) {
+  g2o::EdgeSE3PriorQuat* edge(new g2o::EdgeSE3PriorQuat());
+  edge->setMeasurement(quat);
+  edge->setInformation(information_matrix);
+  edge->vertices()[0] = v_se3;
+  graph->addEdge(edge);
+
+  return edge;
+}
+
+void GraphSLAM::add_robust_kernel(g2o::OptimizableGraph::Edge* edge, const std::string& kernel_type, double kernel_size) {
+  if(kernel_type == "NONE") {
+    return;
+  }
+
+  g2o::RobustKernel* kernel = robust_kernel_factory->construct(kernel_type);
+  if(kernel == nullptr) {
+    std::cerr << "warning : invalid robust kernel type: " << kernel_type << std::endl;
+    return;
+  }
+
+  kernel->setDelta(kernel_size);
+  edge->setRobustKernel(kernel);
+}
+
+void GraphSLAM::optimize(int num_iterations) {
   if(graph->edges().size() < 10) {
     return;
   }
@@ -151,16 +194,18 @@ void GraphSLAM::optimize() {
   std::cout << "optimizing... " << std::flush;
 
   graph->initializeOptimization();
+  graph->computeInitialGuess();
+  graph->computeActiveErrors();
   graph->setVerbose(false);
 
   double chi2 = graph->chi2();
 
   auto t1 = ros::Time::now();
-  int iterations = graph->optimize(1024);
+  int iterations = graph->optimize(num_iterations);
 
   auto t2 = ros::Time::now();
   std::cout << "done" << std::endl;
-  std::cout << "iterations: " << iterations << std::endl;
+  std::cout << "iterations: " << iterations << " / " << num_iterations << std::endl;
   std::cout << "chi2: (before)" << chi2 << " -> (after)" << graph->chi2() << std::endl;
   std::cout << "time: " << boost::format("%.3f") % (t2 - t1).toSec() << "[sec]" << std::endl;
 }

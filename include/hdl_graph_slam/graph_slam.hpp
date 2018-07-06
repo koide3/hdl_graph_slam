@@ -15,13 +15,16 @@ namespace g2o {
   class EdgeSE3PointXYZ;
   class EdgeSE3PriorXY;
   class EdgeSE3PriorXYZ;
+  class EdgeSE3PriorVec;
+  class EdgeSE3PriorQuat;
+  class RobustKernelFactory;
 }
 
 namespace hdl_graph_slam {
 
 class GraphSLAM {
 public:
-  GraphSLAM();
+  GraphSLAM(const std::string& solver_type = "lm_var");
   ~GraphSLAM();
 
   /**
@@ -86,10 +89,16 @@ public:
 
   g2o::EdgeSE3PriorXYZ* add_se3_prior_xyz_edge(g2o::VertexSE3* v_se3, const Eigen::Vector3d& xyz, const Eigen::MatrixXd& information_matrix);
 
+  g2o::EdgeSE3PriorQuat* add_se3_prior_quat_edge(g2o::VertexSE3* v_se3, const Eigen::Quaterniond& quat, const Eigen::MatrixXd& information_matrix);
+
+  g2o::EdgeSE3PriorVec* add_se3_prior_vec_edge(g2o::VertexSE3* v_se3, const Eigen::Vector3d& direction, const Eigen::Vector3d& measurement, const Eigen::MatrixXd& information_matrix);
+
+  void add_robust_kernel(g2o::OptimizableGraph::Edge* edge, const std::string& kernel_type, double kernel_size);
+
   /**
    * @brief perform graph optimization
    */
-  void optimize();
+  void optimize(int num_iterations);
 
   /**
    * @brief save the pose graph
@@ -98,8 +107,8 @@ public:
   void save(const std::string& filename);
 
 public:
+  g2o::RobustKernelFactory* robust_kernel_factory;
   std::unique_ptr<g2o::SparseOptimizer> graph;  // g2o graph
-  g2o::VertexPlane* floor_plane_node;           // ground floor plane node
 };
 
 }
