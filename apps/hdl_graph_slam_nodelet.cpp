@@ -62,11 +62,8 @@ class HdlGraphSlamNodelet : public nodelet::Nodelet {
 public:
   typedef pcl::PointXYZI PointT;
 
-  HdlGraphSlamNodelet() {
-  }
-  virtual ~HdlGraphSlamNodelet() {
-
-  }
+  HdlGraphSlamNodelet() {}
+  virtual ~HdlGraphSlamNodelet() {}
 
   virtual void onInit() {
     nh = getNodeHandle();
@@ -149,7 +146,7 @@ private:
       if(keyframe_queue.empty()) {
         std_msgs::Header read_until;
         read_until.stamp = stamp + ros::Duration(10, 0);
-        read_until.frame_id = "/rslidar_points";
+        read_until.frame_id = "/velodyne_poits";
         read_until_pub.publish(read_until);
         read_until.frame_id = "/filtered_points";
         read_until_pub.publish(read_until);
@@ -166,8 +163,8 @@ private:
   }
 
   /**
-   * @brief this method adds all the keyframes in #keyframe_queue to the pose graph
-   * @return if true, at least one keyframe is added to the pose graph
+   * @brief this method adds all the keyframes in #keyframe_queue to the pose graph (odometry edges)
+   * @return if true, at least one keyframe was added to the pose graph
    */
   bool flush_keyframe_queue() {
     std::lock_guard<std::mutex> lock(keyframe_queue_mutex);
@@ -185,8 +182,10 @@ private:
       num_processed = i;
 
       const auto& keyframe = keyframe_queue[i];
+      // new_keyframes will be tested later for loop closure
       new_keyframes.push_back(keyframe);
 
+      // add pose node
       Eigen::Isometry3d odom = odom2map * keyframe->odom;
       keyframe->node = graph_slam->add_se3_node(odom);
       keyframe_hash[keyframe->stamp] = keyframe;
@@ -195,7 +194,7 @@ private:
         continue;
       }
 
-      // add edge between keyframes
+      // add edge between consecutive keyframes
       const auto& prev_keyframe = i == 0 ? keyframes.back() : keyframe_queue[i - 1];
 
       Eigen::Isometry3d relative_pose = keyframe->odom.inverse() * prev_keyframe->odom;
@@ -206,7 +205,7 @@ private:
 
     std_msgs::Header read_until;
     read_until.stamp = keyframe_queue[num_processed]->stamp + ros::Duration(10, 0);
-    read_until.frame_id = "/rslidar_points";
+    read_until.frame_id = "/velodyne_points";
     read_until_pub.publish(read_until);
     read_until.frame_id = "/filtered_points";
     read_until_pub.publish(read_until);
@@ -272,6 +271,7 @@ private:
         continue;
       }
 
+      // find the gps data which is closest to the keyframe
       auto closest_gps = gps_cursor;
       for(auto gps = gps_cursor; gps != gps_queue.end(); gps++) {
         auto dt = ((*closest_gps)->header.stamp - keyframe->stamp).toSec();
@@ -283,15 +283,18 @@ private:
         closest_gps = gps;
       }
 
+      // if the time residual between the gps and keyframe is too large, skip it
       gps_cursor = closest_gps;
       if(0.2 < std::abs(((*closest_gps)->header.stamp - keyframe->stamp).toSec())) {
         continue;
       }
 
+      // convert (latitude, longitude, altitude) -> (easting, northing, altitude) in UTM coordinate
       geodesy::UTMPoint utm;
       geodesy::fromMsg((*closest_gps)->position, utm);
       Eigen::Vector3d xyz(utm.easting, utm.northing, utm.altitude);
 
+      // the first gps data position will be the origin of the map
       if(!zero_utm) {
         zero_utm = xyz;
       }
@@ -350,6 +353,7 @@ private:
         continue;
       }
 
+      // find imu data which is closest to the keyframe
       auto closest_imu = imu_cursor;
       for(auto imu = imu_cursor; imu != imu_queue.end(); imu++) {
         auto dt = ((*closest_imu)->header.stamp - keyframe->stamp).toSec();
@@ -482,7 +486,7 @@ private:
   }
 
   /**
-   * @brief generate a map point cloud and publish it
+   * @brief generate map point cloud and publish it
    * @param event
    */
   void map_points_publish_timer_callback(const ros::WallTimerEvent& event) {
@@ -523,7 +527,7 @@ private:
     if(!keyframe_updated) {
       std_msgs::Header read_until;
       read_until.stamp = ros::Time::now() + ros::Duration(30, 0);
-      read_until.frame_id = "/rslidar_points";
+      read_until.frame_id = "/velodyne_points";
       read_until_pub.publish(read_until);
       read_until.frame_id = "/filtered_points";
       read_until_pub.publish(read_until);

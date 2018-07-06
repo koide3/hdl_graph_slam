@@ -92,6 +92,7 @@ private:
       return;
     }
 
+    // if base_link_frame is defined, transform the input cloud to the frame
     if(!base_link_frame.empty()) {
       if(!tf_listener.canTransform(base_link_frame, src_cloud->header.frame_id, ros::Time(0))) {
         std::cerr << "failed to find transform between " << base_link_frame << " and " << src_cloud->header.frame_id << std::endl;
