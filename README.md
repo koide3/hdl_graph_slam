@@ -1,5 +1,5 @@
 # hdl_graph_slam
-***hdl_graph_slam*** is an open source ROS package for real-time 3D slam using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also utilizes floor plane detection to generate an environmental map with a completely flat floor. We have tested this packaged mainly in indoor environments, but it can be applied to outdoor environment mapping as well.
+***hdl_graph_slam*** is an open source ROS package for real-time 6DOF SLAM using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also supports several graph constraints, such as GPS, IMU acceleration (gravity vector), IMU orientation (magnetic sensor), and floor plane (detected in a point cloud). We have tested this package with Velodyne (HDL32e, VLP16) and RoboSense (16 channels) sensors in indoor and outdoor environments. 
 
 <img src="imgs/hdl_graph_slam.png" width="712pix" />
 
@@ -12,32 +12,64 @@
 - *floor_detection_nodelet*
 - *hdl_graph_slam_nodelet*
 
-The input point cloud is first downsampled by *prefiltering_nodelet*, and then passed to the next nodelets. While *scan_matching_odometry_nodelet* estimates the sensor pose by iteratively applying a scan matching between consecutive frames (i.e., odometry estimation), *floor_detection_nodelet* detects floor planes by RANSAC. The estimated odometry and the detected floor planes are sent to *hdl_graph_slam*. To compensate the accumulated error of the scan matching, it performs loop detection and optimizes a pose graph which takes odometry, loops, and floor planes into account.<br>
-
-**[Sep/1/2017]** A GPS-based graph optimization has been implemented. *hdl_graph_slam_nodelet* receives GPS data (i.e., latitude, longitude) from */gps/geopoint* and converts them into the UTM coordinate, and then it adds them into the pose graph. It effectively compensate the scan matching error in outdoor environments.
+The input point cloud is first downsampled by *prefiltering_nodelet*, and then passed to the next nodelets. While *scan_matching_odometry_nodelet* estimates the sensor pose by iteratively applying a scan matching between consecutive frames (i.e., odometry estimation), *floor_detection_nodelet* detects floor planes by RANSAC. The estimated odometry and the detected floor planes are sent to *hdl_graph_slam*. To compensate the accumulated error of the scan matching, it performs loop detection and optimizes a pose graph which takes various constraints into account.<br>
 
 <br>
 <img src="imgs/nodelets.png" width="712pix" />
 
-### Parameters
+## Constraints (Edges)
+
+You can enable/disable each constraint by changing params in the launch file, and you can also change the weight (\*_stddev) and the robust kernel (\*_robust_kernel) of each constraint.
+
+
+- ***Odometry***
+
+- ***Loop closure***
+
+- ***GPS***
+  - */gps/geopoint* (geographic_msgs/GeoPointStamped)
+  - */gps/navsat* (sensor_msgs/NavSatFix)
+  - */gpsimu_driver/nmea_sentence* (nmea_msgs/Sentence)
+
+hdl_graph_slam supports several GPS message types. All the supported types contain (latitude, longitude, and altitude). hdl_graph_slam converts them into [the UTM coordinate](http://wiki.ros.org/geodesy), and adds them into the graph as 3D position constraints. If altitude is set to NaN, the GPS data is treated as a 2D constrait. GeoPoint is the most basic one, which consists of only (lat, lon, alt). Although NavSatFix provides many information, we use only (lat, lon, alt) and ignore all other data. If you're using HDL32e, you can directly connect *hdl_graph_slam* and *velodyne_driver* via */gpsimu_driver/nmea_sentence*.
+
+- ***IMU acceleration (gravity vector)***
+  - */gpsimu_driver/imu_data* (sensor_msgs/Imu)
+
+This constraint rotates each pose node so that the acceleration vector associated with the node will be vertical (as the gravity vector). This is useful to compensate the accumulated tilt rotation error of the scan matching. Since we ignore acceleration by sensor motion, you should not give a big weight for this constraint.
+
+- ***IMU orientation (magnetic sensor)***
+  - */gpsimu_driver/imu_data* (sensor_msgs/Imu)
+
+If your IMU has a reliable magnetic orientation sensor, you can add orientation data to the graph as 3D rotation constraints. Note that, magnetic orientation sensors can be affected by external magnetic disturbances. In such cases, this constraint should be disabled.
+
+- ***Floor plane***
+  - */floor_detection/floor_coeffs* (hdl_graph_slam/FloorCoeffs)
+
+This constraint optimizes the graph so that the floor planes (detected by RANSAC) of the pose nodes will be the same. This is designed to compensate the accumulated rotation error of the scan matching in large flat indoor environments.
+
+
+## Parameters
 All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 
-### Services
-- */hdl_graph_slam/dump*  (std_srvs/Empty)
-  - save all data (point clouds, floor coeffs, odoms, and pose graph) to the current directory.
+## Services
+- */hdl_graph_slam/dump*  (hdl_graph_slam/DumpGraph)
+  - save all data (point clouds, floor coeffs, odoms, and pose graph) to a directory.
 - */hdl_graph_slam/save_map*  (hdl_graph_slam/SaveMap)
-  - save generated map as a PCD file.
+  - save the generated map as a PCD file.
 
 ## Requirements
 ***hdl_graph_slam*** requires the following libraries:
 - OpenMP
 - PCL 1.7
 - g2o
+- suitesparse
 
 Note that ***hdl_graph_slam*** cannot be built with older g2o libraries (such as ros-indigo-libg2o). ~~Install the latest g2o:~~
 The latest g2o causes segfault. Use commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* instead of the latest one:
 
 ```bash
+sudo apt-get install libsuitesparse-dev
 git clone https://github.com/RainerKuemmerle/g2o.git
 cd g2o
 git checkout a48ff8c42136f18fbe215b02bfeca48fa0c67507
@@ -53,7 +85,10 @@ The following ROS packages are required:
 - pcl_ros
 - <a href="https://github.com/koide3/ndt_omp">ndt_omp</a>
 ```bash
+# for indigo
 sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
+# for kinetic
+sudo apt-get install ros-kinetic-geodesy ros-kinetic-pcl_ros ros-kinetic-nmea-msgs
 
 cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
@@ -66,7 +101,7 @@ sudo pip install ProgressBar2
 
 ## Example1 (Indoor)
 
-Example bag files (recorded in a small room): 
+Bag files (recorded in a small room): 
 - [hdl_501.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501.bag.tar.gz) (raw data, 344MB)
 - [hdl_501_filtered.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501_filtered.bag.tar.gz) (downsampled data, 57MB, **Recommended!**)
 
@@ -84,13 +119,13 @@ rviz -d hdl_graph_slam.rviz
 rosbag play --clock hdl_501_filtered.bag
 ```
 
-We also provide bag_player.py which adjusts the playback speed according to the processing speed of your PC. It allows processing data as fast as possible for your PC.
+We also provide bag_player.py which adjusts the playback speed according to the processing speed of your PC. It allows to process data as fast as possible for your PC.
 
 ```bash
 rosrun hdl_graph_slam bag_player.py hdl_501_filtered.bag
 ```
 
-You'll see a generated point cloud like:
+You'll see a point cloud like:
 
 <img src="imgs/top.png" height="256pix" /> <img src="imgs/birds.png" height="256pix" /> 
 
@@ -124,10 +159,10 @@ rosbag play --clock hdl_400.bag
 <img src="imgs/hdl_400_points.png" height="256pix" /> <img src="imgs/hdl_400_graph.png" height="256pix" /> 
 
 
-## Example with GPS feature
+## Example with GPS
 Ford Campus Vision and Lidar Data Set <a href="http://robots.engin.umich.edu/SoftwareData/Ford">[URL]</a>.
 
-The following script converts the Ford Lidar Dataset to a rosbag and plays it. In this example, ***hdl_graph_slam*** utilized the GPS data to correct the pose graph.
+The following script converts the Ford Lidar Dataset to a rosbag and plays it. In this example, ***hdl_graph_slam*** utilizes the GPS data to correct the pose graph.
 
 ```bash
 cd IJRR-Dataset-2
@@ -156,7 +191,7 @@ sudo make install
 
 ### hdl_graph_slam in docker
 
-If you still face the error, try our docker environment. You can build the docker image for *hdl_graph_slam* with: 
+If you still have the error, try our docker environment. You can build the docker image for *hdl_graph_slam* with: 
 
 ```bash
 roscd hdl_graph_slam/docker
