@@ -65,7 +65,22 @@ All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 - g2o
 - suitesparse
 
-Note that ***hdl_graph_slam*** cannot be built with older g2o libraries (such as ros-indigo-libg2o). ~~Install the latest g2o:~~
+The following ROS packages are required:
+- geodesy
+- nmea_msgs
+- pcl_ros
+- <a href="https://github.com/koide3/ndt_omp">ndt_omp</a>
+```bash
+# for indigo
+sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
+# for kinetic
+sudo apt-get install ros-kinetic-geodesy ros-kinetic-pcl_ros ros-kinetic-nmea-msgs ros-kinetic-libg2o
+
+cd catkin_ws/src
+git clone https://github.com/koide3/ndt_omp.git
+```
+
+In case use are using ros indigo, note that ***hdl_graph_slam*** cannot be built with ros-indigo-libg2o. ~~Install the latest g2o:~~
 The latest g2o causes segfault. Use commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* instead of the latest one:
 
 ```bash
@@ -79,20 +94,6 @@ make -j8
 sudo make install
 ```
 
-The following ROS packages are required:
-- geodesy
-- nmea_msgs
-- pcl_ros
-- <a href="https://github.com/koide3/ndt_omp">ndt_omp</a>
-```bash
-# for indigo
-sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
-# for kinetic
-sudo apt-get install ros-kinetic-geodesy ros-kinetic-pcl_ros ros-kinetic-nmea-msgs
-
-cd catkin_ws/src
-git clone https://github.com/koide3/ndt_omp.git
-```
 
 **[optional]** *bag_player.py* script requires ProgressBar2.
 ```bash
@@ -171,6 +172,11 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 ```
 
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
+
+
+## Adapt the package to a new sensor
+
+
 
 ## Common Problems
 

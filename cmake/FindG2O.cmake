@@ -9,6 +9,7 @@ FIND_PATH(G2O_INCLUDE_DIR g2o/core/base_vertex.h
   /opt/local/include
   /sw/local/include
   /sw/include
+  /opt/ros/$ENV{ROS_DISTRO}/include
   NO_DEFAULT_PATH
   )
 
@@ -25,6 +26,7 @@ MACRO(FIND_G2O_LIBRARY MYLIBRARY MYLIBRARYNAME)
     ${G2O_ROOT}/lib
     $ENV{G2O_ROOT}/lib/Debug
     $ENV{G2O_ROOT}/lib
+    /opt/ros/$ENV{ROS_DISTRO}/lib
     NO_DEFAULT_PATH
     )
 
@@ -49,6 +51,7 @@ MACRO(FIND_G2O_LIBRARY MYLIBRARY MYLIBRARYNAME)
     ${G2O_ROOT}/lib
     $ENV{G2O_ROOT}/lib/Release
     $ENV{G2O_ROOT}/lib
+    /opt/ros/$ENV{ROS_DISTRO}/lib
     NO_DEFAULT_PATH
     )
 
