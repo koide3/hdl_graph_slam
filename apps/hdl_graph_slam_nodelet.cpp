@@ -96,6 +96,8 @@ public:
     imu_orientation_edge_stddev = private_nh.param<double>("imu_orientation_edge_stddev", 0.1);
     imu_acceleration_edge_stddev = private_nh.param<double>("imu_acceleration_edge_stddev", 3.0);
 
+    points_topic = private_nh.param<std::string>("points_topic", "/velodyne_poits");
+
     // subscribers
     odom_sub.reset(new message_filters::Subscriber<nav_msgs::Odometry>(mt_nh, "/odom", 256));
     cloud_sub.reset(new message_filters::Subscriber<sensor_msgs::PointCloud2>(mt_nh, "/filtered_points", 32));
@@ -146,7 +148,7 @@ private:
       if(keyframe_queue.empty()) {
         std_msgs::Header read_until;
         read_until.stamp = stamp + ros::Duration(10, 0);
-        read_until.frame_id = "/velodyne_poits";
+        read_until.frame_id = points_topic;
         read_until_pub.publish(read_until);
         read_until.frame_id = "/filtered_points";
         read_until_pub.publish(read_until);
@@ -205,7 +207,7 @@ private:
 
     std_msgs::Header read_until;
     read_until.stamp = keyframe_queue[num_processed]->stamp + ros::Duration(10, 0);
-    read_until.frame_id = "/velodyne_points";
+    read_until.frame_id = points_topic;
     read_until_pub.publish(read_until);
     read_until.frame_id = "/filtered_points";
     read_until_pub.publish(read_until);
@@ -527,7 +529,7 @@ private:
     if(!keyframe_updated) {
       std_msgs::Header read_until;
       read_until.stamp = ros::Time::now() + ros::Duration(30, 0);
-      read_until.frame_id = "/velodyne_points";
+      read_until.frame_id = points_topic;
       read_until_pub.publish(read_until);
       read_until.frame_id = "/filtered_points";
       read_until_pub.publish(read_until);
@@ -888,6 +890,7 @@ private:
   Eigen::Matrix4f trans_odom2map;
   ros::Publisher odom2map_pub;
 
+  std::string points_topic;
   ros::Publisher read_until_pub;
   ros::Publisher map_points_pub;
 

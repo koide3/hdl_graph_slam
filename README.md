@@ -80,7 +80,7 @@ cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
 ```
 
-In case use are using ros indigo, note that ***hdl_graph_slam*** cannot be built with ros-indigo-libg2o. ~~Install the latest g2o:~~
+In case use are using ros indigo, ***hdl_graph_slam*** cannot be built with the ros g2o binaries (ros-indigo-libg2o). ~~Install the latest g2o:~~
 The latest g2o causes segfault. Use commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* instead of the latest one:
 
 ```bash
@@ -93,7 +93,6 @@ cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make -j8
 sudo make install
 ```
-
 
 **[optional]** *bag_player.py* script requires ProgressBar2.
 ```bash
@@ -174,9 +173,16 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
 
 
-## Adapt the package to a new sensor
+## Adapt hdl_graph_slam to your own sensor
 
+1. Define the transformation between your sensors (LIDAR, IMU, GPS) and the base of your system using static_transform_publisher (see line #11, hdl_graph_slam.launch). In case your sensor is placed horizontally, it can be just an identity transformation. All the sensor data will be transformed into the common base frame, and passed to the SLAM algorithm.
 
+2. Remap the point cloud topic of ***prefiltering_nodelet***. Like: 
+  ```bash
+  <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" ...
+    <remap from="/velodyne_points" to="/rslidar_points"/>
+  ...
+  ```
 
 ## Common Problems
 
