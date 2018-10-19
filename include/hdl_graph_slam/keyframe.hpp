@@ -34,6 +34,9 @@ public:
   boost::optional<Eigen::Vector4d> floor_coeffs;  // detected floor's coefficients
   boost::optional<Eigen::Vector3d> utm_coord;     // UTM coord obtained by GPS
 
+  boost::optional<Eigen::Vector3d> acceleration;   //
+  boost::optional<Eigen::Quaterniond> orientation; //
+
   g2o::VertexSE3* node;                           // node instance
 };
 

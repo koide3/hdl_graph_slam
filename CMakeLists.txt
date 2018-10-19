@@ -48,6 +48,7 @@ add_message_files(FILES
 
 add_service_files(FILES
   SaveMap.srv
+  DumpGraph.srv
 )
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -112,6 +113,7 @@ target_link_libraries(hdl_graph_slam_nodelet
   ${G2O_STUFF_LIBRARY}
   ${G2O_SOLVER_PCG}
   ${G2O_SOLVER_CSPARSE}
+  ${G2O_SOLVER_CHOLMOD}
   ${G2O_TYPES_SLAM3D}
   ${G2O_TYPES_SLAM3D_ADDONS}
 )

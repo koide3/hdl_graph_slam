@@ -50,6 +50,7 @@ private:
    */
   void initialize_params() {
     auto& pnh = private_nh;
+    points_topic = pnh.param<std::string>("points_topic", "/velodyne_points");
     odom_frame_id = pnh.param<std::string>("odom_frame_id", "odom");
 
     // The minimum tranlational distance and rotation angle between keyframes.
@@ -106,7 +107,7 @@ private:
 
     // In offline estimation, point clouds until the published time will be supplied
     std_msgs::HeaderPtr read_until(new std_msgs::Header());
-    read_until->frame_id = "/velodyne_points";
+    read_until->frame_id = points_topic;
     read_until->stamp = cloud_msg->header.stamp + ros::Duration(1, 0);
     read_until_pub.publish(read_until);
 
@@ -235,6 +236,7 @@ private:
   tf::TransformBroadcaster odom_broadcaster;
   tf::TransformBroadcaster keyframe_broadcaster;
 
+  std::string points_topic;
   std::string odom_frame_id;
   ros::Publisher read_until_pub;
 
