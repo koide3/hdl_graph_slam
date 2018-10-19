@@ -108,7 +108,7 @@
     <param name="floor_edge_stddev" value="10.0" />
     <!-- scan matching -->
     <!-- robust kernels: NONE, Cauchy, DCS, Fair, GemanMcClure, Huber, PseudoHuber, Saturated, Tukey, Welsch -->
-    <param name="odometry_edge_robust_kernel" value="Huber" />
+    <param name="odometry_edge_robust_kernel" value="NONE" />
     <param name="odometry_edge_robust_kernel_size" value="1.0" />
     <param name="loop_closure_edge_robust_kernel" value="Huber" />
     <param name="loop_closure_edge_robust_kernel_size" value="1.0" />

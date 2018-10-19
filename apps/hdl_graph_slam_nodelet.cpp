@@ -87,10 +87,12 @@ public:
     inf_calclator.reset(new InformationMatrixCalculator(private_nh));
     nmea_parser.reset(new NmeaSentenceParser());
 
+    gps_time_offset = private_nh.param<double>("gps_time_offset", 0.0);
     gps_edge_stddev_xy = private_nh.param<double>("gps_edge_stddev_xy", 10000.0);
     gps_edge_stddev_z = private_nh.param<double>("gps_edge_stddev_z", 10.0);
     floor_edge_stddev = private_nh.param<double>("floor_edge_stddev", 10.0);
 
+    imu_time_offset = private_nh.param<double>("imu_time_offset", 0.0);
     enable_imu_orientation = private_nh.param<bool>("enable_imu_orientation", false);
     enable_imu_acceleration = private_nh.param<bool>("enable_imu_acceleration", false);
     imu_orientation_edge_stddev = private_nh.param<double>("imu_orientation_edge_stddev", 0.1);
@@ -245,8 +247,9 @@ private:
    * @brief received gps data is added to #gps_queue
    * @param gps_msg
    */
-  void gps_callback(const geographic_msgs::GeoPointStampedConstPtr& gps_msg) {
+  void gps_callback(const geographic_msgs::GeoPointStampedPtr& gps_msg) {
     std::lock_guard<std::mutex> lock(gps_queue_mutex);
+    gps_msg->header.stamp += ros::Duration(gps_time_offset);
     gps_queue.push_back(gps_msg);
   }
 
@@ -328,12 +331,13 @@ private:
     return updated;
   }
 
-  void imu_callback(const sensor_msgs::ImuConstPtr& imu_msg) {
+  void imu_callback(const sensor_msgs::ImuPtr& imu_msg) {
     if(!enable_imu_orientation && !enable_imu_acceleration) {
       return;
     }
 
     std::lock_guard<std::mutex> lock(imu_queue_mutex);
+    imu_msg->header.stamp += ros::Duration(imu_time_offset);
     imu_queue.push_back(imu_msg);
   }
 
@@ -905,6 +909,7 @@ private:
   std::deque<KeyFrame::Ptr> keyframe_queue;
 
   // gps queue
+  double gps_time_offset;
   double gps_edge_stddev_xy;
   double gps_edge_stddev_z;
   boost::optional<Eigen::Vector3d> zero_utm;
@@ -912,6 +917,7 @@ private:
   std::deque<geographic_msgs::GeoPointStampedConstPtr> gps_queue;
 
   // imu queue
+  double imu_time_offset;
   bool enable_imu_orientation;
   double imu_orientation_edge_stddev;
   bool enable_imu_acceleration;

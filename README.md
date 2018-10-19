@@ -50,11 +50,11 @@ This constraint optimizes the graph so that the floor planes (detected by RANSAC
 
 
 ## Parameters
-All the parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
+All the configurable parameters are listed in *launch/hdl_graph_slam.launch* as ros params.
 
 ## Services
 - */hdl_graph_slam/dump*  (hdl_graph_slam/DumpGraph)
-  - save all data (point clouds, floor coeffs, odoms, and pose graph) to a directory.
+  - save all the data (point clouds, floor coeffs, odoms, and pose graph) to a directory.
 - */hdl_graph_slam/save_map*  (hdl_graph_slam/SaveMap)
   - save the generated map as a PCD file.
 
@@ -80,7 +80,7 @@ cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
 ```
 
-In case use are using ros indigo, ***hdl_graph_slam*** cannot be built with the ros g2o binaries (ros-indigo-libg2o). ~~Install the latest g2o:~~
+Note that, in case use are using ros indigo, ***hdl_graph_slam*** cannot be built with the ros g2o binaries (ros-indigo-libg2o). ~~Install the latest g2o:~~
 The latest g2o causes segfault. Use commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* instead of the latest one:
 
 ```bash
@@ -101,7 +101,7 @@ sudo pip install ProgressBar2
 
 ## Example1 (Indoor)
 
-Bag files (recorded in a small room): 
+Bag file (recorded in a small room): 
 - [hdl_501.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501.bag.tar.gz) (raw data, 344MB)
 - [hdl_501_filtered.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501_filtered.bag.tar.gz) (downsampled data, 57MB, **Recommended!**)
 
@@ -173,9 +173,9 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
 
 
-## Adapt hdl_graph_slam to your own sensor
+## Use hdl_graph_slam in your sensor
 
-1. Define the transformation between your sensors (LIDAR, IMU, GPS) and the base of your system using static_transform_publisher (see line #11, hdl_graph_slam.launch). In case your sensor is placed horizontally, it can be just an identity transformation. All the sensor data will be transformed into the common base frame, and passed to the SLAM algorithm.
+1. Define the transformation between your sensors (LIDAR, IMU, GPS) and the base of your system using static_transform_publisher (see line #11, hdl_graph_slam.launch). All the sensor data will be transformed into the common base frame, and then passed to the SLAM algorithm.
 
 2. Remap the point cloud topic of ***prefiltering_nodelet***. Like: 
   ```bash
