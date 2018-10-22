@@ -566,16 +566,15 @@ private:
     trans_odom2map = trans.matrix().cast<float>();
     trans_odom2map_mutex.unlock();
 
-    if(map_points_pub.getNumSubscribers()) {
-      std::vector<KeyFrameSnapshot::Ptr> snapshot(keyframes.size());
-      std::transform(keyframes.begin(), keyframes.end(), snapshot.begin(),
-        [=](const KeyFrame::Ptr& k) {
-          return std::make_shared<KeyFrameSnapshot>(k);
-      });
+    std::vector<KeyFrameSnapshot::Ptr> snapshot(keyframes.size());
+    std::transform(keyframes.begin(), keyframes.end(), snapshot.begin(),
+      [=](const KeyFrame::Ptr& k) {
+        return std::make_shared<KeyFrameSnapshot>(k);
+    });
 
-      std::lock_guard<std::mutex> lock(keyframes_snapshot_mutex);
-      keyframes_snapshot.swap(snapshot);
-    }
+    keyframes_snapshot_mutex.lock();
+    keyframes_snapshot.swap(snapshot);
+    keyframes_snapshot_mutex.unlock();
 
     if(odom2map_pub.getNumSubscribers()) {
       geometry_msgs::TransformStamped ts = matrix2transform(keyframe->stamp, trans.matrix().cast<float>(), map_frame_id, odom_frame_id);
@@ -861,6 +860,7 @@ private:
       std::ofstream ofs(req.destination + ".utm");
       ofs << (*zero_utm).transpose() << std::endl;
     }
+
     int ret = pcl::io::savePCDFileBinary(req.destination, *cloud);
     res.success = ret == 0;
 

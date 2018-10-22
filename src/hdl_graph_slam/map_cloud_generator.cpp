@@ -13,6 +13,7 @@ MapCloudGenerator::~MapCloudGenerator() {
 
 pcl::PointCloud<MapCloudGenerator::PointT>::Ptr MapCloudGenerator::generate(const std::vector<KeyFrameSnapshot::Ptr>& keyframes, double resolution) const {
   if(keyframes.empty()) {
+    std::cerr << "warning: keyframes empty!!" << std::endl;
     return nullptr;
   }
 
