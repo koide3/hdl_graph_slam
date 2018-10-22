@@ -173,7 +173,7 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 <img src="imgs/ford1.png" height="200pix"/> <img src="imgs/ford2.png" height="200pix"/> <img src="imgs/ford3.png" height="200pix"/>
 
 
-## Use hdl_graph_slam in your sensor
+## Use hdl_graph_slam in your system
 
 1. Define the transformation between your sensors (LIDAR, IMU, GPS) and the base of your system using static_transform_publisher (see line #11, hdl_graph_slam.launch). All the sensor data will be transformed into the common base frame, and then passed to the SLAM algorithm.
 
