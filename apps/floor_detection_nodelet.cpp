@@ -14,6 +14,7 @@
 
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
+#include <pcl/search/impl/search.hpp>
 #include <pcl/filters/impl/plane_clipper3D.hpp>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/sample_consensus/ransac.h>
