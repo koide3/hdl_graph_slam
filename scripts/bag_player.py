@@ -4,6 +4,7 @@ import yaml
 import time
 import curses
 import StringIO
+import argparse
 
 import rospy
 import rosbag
@@ -15,7 +16,7 @@ from progressbar import ProgressBar
 
 
 class BagPlayer:
-	def __init__(self, bagfile):
+	def __init__(self, bagfile, start, duration):
 		print 'opening...',
 		self.bag = rosbag.Bag(bagfile, 'r')
 		print 'done'
@@ -34,6 +35,10 @@ class BagPlayer:
 			self.publishers[con.topic] = rospy.Publisher(con.topic, msg_class, queue_size=256)
 		self.clock_pub = rospy.Publisher('/clock', Clock, queue_size=256)
 
+		self.init_time = None
+		self.start = start
+		self.duration = duration
+		self.fail_count = 0
 		self.time_subs = {}
 		self.target_times = {}
 		self.latest_stamps = {}
@@ -50,7 +55,9 @@ class BagPlayer:
 	def time_callback(self, header_msg, topic_name):
 		if header_msg.frame_id not in self.target_times:
 			self.target_times[header_msg.frame_id] = {}
-		self.target_times[header_msg.frame_id][topic_name] = header_msg.stamp
+
+		if topic_name not in self.target_times[header_msg.frame_id] or self.target_times[header_msg.frame_id][topic_name] < header_msg.stamp:
+			self.target_times[header_msg.frame_id][topic_name] = header_msg.stamp
 
 	def play_realtime(self, duration):
 		topic, msg, stamp = self.message_generator.next()
@@ -72,8 +79,14 @@ class BagPlayer:
 			clock_msg = Clock()
 			clock_msg.clock = stamp
 
-			self.clock_pub.publish(clock_msg)
-			self.publishers[topic].publish(msg)
+			if self.init_time is None:
+				self.init_time = stamp;
+
+			if self.start and (stamp - self.init_time) < rospy.Duration(float(self.start)):
+				start_stamp = stamp
+			else:
+				self.clock_pub.publish(clock_msg)
+				self.publishers[topic].publish(msg)
 
 			topic, msg, stamp = self.message_generator.next()
 
@@ -128,17 +141,23 @@ class BagPlayer:
 		if topic not in self.target_times:
 			return True
 
+		if self.fail_count > 10:
+			self.fail_count = 0
+			return True
+
 		target_time_map = self.target_times[topic]
 		for sub_name in target_time_map:
 			self.latest_stamps[topic] = msg.header
 			if msg.header.stamp > target_time_map[sub_name]:
+				self.fail_count += 1
 				return False
 
+		self.fail_count = 0
 		return True
 
 	def play(self):
 		print 'play realtime for 3.0[sec]'
-		topic, msg, stamp = self.play_realtime(rospy.Duration(15.0))
+		topic, msg, stamp = self.play_realtime(rospy.Duration(5.0))
 		self.update_time_subs()
 
 		print 'play as fast as possible'
@@ -160,10 +179,15 @@ class BagPlayer:
 				clock_msg = Clock()
 				clock_msg.clock = stamp
 
+				if self.duration:
+					if (stamp - self.init_time) > rospy.Duration(float(self.duration)):
+						break
+
 				self.clock_pub.publish(clock_msg)
 				self.publishers[topic].publish(msg)
 				topic, msg, stamp = self.message_generator.next()
 		except:
+			print sys.exc_info()[0]
 			clock_msg = Clock()
 			clock_msg.clock = stamp + rospy.Duration(30.0)
 			self.clock_pub.publish(clock_msg)
@@ -174,14 +198,18 @@ class BagPlayer:
 
 
 def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('input_bag', help='bag file to be played')
+	parser.add_argument('-s', '--start', help='start sec seconds into the bag')
+	parser.add_argument('-u', '--duration', help='play only sec seconds into the bag')
+	args = parser.parse_args()
+
 	if len(sys.argv) < 2:
 		print 'usage bag_player src_bagname'
 		return
 
 	rospy.init_node('bag_player')
-	for argv in sys.argv[1:]:
-		print argv
-		bp = BagPlayer(argv)
+	bp = BagPlayer(args.input_bag, args.start, args.duration)
 
 if __name__ == '__main__':
 	main()

@@ -79,6 +79,8 @@ public:
     max_keyframes_per_update = private_nh.param<int>("max_keyframes_per_update", 10);
 
     //
+    anchor_node = nullptr;
+    anchor_edge = nullptr;
     floor_plane_node = nullptr;
     graph_slam.reset(new GraphSLAM(private_nh.param<std::string>("g2o_solver_type", "lm_var")));
     keyframe_updater.reset(new KeyframeUpdater(private_nh));
@@ -193,6 +195,15 @@ private:
       Eigen::Isometry3d odom = odom2map * keyframe->odom;
       keyframe->node = graph_slam->add_se3_node(odom);
       keyframe_hash[keyframe->stamp] = keyframe;
+
+      // fix the first node
+      if(keyframes.empty() && new_keyframes.size() == 1) {
+        if(private_nh.param<bool>("fix_first_node", false)) {
+          anchor_node = graph_slam->add_se3_node(Eigen::Isometry3d::Identity());
+          anchor_node->setFixed(true);
+          anchor_edge = graph_slam->add_se3_edge(anchor_node, keyframe->node, Eigen::Isometry3d::Identity(), Eigen::MatrixXd::Identity(6, 6));
+        }
+      }
 
       if(i==0 && keyframes.empty()) {
         continue;
@@ -943,6 +954,8 @@ private:
   int max_keyframes_per_update;
   std::deque<KeyFrame::Ptr> new_keyframes;
 
+  g2o::VertexSE3* anchor_node;
+  g2o::EdgeSE3* anchor_edge;
   g2o::VertexPlane* floor_plane_node;
   std::vector<KeyFrame::Ptr> keyframes;
   std::unordered_map<ros::Time, KeyFrame::Ptr, RosTimeHash> keyframe_hash;
