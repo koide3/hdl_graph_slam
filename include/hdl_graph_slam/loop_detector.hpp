@@ -1,6 +1,7 @@
 #ifndef LOOP_DETECTOR_HPP
 #define LOOP_DETECTOR_HPP
 
+#include <boost/format.hpp>
 #include <hdl_graph_slam/keyframe.hpp>
 #include <hdl_graph_slam/registrations.hpp>
 #include <hdl_graph_slam/graph_slam.hpp>
