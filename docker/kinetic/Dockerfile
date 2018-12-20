@@ -1,6 +1,9 @@
 FROM ros:kinetic
 
-RUN apt-get update && apt-get install -y && apt-get install --no-install-recommends -y wget nano build-essential ros-kinetic-geodesy ros-kinetic-pcl-ros ros-kinetic-nmea-msgs ros-kinetic-rviz ros-kinetic-tf-conversions ros-kinetic-libg2o
+RUN apt-get update && apt-get install --no-install-recommends -y && apt-get install --no-install-recommends -y wget nano build-essential ros-kinetic-geodesy ros-kinetic-pcl-ros ros-kinetic-nmea-msgs ros-kinetic-rviz ros-kinetic-tf-conversions ros-kinetic-libg2o \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
 
 RUN mkdir -p /root/catkin_ws/src
 WORKDIR /root/catkin_ws/src

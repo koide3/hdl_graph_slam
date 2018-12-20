@@ -1,6 +1,8 @@
 FROM ros:melodic
 
-RUN apt-get update && apt-get install -y && apt-get install -y --no-install-recommends wget nano build-essential ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs ros-melodic-rviz ros-melodic-tf-conversions ros-melodic-libg2o
+RUN apt-get update && apt-get install -y --no-install-recommends && apt-get install -y --no-install-recommends wget nano build-essential ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs ros-melodic-rviz ros-melodic-tf-conversions ros-melodic-libg2o \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /root/catkin_ws/src
 WORKDIR /root/catkin_ws/src
