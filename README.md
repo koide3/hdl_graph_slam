@@ -1,4 +1,6 @@
 # hdl_graph_slam
+[![Build Status](https://travis-ci.org/koide3/hdl_graph_slam.svg?branch=master)](https://travis-ci.org/koide3/hdl_graph_slam)
+
 ***hdl_graph_slam*** is an open source ROS package for real-time 6DOF SLAM using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also supports several graph constraints, such as GPS, IMU acceleration (gravity vector), IMU orientation (magnetic sensor), and floor plane (detected in a point cloud). We have tested this package with Velodyne (HDL32e, VLP16) and RoboSense (16 channels) sensors in indoor and outdoor environments. 
 
 <img src="imgs/hdl_graph_slam.png" width="712pix" />
@@ -206,8 +208,10 @@ sudo make install
 If you still have the error, try our docker environment. You can build the docker image for *hdl_graph_slam* with: 
 
 ```bash
-roscd hdl_graph_slam/docker
-sudo docker build --tag hdl_graph_slam .
+roscd hdl_graph_slam
+sudo docker build --tag hdl_graph_slam -f docker/kinetic/Dockerfile .
+# you can also use melodic environment
+# sudo docker build --tag hdl_graph_slam -f docker/melodic/Dockerfile .
 ```
 
 After building the image, you can launch hdl_graph_slam with:

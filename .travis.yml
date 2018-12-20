@@ -3,5 +3,5 @@ language: C++
 services:
   - docker
 script:
-  - docker build ./docker/kinetic
-  - docker build ./docker/melodic
+  - docker build -f docker/kinetic/Dockerfile .
+  - docker build -f docker/melodic/Dockerfile .
