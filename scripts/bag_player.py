@@ -23,7 +23,7 @@ class BagPlayer:
 
 		self.message_generator = self.bag.read_messages()
 
-		info_dict = yaml.load(self.bag._get_yaml_info())
+		info_dict = yaml.safe_load(self.bag._get_yaml_info())
 		self.duration = float(info_dict['duration'])
 		self.endtime = float(info_dict['end'])
 
@@ -80,7 +80,7 @@ class BagPlayer:
 			clock_msg.clock = stamp
 
 			if self.init_time is None:
-				self.init_time = stamp;
+				self.init_time = stamp
 
 			if self.start and (stamp - self.init_time) < rospy.Duration(float(self.start)):
 				start_stamp = stamp
@@ -110,7 +110,7 @@ class BagPlayer:
 				residual = target_time - self.latest_stamps[target].stamp
 
 				color = 1 if residual.to_sec() > 0.0 else 2
-                                self.stdscr.addstr(line, 50, '%.5f' % residual.to_sec(), curses.color_pair(color))
+				self.stdscr.addstr(line, 50, '%.5f' % residual.to_sec(), curses.color_pair(color))
 				line += 1
 
 		if not hasattr(self, 'prev_stamp'):
@@ -123,14 +123,15 @@ class BagPlayer:
 			self.processing_speed = sim_duration / wall_duration
 
 		self.stdscr.addstr(line, 0, 'current_stamp')
-                self.stdscr.addstr(line, 25, '%.6f' % stamp.to_sec())
-                self.stdscr.addstr(line, 50, '(x%.2f)' % self.processing_speed)
+		self.stdscr.addstr(line, 25, '%.6f' % stamp.to_sec())
+		self.stdscr.addstr(line, 50, '(x%.2f)' % self.processing_speed)
 
 		elapsed = (stamp - self.start_stamp).to_sec()
 		self.progress.fd = StringIO.StringIO()
 		try:
 			self.progress.update(elapsed)
 		except:
+			# nothing to do
 			pass
 		self.stdscr.addstr(line + 1, 0, '----------')
 		self.stdscr.addstr(line + 2, 0, self.progress.fd.getvalue())
@@ -209,7 +210,7 @@ def main():
 		return
 
 	rospy.init_node('bag_player')
-	bp = BagPlayer(args.input_bag, args.start, args.duration)
+	BagPlayer(args.input_bag, args.start, args.duration)
 
 if __name__ == '__main__':
 	main()
