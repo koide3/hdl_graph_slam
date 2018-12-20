@@ -5,6 +5,9 @@
 
 <a href="https://drive.google.com/open?id=0B9f5zFkpn4soSG96Tkt4SFFTbms">video</a>
 
+
+[![Build Status](https://travis-ci.org/koide3/hdl_graph_slam.svg?branch=master)](https://travis-ci.org/koide3/hdl_graph_slam) on kinetic & melodic
+
 ## Nodelets
 ***hdl_graph_slam*** consists of four nodelets. 
 - *prefiltering_nodelet*
@@ -75,6 +78,8 @@ The following ROS packages are required:
 sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
 # for kinetic
 sudo apt-get install ros-kinetic-geodesy ros-kinetic-pcl_ros ros-kinetic-nmea-msgs ros-kinetic-libg2o
+# for melodic
+sudo apt-get install ros-melodic-geodesy ros-melodic-pcl_ros ros-melodic-nmea-msgs ros-melodic-libg2o
 
 cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
@@ -206,8 +211,10 @@ sudo make install
 If you still have the error, try our docker environment. You can build the docker image for *hdl_graph_slam* with: 
 
 ```bash
-roscd hdl_graph_slam/docker
-sudo docker build --tag hdl_graph_slam .
+roscd hdl_graph_slam
+sudo docker build --tag hdl_graph_slam -f docker/kinetic/Dockerfile .
+# you can also use melodic environment
+# sudo docker build --tag hdl_graph_slam -f docker/melodic/Dockerfile .
 ```
 
 After building the image, you can launch hdl_graph_slam with:

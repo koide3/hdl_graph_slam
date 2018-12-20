@@ -5,11 +5,11 @@
 #include <g2o/types/slam3d_addons/types_slam3d_addons.h>
 
 namespace g2o {
-  class EdgeSE3PriorVec : public g2o::BaseUnaryEdge<3, Eigen::Matrix<double, 6, 1>, g2o::VertexSE3> {
+class EdgeSE3PriorVec : public g2o::BaseUnaryEdge<3, Eigen::Matrix<double, 6, 1>, g2o::VertexSE3> {
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		EdgeSE3PriorVec()
-      : g2o::BaseUnaryEdge<3, Eigen::Matrix<double, 6, 1>, g2o::VertexSE3>()
+		: g2o::BaseUnaryEdge<3, Eigen::Matrix<double, 6, 1>, g2o::VertexSE3>()
 		{}
 
 		void computeError() override {

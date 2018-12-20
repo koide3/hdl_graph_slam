@@ -1,5 +1,6 @@
 #include <hdl_graph_slam/graph_slam.hpp>
 
+#include <boost/format.hpp>
 #include <g2o/stuff/macros.h>
 #include <g2o/core/factory.h>
 #include <g2o/core/block_solver.h>
@@ -66,7 +67,7 @@ GraphSLAM::~GraphSLAM() {
 
 g2o::VertexSE3* GraphSLAM::add_se3_node(const Eigen::Isometry3d& pose) {
   g2o::VertexSE3* vertex(new g2o::VertexSE3());
-  vertex->setId(graph->vertices().size());
+  vertex->setId(static_cast<int>(graph->vertices().size()));
   vertex->setEstimate(pose);
   graph->addVertex(vertex);
 
@@ -75,7 +76,7 @@ g2o::VertexSE3* GraphSLAM::add_se3_node(const Eigen::Isometry3d& pose) {
 
 g2o::VertexPlane* GraphSLAM::add_plane_node(const Eigen::Vector4d& plane_coeffs) {
   g2o::VertexPlane* vertex(new g2o::VertexPlane());
-  vertex->setId(graph->vertices().size());
+  vertex->setId(static_cast<int>(graph->vertices().size()));
   vertex->setEstimate(plane_coeffs);
   graph->addVertex(vertex);
 
@@ -84,7 +85,7 @@ g2o::VertexPlane* GraphSLAM::add_plane_node(const Eigen::Vector4d& plane_coeffs)
 
 g2o::VertexPointXYZ* GraphSLAM::add_point_xyz_node(const Eigen::Vector3d& xyz) {
   g2o::VertexPointXYZ* vertex(new g2o::VertexPointXYZ());
-  vertex->setId(graph->vertices().size());
+  vertex->setId(static_cast<int>(graph->vertices().size()));
   vertex->setEstimate(xyz);
   graph->addVertex(vertex);
 

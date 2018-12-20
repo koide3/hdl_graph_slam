@@ -1,0 +1,7 @@
+sudo: required
+language: C++
+services:
+  - docker
+script:
+  - docker build -f docker/kinetic/Dockerfile .
+  - docker build -f docker/melodic/Dockerfile .

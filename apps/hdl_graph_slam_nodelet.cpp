@@ -435,6 +435,8 @@ private:
       }
     );
     imu_queue.erase(imu_queue.begin(), remove_loc);
+
+    return true;
   }
 
 
