@@ -6,6 +6,7 @@
 <a href="https://drive.google.com/open?id=0B9f5zFkpn4soSG96Tkt4SFFTbms">video</a>
 
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1175635f00394e789b457b44690ce72c)](https://app.codacy.com/app/koide3/hdl_graph_slam?utm_source=github.com&utm_medium=referral&utm_content=koide3/hdl_graph_slam&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/koide3/hdl_graph_slam.svg?branch=master)](https://travis-ci.org/koide3/hdl_graph_slam) on kinetic & melodic
 
 ## Nodelets
