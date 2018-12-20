@@ -5,11 +5,11 @@
 #include <g2o/types/slam3d_addons/types_slam3d_addons.h>
 
 namespace g2o {
-  class EdgeSE3PriorQuat : public g2o::BaseUnaryEdge<3, Eigen::Quaterniond, g2o::VertexSE3> {
+class EdgeSE3PriorQuat : public g2o::BaseUnaryEdge<3, Eigen::Quaterniond, g2o::VertexSE3> {
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		EdgeSE3PriorQuat()
-      : g2o::BaseUnaryEdge<3, Eigen::Quaterniond, g2o::VertexSE3>()
+		: g2o::BaseUnaryEdge<3, Eigen::Quaterniond, g2o::VertexSE3>()
 		{}
 
 		void computeError() override {
@@ -32,7 +32,7 @@ namespace g2o {
 		virtual bool read(std::istream& is) override {
 			Eigen::Quaterniond q;
 			is >> q.w() >> q.x() >> q.y() >> q.z();
-    		setMeasurement(q);
+			setMeasurement(q);
 			for (int i = 0; i < information().rows(); ++i)
 				for (int j = i; j < information().cols(); ++j) {
 					is >> information()(i, j);
