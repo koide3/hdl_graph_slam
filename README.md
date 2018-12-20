@@ -24,7 +24,9 @@ The input point cloud is first downsampled by *prefiltering_nodelet*, and then p
 You can enable/disable each constraint by changing params in the launch file, and you can also change the weight (\*_stddev) and the robust kernel (\*_robust_kernel) of each constraint.
 
 - ***Odometry***
+
 - ***Loop closure***
+
 - ***GPS***
   - */gps/geopoint* (geographic_msgs/GeoPointStamped)
   - */gps/navsat* (sensor_msgs/NavSatFix)
@@ -224,9 +226,9 @@ roslaunch hdl_graph_slam hdl_graph_slam.launch
 
 ## Related packages
 
-  - [hdl_graph_slam](https://github.com/koide3/hdl_graph_slam)
-  - [hdl_localization](https://github.com/koide3/hdl_localization)
-  - [hdl_people_tracking](https://github.com/koide3/hdl_people_tracking)
+- [hdl_graph_slam](https://github.com/koide3/hdl_graph_slam)
+- [hdl_localization](https://github.com/koide3/hdl_localization)
+- [hdl_people_tracking](https://github.com/koide3/hdl_people_tracking)
 
 <img src="imgs/packages.png"/>
 
@@ -237,4 +239,3 @@ Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System
 Kenji Koide, Active Intelligent Systems Laboratory, Toyohashi University of Technology [\[URL\]](http://www.aisl.cs.tut.ac.jp)
 
 koide@aisl.cs.tut.ac.jp
-
