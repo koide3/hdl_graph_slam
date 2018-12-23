@@ -1,7 +1,16 @@
 sudo: required
-language: C++
+language: generic
+dist: xenial
+
 services:
   - docker
+
+matrix:
+  include:
+    - name: "Xenial kinetic"
+      env: ROS_DISTRO=kinetic
+    - name: "Bionic melodic"
+      env: ROS_DISTRO=melodic
+
 script:
-  - docker build -f docker/kinetic/Dockerfile .
-  - docker build -f docker/melodic/Dockerfile .
+  - docker build -f ./docker/$ROS_DISTRO/Dockerfile .
