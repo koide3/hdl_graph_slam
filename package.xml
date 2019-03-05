@@ -2,11 +2,11 @@
 <package>
   <name>hdl_graph_slam</name>
   <version>0.0.0</version>
-  <description>The hdl_scan_matching_odometry package</description>
+  <description>The hdl_graph_slam package</description>
 
   <maintainer email="koide@aisl.cs.tut.ac.jp">koide</maintainer>
 
-  <license>TODO</license>
+  <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>ndt_omp</build_depend>
