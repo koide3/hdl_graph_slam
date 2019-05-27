@@ -70,7 +70,7 @@ private:
       outlier_removal_filter = sor;
     } else if(outlier_removal_method == "RADIUS") {
       double radius = private_nh.param<double>("radius_radius", 0.8);
-      int min_neighbors = private_nh.param<int>("radus_min_neighbors", 2);
+      int min_neighbors = private_nh.param<int>("radius_min_neighbors", 2);
       std::cout << "outlier_removal: RADIUS " << radius << " - " << min_neighbors << std::endl;
 
       pcl::RadiusOutlierRemoval<PointT>::Ptr rad(new pcl::RadiusOutlierRemoval<PointT>());
