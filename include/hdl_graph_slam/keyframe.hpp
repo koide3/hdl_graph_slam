@@ -8,6 +8,7 @@
 
 namespace g2o {
   class VertexSE3;
+  class SparseOptimizer;
 }
 
 namespace hdl_graph_slam {
@@ -22,9 +23,11 @@ public:
   using Ptr = std::shared_ptr<KeyFrame>;
 
   KeyFrame(const ros::Time& stamp, const Eigen::Isometry3d& odom, double accum_distance, const pcl::PointCloud<PointT>::ConstPtr& cloud);
-  ~KeyFrame();
+  KeyFrame(const std::string& directory, g2o::SparseOptimizer* graph);
+  virtual ~KeyFrame();
 
-  void dump(const std::string& directory);
+  void save(const std::string& directory);
+  bool load(const std::string& directory, g2o::SparseOptimizer* graph);
 
 public:
   ros::Time stamp;                                // timestamp

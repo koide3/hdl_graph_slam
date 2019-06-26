@@ -17,6 +17,7 @@
 #include <g2o/edge_se3_priorxyz.hpp>
 #include <g2o/edge_se3_priorvec.hpp>
 #include <g2o/edge_se3_priorquat.hpp>
+#include <g2o/robust_kernel_io.hpp>
 
 G2O_USE_OPTIMIZATION_LIBRARY(pcg)
 G2O_USE_OPTIMIZATION_LIBRARY(cholmod)
@@ -194,13 +195,14 @@ void GraphSLAM::optimize(int num_iterations) {
   std::cout << "nodes: " << graph->vertices().size() << "   edges: " << graph->edges().size() << std::endl;
   std::cout << "optimizing... " << std::flush;
 
+  std::cout << "init" << std::endl;
   graph->initializeOptimization();
-  graph->computeInitialGuess();
-  graph->computeActiveErrors();
-  graph->setVerbose(false);
+  graph->setVerbose(true);
 
+  std::cout << "chi2" << std::endl;
   double chi2 = graph->chi2();
 
+  std::cout << "optimize!!" << std::endl;
   auto t1 = ros::Time::now();
   int iterations = graph->optimize(num_iterations);
 
@@ -214,6 +216,26 @@ void GraphSLAM::optimize(int num_iterations) {
 void GraphSLAM::save(const std::string& filename) {
   std::ofstream ofs(filename);
   graph->save(ofs);
+
+  g2o::save_robust_kernels(filename + ".kernels", graph.get());
+}
+
+bool GraphSLAM::load(const std::string& filename) {
+    std::cout << "loading pose graph..." << std::endl;
+
+    std::ifstream ifs(filename);
+    if(!graph->load(ifs, true)) {
+        return false;
+    }
+
+    std::cout << "nodes  : " << graph->vertices().size() << std::endl;
+    std::cout << "edges  : " << graph->edges().size() << std::endl;
+
+    if(!g2o::load_robust_kernels(filename + ".kernels", graph.get())) {
+        return false;
+    }
+
+    return true;
 }
 
 }

@@ -101,11 +101,16 @@ public:
   void optimize(int num_iterations);
 
   /**
-   * @brief save the pose graph
+   * @brief save the pose graph to a file
    * @param filename  output filename
    */
   void save(const std::string& filename);
 
+  /**
+   * @brief load the pose graph from file
+   * @param filename  output filename
+   */
+  bool load(const std::string& filename);
 public:
   g2o::RobustKernelFactory* robust_kernel_factory;
   std::unique_ptr<g2o::SparseOptimizer> graph;  // g2o graph
