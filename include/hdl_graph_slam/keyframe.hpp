@@ -8,6 +8,7 @@
 
 namespace g2o {
   class VertexSE3;
+  class HyperGraph;
   class SparseOptimizer;
 }
 
@@ -23,11 +24,11 @@ public:
   using Ptr = std::shared_ptr<KeyFrame>;
 
   KeyFrame(const ros::Time& stamp, const Eigen::Isometry3d& odom, double accum_distance, const pcl::PointCloud<PointT>::ConstPtr& cloud);
-  KeyFrame(const std::string& directory, g2o::SparseOptimizer* graph);
+  KeyFrame(const std::string& directory, g2o::HyperGraph* graph);
   virtual ~KeyFrame();
 
   void save(const std::string& directory);
-  bool load(const std::string& directory, g2o::SparseOptimizer* graph);
+  bool load(const std::string& directory, g2o::HyperGraph* graph);
 
 public:
   ros::Time stamp;                                // timestamp

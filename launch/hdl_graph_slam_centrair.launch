@@ -9,7 +9,7 @@
   <arg name="points_topic" default="/velodyne_points" />
 
   <!-- transformation between lidar and base_link -->
-  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 base_link velodyne 10" />
+  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0.1 0 0.2 base_link velodyne 10" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
@@ -82,7 +82,7 @@
     <param name="keyframe_delta_trans" value="2.0" />
     <param name="keyframe_delta_angle" value="2.0" />
     <!-- loop closure params -->
-    <param name="distance_thresh" value="10.0" />
+    <param name="distance_thresh" value="0.0" />
     <param name="accum_distance_thresh" value="15.0" />
     <param name="min_edge_interval" value="5.0" />
     <param name="fitness_score_max_range" value="2.0" />
@@ -124,8 +124,8 @@
     <param name="max_stddev_q" value="0.2" />
     <!-- update params -->
     <param name="graph_update_interval" value="3.0" />
-    <param name="map_cloud_update_interval" value="10.0" />
-    <param name="map_cloud_resolution" value="0.05" />
+    <param name="map_cloud_update_interval" value="15.0" />
+    <param name="map_cloud_resolution" value="0.2" />
   </node>
 
   <node pkg="hdl_graph_slam" type="map2odom_publisher.py" name="map2odom_publisher" />

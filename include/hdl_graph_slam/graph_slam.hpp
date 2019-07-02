@@ -4,7 +4,7 @@
 #include <memory>
 #include <ros/time.h>
 
-#include <g2o/core/sparse_optimizer.h>
+#include <g2o/core/hyper_graph.h>
 
 namespace g2o {
   class VertexSE3;
@@ -17,6 +17,8 @@ namespace g2o {
   class EdgeSE3PriorXYZ;
   class EdgeSE3PriorVec;
   class EdgeSE3PriorQuat;
+  class EdgePlane;
+  class EdgePlaneParallel;
   class RobustKernelFactory;
 }
 
@@ -93,7 +95,11 @@ public:
 
   g2o::EdgeSE3PriorVec* add_se3_prior_vec_edge(g2o::VertexSE3* v_se3, const Eigen::Vector3d& direction, const Eigen::Vector3d& measurement, const Eigen::MatrixXd& information_matrix);
 
-  void add_robust_kernel(g2o::OptimizableGraph::Edge* edge, const std::string& kernel_type, double kernel_size);
+  g2o::EdgePlane* add_plane_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector4d& measurement, const Eigen::Matrix4d& information);
+
+  g2o::EdgePlaneParallel* add_plane_parallel_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information);
+
+  void add_robust_kernel(g2o::HyperGraph::Edge* edge, const std::string& kernel_type, double kernel_size);
 
   /**
    * @brief perform graph optimization
@@ -113,7 +119,7 @@ public:
   bool load(const std::string& filename);
 public:
   g2o::RobustKernelFactory* robust_kernel_factory;
-  std::unique_ptr<g2o::SparseOptimizer> graph;  // g2o graph
+  std::unique_ptr<g2o::HyperGraph> graph;  // g2o graph
 };
 
 }

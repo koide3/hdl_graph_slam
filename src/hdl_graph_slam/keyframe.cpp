@@ -16,7 +16,7 @@ KeyFrame::KeyFrame(const ros::Time& stamp, const Eigen::Isometry3d& odom, double
     node(nullptr)
 {}
 
-KeyFrame::KeyFrame(const std::string& directory, g2o::SparseOptimizer* graph)
+KeyFrame::KeyFrame(const std::string& directory, g2o::HyperGraph* graph)
     : stamp(),
       odom(Eigen::Isometry3d::Identity()),
       accum_distance(-1),
@@ -69,7 +69,7 @@ void KeyFrame::save(const std::string& directory) {
   pcl::io::savePCDFileBinary(directory + "/cloud.pcd", *cloud);
 }
 
-bool KeyFrame::load(const std::string& directory, g2o::SparseOptimizer* graph) {
+bool KeyFrame::load(const std::string& directory, g2o::HyperGraph* graph) {
     std::ifstream ifs(directory + "/data");
     if(!ifs) {
         return false;
