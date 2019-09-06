@@ -65,6 +65,8 @@ GraphSLAM::~GraphSLAM() {
   graph.reset();
 }
 
+int GraphSLAM::num_vertices() const { return graph->vertices().size(); }
+int GraphSLAM::num_edges() const { return graph->edges().size(); }
 
 g2o::VertexSE3* GraphSLAM::add_se3_node(const Eigen::Isometry3d& pose) {
   g2o::VertexSE3* vertex(new g2o::VertexSE3());
@@ -185,9 +187,9 @@ void GraphSLAM::add_robust_kernel(g2o::OptimizableGraph::Edge* edge, const std::
   edge->setRobustKernel(kernel);
 }
 
-void GraphSLAM::optimize(int num_iterations) {
+int GraphSLAM::optimize(int num_iterations) {
   if(graph->edges().size() < 10) {
-    return;
+    return -1;
   }
 
   std::cout << std::endl;
@@ -203,14 +205,16 @@ void GraphSLAM::optimize(int num_iterations) {
   double chi2 = graph->chi2();
 
   std::cout << "optimize!!" << std::endl;
-  auto t1 = ros::Time::now();
+  auto t1 = ros::WallTime::now();
   int iterations = graph->optimize(num_iterations);
 
-  auto t2 = ros::Time::now();
+  auto t2 = ros::WallTime::now();
   std::cout << "done" << std::endl;
   std::cout << "iterations: " << iterations << " / " << num_iterations << std::endl;
   std::cout << "chi2: (before)" << chi2 << " -> (after)" << graph->chi2() << std::endl;
   std::cout << "time: " << boost::format("%.3f") % (t2 - t1).toSec() << "[sec]" << std::endl;
+
+  return iterations;
 }
 
 void GraphSLAM::save(const std::string& filename) {

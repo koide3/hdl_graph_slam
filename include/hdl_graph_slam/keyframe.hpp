@@ -29,6 +29,9 @@ public:
   void save(const std::string& directory);
   bool load(const std::string& directory, g2o::SparseOptimizer* graph);
 
+  long id() const;
+  Eigen::Isometry3d estimate() const;
+
 public:
   ros::Time stamp;                                // timestamp
   Eigen::Isometry3d odom;                         // odometry (estimated by scan_matching_odometry)

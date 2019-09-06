@@ -151,6 +151,14 @@ bool KeyFrame::load(const std::string& directory, g2o::SparseOptimizer* graph) {
     return true;
 }
 
+long KeyFrame::id() const {
+    return node->id();
+}
+
+Eigen::Isometry3d KeyFrame::estimate() const {
+  return node->estimate();
+}
+
 KeyFrameSnapshot::KeyFrameSnapshot(const Eigen::Isometry3d& pose, const pcl::PointCloud<PointT>::ConstPtr& cloud)
   : pose(pose),
     cloud(cloud)

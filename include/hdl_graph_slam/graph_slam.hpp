@@ -25,7 +25,10 @@ namespace hdl_graph_slam {
 class GraphSLAM {
 public:
   GraphSLAM(const std::string& solver_type = "lm_var");
-  ~GraphSLAM();
+  virtual ~GraphSLAM();
+
+  int num_vertices() const;
+  int num_edges() const;
 
   /**
    * @brief add a SE3 node to the graph
@@ -98,7 +101,7 @@ public:
   /**
    * @brief perform graph optimization
    */
-  void optimize(int num_iterations);
+  int optimize(int num_iterations);
 
   /**
    * @brief save the pose graph to a file

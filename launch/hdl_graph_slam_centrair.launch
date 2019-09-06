@@ -82,7 +82,7 @@
     <param name="keyframe_delta_trans" value="2.0" />
     <param name="keyframe_delta_angle" value="2.0" />
     <!-- loop closure params -->
-    <param name="distance_thresh" value="10.0" />
+    <param name="distance_thresh" value="0.0" />
     <param name="accum_distance_thresh" value="15.0" />
     <param name="min_edge_interval" value="5.0" />
     <param name="fitness_score_max_range" value="2.0" />
