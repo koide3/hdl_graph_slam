@@ -80,7 +80,7 @@ sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
 # for kinetic
 sudo apt-get install ros-kinetic-geodesy ros-kinetic-pcl_ros ros-kinetic-nmea-msgs ros-kinetic-libg2o
 # for melodic
-sudo apt-get install ros-melodic-geodesy ros-melodic-pcl_ros ros-melodic-nmea-msgs ros-melodic-libg2o
+sudo apt-get install ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs ros-melodic-libg2o
 
 cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
