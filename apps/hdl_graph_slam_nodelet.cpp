@@ -829,13 +829,18 @@ private:
       std::stringstream sst;
       sst << boost::format("%s/%06d") % directory % i;
 
-      keyframes[i]->dump(sst.str());
+      keyframes[i]->save(sst.str());
     }
 
     if(zero_utm) {
       std::ofstream zero_utm_ofs(directory + "/zero_utm");
       zero_utm_ofs << *zero_utm << std::endl;
     }
+
+    std::ofstream ofs(directory + "/special_nodes.csv");
+    ofs << "anchor_node " << (anchor_node == nullptr ? -1 : anchor_node->id()) << std::endl;
+    ofs << "anchor_edge " << (anchor_edge == nullptr ? -1 : anchor_edge->id()) << std::endl;
+    ofs << "floor_node " << (floor_plane_node == nullptr ? -1 : floor_plane_node->id()) << std::endl;
 
     res.success = true;
     return true;

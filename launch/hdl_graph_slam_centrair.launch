@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- arguments -->
+  <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
+  <arg name="enable_floor_detection" default="true" />
+  <arg name="enable_gps" default="false" />
+  <arg name="enable_imu_acc" default="false" />
+  <arg name="enable_imu_ori" default="false" />
+  <arg name="points_topic" default="/velodyne_points" />
+
+  <!-- transformation between lidar and base_link -->
+  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0.1 0 0.2 base_link velodyne 10" />
+
+  <!-- in case you use velodyne_driver, comment out the following line -->
+  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
+
+  <!-- prefiltering_nodelet -->
+  <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" args="load hdl_graph_slam/PrefilteringNodelet $(arg nodelet_manager)">
+    <remap from="/velodyne_points" to="$(arg points_topic)" />
+    <!-- in case base_link_frame is blank, mapping will be performed in the lidar frame -->
+    <param name="base_link_frame" value="base_link" />
+    <!-- distance filter -->
+    <param name="use_distance_filter" value="true" />
+    <param name="distance_near_thresh" value="0.1" />
+    <param name="distance_far_thresh" value="100.0" />
+    <!-- NONE, VOXELGRID, or APPROX_VOXELGRID -->
+    <param name="downsample_method" value="VOXELGRID" />
+    <param name="downsample_resolution" value="0.1" />
+    <!-- NONE, RADIUS, or STATISTICAL -->
+    <param name="outlier_removal_method" value="RADIUS" />
+    <param name="statistical_mean_k" value="30" />
+    <param name="statistical_stddev" value="1.2" />
+    <param name="radius_radius" value="0.5" />
+    <param name="radius_min_neighbors" value="2" />
+  </node>
+
+  <!-- scan_matching_odometry_nodelet -->
+  <node pkg="nodelet" type="nodelet" name="scan_matching_odometry_nodelet" args="load hdl_graph_slam/ScanMatchingOdometryNodelet $(arg nodelet_manager)">
+      <param name="points_topic" value="$(arg points_topic)" />
+      <param name="odom_frame_id" value="odom" />
+      <param name="keyframe_delta_trans" value="1.0" />
+      <param name="keyframe_delta_angle" value="1.0" />
+      <param name="keyframe_delta_time" value="1.0" />
+      <param name="transform_thresholding" value="false" />
+      <param name="max_acceptable_trans" value="1.0" />
+      <param name="max_acceptable_angle" value="1.0" />
+      <param name="downsample_method" value="NONE" />
+      <param name="downsample_resolution" value="0.1" />
+      <!-- ICP, GICP, NDT, GICP_OMP, or NDT_OMP(recommended) -->
+      <param name="registration_method" value="NDT_OMP" />
+      <param name="ndt_resolution" value="2.0" />
+      <param name="ndt_num_threads" value="0" />
+      <param name="ndt_nn_search_method" value="DIRECT7" />
+  </node>
+
+  <!-- floor_detection_nodelet -->
+  <node pkg="nodelet" type="nodelet" name="floor_detection_nodelet" args="load hdl_graph_slam/FloorDetectionNodelet $(arg nodelet_manager)" if="$(arg enable_floor_detection)">
+    <param name="points_topic" value="$(arg points_topic)" />
+    <param name="tilt_deg" value="0.0" />
+    <param name="sensor_height" value="2.0" />
+    <param name="height_clip_range" value="1.0" />
+    <param name="floor_pts_thresh" value="128" />
+    <param name="use_normal_filtering" value="true" />
+    <param name="normal_filter_thresh" value="40.0" />
+  </node>
+
+  <!-- hdl_graph_slam_nodelet -->
+  <node pkg="nodelet" type="nodelet" name="hdl_graph_slam_nodelet" args="load hdl_graph_slam/HdlGraphSlamNodelet $(arg nodelet_manager)">
+    <param name="points_topic" value="$(arg points_topic)" />
+    <!-- frame settings -->
+    <param name="map_frame_id" value="map" />
+    <param name="odom_frame_id" value="odom" />
+    <!-- optimization params -->
+    <!-- typical solvers: gn_var, gn_fix6_3, gn_var_cholmod, lm_var, lm_fix6_3, lm_var_cholmod, ... -->
+    <param name="g2o_solver_type" value="gn_var_cholmod" />
+    <param name="g2o_solver_num_iterations" value="128" />
+    <!-- keyframe registration params -->
+    <param name="enable_gps" value="$(arg enable_gps)" />
+    <param name="enable_imu_acceleration" value="$(arg enable_imu_acc)" />
+    <param name="enable_imu_orientation" value="$(arg enable_imu_ori)" />
+    <param name="max_keyframes_per_update" value="10" />
+    <param name="keyframe_delta_trans" value="2.0" />
+    <param name="keyframe_delta_angle" value="2.0" />
+    <!-- loop closure params -->
+    <param name="distance_thresh" value="0.0" />
+    <param name="accum_distance_thresh" value="15.0" />
+    <param name="min_edge_interval" value="5.0" />
+    <param name="fitness_score_max_range" value="2.0" />
+    <param name="fitness_score_thresh" value="0.4" />
+    <!-- scan matching params -->
+    <param name="registration_method" value="NDT_OMP" />
+    <param name="ndt_resolution" value="2.0" />
+    <param name="ndt_num_threads" value="0" />
+    <param name="ndt_nn_search_method" value="DIRECT7" />
+    <!-- edge params -->
+    <!-- GPS -->
+    <param name="gps_edge_robust_kernel" value="NONE" />
+    <param name="gps_edge_robust_kernel_size" value="1.0" />
+    <param name="gps_edge_stddev_xy" value="20.0" />
+    <param name="gps_edge_stddev_z" value="5.0" />
+    <!-- IMU orientation -->
+    <param name="imu_orientation_edge_robust_kernel" value="NONE" />
+    <param name="imu_orientation_edge_stddev" value="1.0" />
+    <!-- IMU acceleration (gravity vector) -->
+    <param name="imu_acceleration_edge_robust_kernel" value="NONE" />
+    <param name="imu_acceleration_edge_stddev" value="1.0" />
+    <!-- ground plane -->
+    <param name="floor_edge_robust_kernel" value="NONE" />
+    <param name="floor_edge_stddev" value="10.0" />
+    <!-- scan matching -->
+    <!-- robust kernels: NONE, Cauchy, DCS, Fair, GemanMcClure, Huber, PseudoHuber, Saturated, Tukey, Welsch -->
+    <param name="fix_first_node" value="true" />
+    <param name="odometry_edge_robust_kernel" value="NONE" />
+    <param name="odometry_edge_robust_kernel_size" value="1.0" />
+    <param name="loop_closure_edge_robust_kernel" value="Huber" />
+    <param name="loop_closure_edge_robust_kernel_size" value="1.0" />
+    <param name="use_const_inf_matrix" value="false" />
+    <param name="const_stddev_x" value="0.5" />
+    <param name="const_stddev_q" value="0.1" />
+    <param name="var_gain_a" value="20.0" />
+    <param name="min_stddev_x" value="0.1" />
+    <param name="max_stddev_x" value="5.0" />
+    <param name="min_stddev_q" value="0.05" />
+    <param name="max_stddev_q" value="0.2" />
+    <!-- update params -->
+    <param name="graph_update_interval" value="3.0" />
+    <param name="map_cloud_update_interval" value="15.0" />
+    <param name="map_cloud_resolution" value="0.2" />
+  </node>
+
+  <node pkg="hdl_graph_slam" type="map2odom_publisher.py" name="map2odom_publisher" />
+</launch>
