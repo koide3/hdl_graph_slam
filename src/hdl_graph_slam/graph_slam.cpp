@@ -31,6 +31,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORVEC, EdgeSE3PriorVec)
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
   G2O_REGISTER_TYPE(EDGE_PLANE_PARALLEL, EdgePlaneParallel)
+  G2O_REGISTER_TYPE(EDGE_PLANE_PAERPENDICULAR, EdgePlanePerpendicular)
 }
 
 namespace hdl_graph_slam {
@@ -188,6 +189,17 @@ g2o::EdgePlane* GraphSLAM::add_plane_edge(g2o::VertexPlane* v_plane1, g2o::Verte
 
 g2o::EdgePlaneParallel* GraphSLAM::add_plane_parallel_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information) {
     g2o::EdgePlaneParallel* edge(new g2o::EdgePlaneParallel());
+    edge->setMeasurement(measurement);
+    edge->setInformation(information);
+    edge->vertices()[0] = v_plane1;
+    edge->vertices()[1] = v_plane2;
+    graph->addEdge(edge);
+
+    return edge;
+}
+
+g2o::EdgePlanePerpendicular* GraphSLAM::add_plane_perpendicular_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information) {
+    g2o::EdgePlanePerpendicular* edge(new g2o::EdgePlanePerpendicular());
     edge->setMeasurement(measurement);
     edge->setInformation(information);
     edge->vertices()[0] = v_plane1;
