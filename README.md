@@ -236,6 +236,7 @@ roslaunch hdl_graph_slam hdl_graph_slam.launch
 Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System for Long-term and Wide-area People Behavior Measurement, Advanced Robotic Systems, 2019 [[link]](https://www.researchgate.net/publication/331283709_A_Portable_3D_LIDAR-based_System_for_Long-term_and_Wide-area_People_Behavior_Measurement).
 
 ## Contact
-Kenji Koide, Active Intelligent Systems Laboratory, Toyohashi University of Technology [\[URL\]](http://www.aisl.cs.tut.ac.jp)
+Kenji Koide, k.koide@aist.go.jp
 
-koide@aisl.cs.tut.ac.jp
+Active Intelligent Systems Laboratory, Toyohashi University of Technology, Japan [\[URL\]](http://www.aisl.cs.tut.ac.jp)  
+Robot Innovation Research Center, National Institute of Advanced Industrial Science and Technology, Japan  [\[URL\]](https://unit.aist.go.jp/rirc/en/team/smart_mobility.html)
