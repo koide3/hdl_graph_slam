@@ -94,8 +94,8 @@ public:
 bool load_robust_kernels(const std::string& filename, g2o::SparseOptimizer* graph) {
     std::ifstream ifs(filename);
     if(!ifs) {
-        std::cerr << "failed to open input stream!!" << std::endl;
-        return false;
+        std::cerr << "warning: failed to open input stream!!" << std::endl;
+        return true;
     }
 
     std::vector<KernelData> kernels;

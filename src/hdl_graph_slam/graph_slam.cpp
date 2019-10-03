@@ -17,6 +17,7 @@
 #include <g2o/edge_se3_priorxyz.hpp>
 #include <g2o/edge_se3_priorvec.hpp>
 #include <g2o/edge_se3_priorquat.hpp>
+#include <g2o/edge_plane_prior.hpp>
 #include <g2o/edge_plane_parallel.hpp>
 #include <g2o/robust_kernel_io.hpp>
 
@@ -30,6 +31,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORXYZ, EdgeSE3PriorXYZ)
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORVEC, EdgeSE3PriorVec)
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
+  G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_NORMAL, EdgePlanePriorNormal)
   G2O_REGISTER_TYPE(EDGE_PLANE_PARALLEL, EdgePlaneParallel)
   G2O_REGISTER_TYPE(EDGE_PLANE_PAERPENDICULAR, EdgePlanePerpendicular)
 }
@@ -127,6 +129,16 @@ g2o::EdgeSE3PointXYZ* GraphSLAM::add_se3_point_xyz_edge(g2o::VertexSE3* v_se3, g
   edge->setInformation(information_matrix);
   edge->vertices()[0] = v_se3;
   edge->vertices()[1] = v_xyz;
+  graph->addEdge(edge);
+
+  return edge;
+}
+
+g2o::EdgePlanePriorNormal* GraphSLAM::add_plane_normal_prior_edge(g2o::VertexPlane* v, const Eigen::Vector3d& normal, const Eigen::MatrixXd& information_matrix) {
+  g2o::EdgePlanePriorNormal* edge(new g2o::EdgePlanePriorNormal());
+  edge->setMeasurement(normal);
+  edge->setInformation(information_matrix);
+  edge->vertices()[0] = v;
   graph->addEdge(edge);
 
   return edge;

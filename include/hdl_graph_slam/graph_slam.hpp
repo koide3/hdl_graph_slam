@@ -20,6 +20,7 @@ namespace g2o {
   class EdgePlane;
   class EdgePlaneParallel;
   class EdgePlanePerpendicular;
+  class EdgePlanePriorNormal;
   class RobustKernelFactory;
 }
 
@@ -91,6 +92,8 @@ public:
    * @param information_matrix
    * @return
    */
+  g2o::EdgePlanePriorNormal* add_plane_normal_prior_edge(g2o::VertexPlane* v, const Eigen::Vector3d& normal, const Eigen::MatrixXd& information_matrix);
+
   g2o::EdgeSE3PriorXY* add_se3_prior_xy_edge(g2o::VertexSE3* v_se3, const Eigen::Vector2d& xy, const Eigen::MatrixXd& information_matrix);
 
   g2o::EdgeSE3PriorXYZ* add_se3_prior_xyz_edge(g2o::VertexSE3* v_se3, const Eigen::Vector3d& xyz, const Eigen::MatrixXd& information_matrix);
