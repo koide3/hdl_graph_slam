@@ -100,7 +100,7 @@ public:
     imu_orientation_edge_stddev = private_nh.param<double>("imu_orientation_edge_stddev", 0.1);
     imu_acceleration_edge_stddev = private_nh.param<double>("imu_acceleration_edge_stddev", 3.0);
 
-    points_topic = private_nh.param<std::string>("points_topic", "/velodyne_poits");
+    points_topic = private_nh.param<std::string>("points_topic", "/velodyne_points");
 
     // subscribers
     odom_sub.reset(new message_filters::Subscriber<nav_msgs::Odometry>(mt_nh, "/odom", 256));
