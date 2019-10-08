@@ -35,10 +35,10 @@ public:
     }
 
     setMeasurement(v);
-    for (int i = 0; i < 3; ++i) {
-      for (int j = i; j < 3; ++j) {
+    for(int i = 0; i < information().rows(); ++i) {
+      for(int j = i; j < information().cols(); ++j) {
         is >> information()(i, j);
-        if (i != j) {
+        if(i != j) {
           information()(j, i) = information()(i, j);
         }
       }
@@ -48,9 +48,15 @@ public:
   }
 
   virtual bool write(std::ostream& os) const override {
-    for (int i = 0; i < 3; ++i) os << _measurement[i] << " ";
-    for (int i = 0; i < 3; ++i)
-      for (int j = i; j < 3; ++j) os << " " << information()(i, j);
+    for(int i = 0; i < 3; ++i) {
+      os << _measurement[i] << " ";
+    }
+
+    for(int i = 0; i < information().rows(); ++i) {
+      for(int j = i; j < information().cols(); ++j) {
+        os << " " << information()(i, j);
+      };
+    }
     return os.good();
   }
 
@@ -59,10 +65,10 @@ public:
   virtual int measurementDimension() const override { return 3; }
 };
 
-class EdgePlanePerpendicular : public BaseBinaryEdge<3, Eigen::Vector3d, VertexPlane, VertexPlane> {
+class EdgePlanePerpendicular : public BaseBinaryEdge<1, Eigen::Vector3d, VertexPlane, VertexPlane> {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  EdgePlanePerpendicular() : BaseBinaryEdge<3, Eigen::Vector3d, VertexPlane, VertexPlane>() {
+  EdgePlanePerpendicular() : BaseBinaryEdge<1, Eigen::Vector3d, VertexPlane, VertexPlane>() {
     _information.setIdentity();
     _error.setZero();
   }
@@ -74,7 +80,7 @@ public:
     Eigen::Vector3d normal1 = v1->estimate().normal().normalized();
     Eigen::Vector3d normal2 = v2->estimate().normal().normalized();
 
-    _error = normal1.array() * normal2.array();
+    _error[0] = normal1.dot(normal2);
   }
   virtual bool read(std::istream& is) override {
     Eigen::Vector3d v;
@@ -83,8 +89,8 @@ public:
     }
 
     setMeasurement(v);
-    for (int i = 0; i < 3; ++i) {
-      for (int j = i; j < 3; ++j) {
+    for(int i = 0; i < information().rows(); ++i) {
+      for(int j = i; j < information().cols(); ++j) {
         is >> information()(i, j);
         if (i != j) {
           information()(j, i) = information()(i, j);
@@ -96,9 +102,15 @@ public:
   }
 
   virtual bool write(std::ostream& os) const override {
-    for (int i = 0; i < 3; ++i) os << _measurement[i] << " ";
-    for (int i = 0; i < 3; ++i)
-      for (int j = i; j < 3; ++j) os << " " << information()(i, j);
+    for (int i = 0; i < 3; ++i) {
+      os << _measurement[i] << " ";
+    }
+
+    for(int i = 0; i < information().rows(); ++i) {
+      for(int j = i; j < information().cols(); ++j) {
+        os << " " << information()(i, j);
+      };
+    }
     return os.good();
   }
 

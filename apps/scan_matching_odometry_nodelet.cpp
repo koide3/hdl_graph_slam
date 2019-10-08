@@ -178,6 +178,7 @@ private:
 
     prev_trans = trans;
 
+
     auto keyframe_trans = matrix2transform(stamp, keyframe_pose, odom_frame_id, "keyframe");
     keyframe_broadcaster.sendTransform(keyframe_trans);
 

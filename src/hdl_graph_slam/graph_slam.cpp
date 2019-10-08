@@ -32,6 +32,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORVEC, EdgeSE3PriorVec)
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
   G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_NORMAL, EdgePlanePriorNormal)
+  G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_DISTANCE, EdgePlanePriorDistance)
   G2O_REGISTER_TYPE(EDGE_PLANE_PARALLEL, EdgePlaneParallel)
   G2O_REGISTER_TYPE(EDGE_PLANE_PAERPENDICULAR, EdgePlanePerpendicular)
 }
@@ -144,6 +145,16 @@ g2o::EdgePlanePriorNormal* GraphSLAM::add_plane_normal_prior_edge(g2o::VertexPla
   return edge;
 }
 
+g2o::EdgePlanePriorDistance* GraphSLAM::add_plane_distance_prior_edge(g2o::VertexPlane* v, double distance, const Eigen::MatrixXd& information_matrix) {
+  g2o::EdgePlanePriorDistance* edge(new g2o::EdgePlanePriorDistance());
+  edge->setMeasurement(distance);
+  edge->setInformation(information_matrix);
+  edge->vertices()[0] = v;
+  graph->addEdge(edge);
+
+  return edge;
+}
+
 g2o::EdgeSE3PriorXY* GraphSLAM::add_se3_prior_xy_edge(g2o::VertexSE3* v_se3, const Eigen::Vector2d& xy, const Eigen::MatrixXd& information_matrix) {
   g2o::EdgeSE3PriorXY* edge(new g2o::EdgeSE3PriorXY());
   edge->setMeasurement(xy);
@@ -210,7 +221,7 @@ g2o::EdgePlaneParallel* GraphSLAM::add_plane_parallel_edge(g2o::VertexPlane* v_p
     return edge;
 }
 
-g2o::EdgePlanePerpendicular* GraphSLAM::add_plane_perpendicular_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information) {
+g2o::EdgePlanePerpendicular* GraphSLAM::add_plane_perpendicular_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::MatrixXd& information) {
     g2o::EdgePlanePerpendicular* edge(new g2o::EdgePlanePerpendicular());
     edge->setMeasurement(measurement);
     edge->setInformation(information);

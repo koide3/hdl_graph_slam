@@ -69,6 +69,7 @@ catkin_package(
 ###########
 include_directories(include)
 include_directories(
+  ${PCL_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 

@@ -199,11 +199,12 @@ class BagPlayer:
 
 
 def main():
+	myargv = rospy.myargv(sys.argv)
 	parser = argparse.ArgumentParser()
 	parser.add_argument('input_bag', help='bag file to be played')
 	parser.add_argument('-s', '--start', help='start sec seconds into the bag')
 	parser.add_argument('-u', '--duration', help='play only sec seconds into the bag')
-	args = parser.parse_args()
+	args = parser.parse_args(myargv[1:])
 
 	if len(sys.argv) < 2:
 		print 'usage bag_player src_bagname'

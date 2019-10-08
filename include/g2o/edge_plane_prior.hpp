@@ -45,6 +45,37 @@ public:
     return os.good();
   }
 };
+
+class EdgePlanePriorDistance : public g2o::BaseUnaryEdge<1, double, g2o::VertexPlane> {
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EdgePlanePriorDistance() : g2o::BaseUnaryEdge<1, double, g2o::VertexPlane>() {}
+
+  void computeError() override {
+    const g2o::VertexPlane* v1 = static_cast<const g2o::VertexPlane*>(_vertices[0]);
+    _error[0] = _measurement - v1->estimate().distance();
+  }
+
+  void setMeasurement(const double& m) override {
+    _measurement = m;
+  }
+
+  virtual bool read(std::istream& is) override {
+    is >> _measurement;
+    for(int i = 0; i < information().rows(); ++i)
+      for(int j = i; j < information().cols(); ++j) {
+        is >> information()(i, j);
+        if(i != j) information()(j, i) = information()(i, j);
+      }
+    return true;
+  }
+  virtual bool write(std::ostream& os) const override {
+    os << _measurement;
+    for(int i = 0; i < information().rows(); ++i)
+      for(int j = i; j < information().cols(); ++j) os << " " << information()(i, j);
+    return os.good();
+  }
+};
 }  // namespace g2o
 
 #endif  // EDGE_SE3_PRIORXY_HPP
