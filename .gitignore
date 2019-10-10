@@ -1,3 +1,4 @@
+imgui.ini
 rviz/*
 launch/*
-imgui.ini
+!launch/hdl_graph_slam.launch
