@@ -7,6 +7,7 @@
 #include <g2o/core/linear_solver.h>
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/robust_kernel_factory.h>
+#include <g2o/core/optimization_algorithm.h>
 #include <g2o/core/optimization_algorithm_factory.h>
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
 #include <g2o/types/slam3d/types_slam3d.h>
@@ -46,7 +47,7 @@ GraphSLAM::GraphSLAM(const std::string& solver_type) {
   graph.reset(new g2o::SparseOptimizer());
   g2o::SparseOptimizer* graph = dynamic_cast<g2o::SparseOptimizer*>(this->graph.get());
 
-  std::cout << "construct solver... " << std::endl;
+  std::cout << "construct solver: " << solver_type << std::endl;
   g2o::OptimizationAlgorithmFactory* solver_factory = g2o::OptimizationAlgorithmFactory::instance();
   g2o::OptimizationAlgorithmProperty solver_property;
   g2o::OptimizationAlgorithm* solver = solver_factory->construct(solver_type, solver_property);
@@ -70,6 +71,26 @@ GraphSLAM::GraphSLAM(const std::string& solver_type) {
  */
 GraphSLAM::~GraphSLAM() {
   graph.reset();
+}
+
+void GraphSLAM::set_solver(const std::string& solver_type) {
+  g2o::SparseOptimizer* graph = dynamic_cast<g2o::SparseOptimizer*>(this->graph.get());
+
+  std::cout << "construct solver: " << solver_type << std::endl;
+  g2o::OptimizationAlgorithmFactory* solver_factory = g2o::OptimizationAlgorithmFactory::instance();
+  g2o::OptimizationAlgorithmProperty solver_property;
+  g2o::OptimizationAlgorithm* solver = solver_factory->construct(solver_type, solver_property);
+  graph->setAlgorithm(solver);
+
+  if(!graph->solver()) {
+    std::cerr << std::endl;
+    std::cerr << "error : failed to allocate solver!!" << std::endl;
+    solver_factory->listSolvers(std::cerr);
+    std::cerr << "-------------" << std::endl;
+    std::cin.ignore(1);
+    return;
+  }
+  std::cout << "done" << std::endl;
 }
 
 int GraphSLAM::num_vertices() const { return graph->vertices().size(); }
