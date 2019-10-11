@@ -17,7 +17,7 @@ class EdgeSE3PriorQuat : public g2o::BaseUnaryEdge<3, Eigen::Quaterniond, g2o::V
 
 			Eigen::Quaterniond estimate = Eigen::Quaterniond(v1->estimate().linear());
 
-			if(Eigen::Quaterniond(v1->estimate().linear()).coeffs().dot(estimate.coeffs()) < 0.0) {
+			if(_measurement.coeffs().dot(estimate.coeffs()) < 0.0) {
 				estimate.coeffs() = -estimate.coeffs();
 			}
 			_error = estimate.vec() - _measurement.vec();
