@@ -35,6 +35,8 @@ public:
   int num_vertices() const;
   int num_edges() const;
 
+  void set_solver(const std::string& solver_type);
+
   /**
    * @brief add a SE3 node to the graph
    * @param pose

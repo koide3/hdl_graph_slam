@@ -26,7 +26,7 @@ public:
     max_stddev_x = params.template param<double>("max_stddev_x", 5.0);
     min_stddev_q = params.template param<double>("min_stddev_q", 0.05);
     max_stddev_q = params.template param<double>("max_stddev_q", 0.2);
-    fitness_score_thresh = params.template param<double>("fitness_score_thresh", 0.5);
+    fitness_score_thresh = params.template param<double>("fitness_score_thresh", 2.5);
   }
 
   static double calc_fitness_score(const pcl::PointCloud<PointT>::ConstPtr& cloud1, const pcl::PointCloud<PointT>::ConstPtr& cloud2, const Eigen::Isometry3d& relpose, double max_range = std::numeric_limits<double>::max());

@@ -19,15 +19,28 @@ boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_regi
   if(registration_method == "ICP") {
     std::cout << "registration: ICP" << std::endl;
     boost::shared_ptr<pcl::IterativeClosestPoint<PointT, PointT>> icp(new pcl::IterativeClosestPoint<PointT, PointT>());
+    icp->setTransformationEpsilon(pnh.param<double>("transformation_epsilon", 0.01));
+    icp->setMaximumIterations(pnh.param<int>("maximum_iterations", 64));
+    icp->setUseReciprocalCorrespondences(pnh.param<bool>("use_reciprocal_correspondences", false));
     return icp;
   } else if(registration_method.find("GICP") != std::string::npos) {
     if(registration_method.find("OMP") == std::string::npos) {
       std::cout << "registration: GICP" << std::endl;
       boost::shared_ptr<pcl::GeneralizedIterativeClosestPoint<PointT, PointT>> gicp(new pcl::GeneralizedIterativeClosestPoint<PointT, PointT>());
+      gicp->setTransformationEpsilon(pnh.param<double>("transformation_epsilon", 0.01));
+      gicp->setMaximumIterations(pnh.param<int>("maximum_iterations", 64));
+      gicp->setUseReciprocalCorrespondences(pnh.param<bool>("use_reciprocal_correspondences", false));
+      gicp->setCorrespondenceRandomness(pnh.param<int>("gicp_correspondence_randomness", 20));
+      gicp->setMaximumOptimizerIterations(pnh.param<int>("gicp_max_optimizer_iterations", 20));
       return gicp;
     } else {
       std::cout << "registration: GICP_OMP" << std::endl;
       boost::shared_ptr<pclomp::GeneralizedIterativeClosestPoint<PointT, PointT>> gicp(new pclomp::GeneralizedIterativeClosestPoint<PointT, PointT>());
+      gicp->setTransformationEpsilon(pnh.param<double>("transformation_epsilon", 0.01));
+      gicp->setMaximumIterations(pnh.param<int>("maximum_iterations", 64));
+      gicp->setUseReciprocalCorrespondences(pnh.param<bool>("use_reciprocal_correspondences", false));
+      gicp->setCorrespondenceRandomness(pnh.param<int>("gicp_correspondence_randomness", 20));
+      gicp->setMaximumOptimizerIterations(pnh.param<int>("gicp_max_optimizer_iterations", 20));
       return gicp;
     }
   } else {
@@ -40,7 +53,8 @@ boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_regi
     if(registration_method.find("OMP") == std::string::npos) {
       std::cout << "registration: NDT " << ndt_resolution << std::endl;
       boost::shared_ptr<pcl::NormalDistributionsTransform<PointT, PointT>> ndt(new pcl::NormalDistributionsTransform<PointT, PointT>());
-      ndt->setTransformationEpsilon(0.01);
+      ndt->setTransformationEpsilon(pnh.param<double>("transformation_epsilon", 0.01));
+      ndt->setMaximumIterations(pnh.param<int>("maximum_iterations", 64));
       ndt->setResolution(ndt_resolution);
       return ndt;
     } else {
@@ -51,8 +65,8 @@ boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_regi
       if(num_threads > 0) {
         ndt->setNumThreads(num_threads);
       }
-      ndt->setTransformationEpsilon(0.01);
-      ndt->setMaximumIterations(64);
+      ndt->setTransformationEpsilon(pnh.param<double>("transformation_epsilon", 0.01));
+      ndt->setMaximumIterations(pnh.param<int>("maximum_iterations", 64));
       ndt->setResolution(ndt_resolution);
       if(nn_search_method == "KDTREE") {
         ndt->setNeighborhoodSearchMethod(pclomp::KDTREE);
