@@ -63,18 +63,18 @@ public:
     return os.good();
   }
 
-  virtual void setMeasurement(const Vector4& m) override {
+  virtual void setMeasurement(const Eigen::Vector4d& m) override {
     _measurement = m;
   }
 
   virtual bool setMeasurementData(const number_t* d) override {
-    Eigen::Map<const Vector4> m(d);
+    Eigen::Map<const Eigen::Vector4d> m(d);
     _measurement = m;
     return true;
   }
 
   virtual bool getMeasurementData(number_t* d) const override {
-    Eigen::Map<Vector4> m(d);
+    Eigen::Map<Eigen::Vector4d> m(d);
     m = _measurement;
     return true;
   }
