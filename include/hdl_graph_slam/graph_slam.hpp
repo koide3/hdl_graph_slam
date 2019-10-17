@@ -18,6 +18,7 @@ namespace g2o {
   class EdgeSE3PriorVec;
   class EdgeSE3PriorQuat;
   class EdgePlane;
+  class EdgePlaneIdentity;
   class EdgePlaneParallel;
   class EdgePlanePerpendicular;
   class EdgePlanePriorNormal;
@@ -108,6 +109,8 @@ public:
   g2o::EdgeSE3PriorVec* add_se3_prior_vec_edge(g2o::VertexSE3* v_se3, const Eigen::Vector3d& direction, const Eigen::Vector3d& measurement, const Eigen::MatrixXd& information_matrix);
 
   g2o::EdgePlane* add_plane_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector4d& measurement, const Eigen::Matrix4d& information);
+
+  g2o::EdgePlaneIdentity* add_plane_identity_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector4d& measurement, const Eigen::Matrix4d& information);
 
   g2o::EdgePlaneParallel* add_plane_parallel_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information);
 

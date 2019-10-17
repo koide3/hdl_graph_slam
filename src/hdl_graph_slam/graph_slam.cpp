@@ -19,6 +19,7 @@
 #include <g2o/edge_se3_priorvec.hpp>
 #include <g2o/edge_se3_priorquat.hpp>
 #include <g2o/edge_plane_prior.hpp>
+#include <g2o/edge_plane_identity.hpp>
 #include <g2o/edge_plane_parallel.hpp>
 #include <g2o/robust_kernel_io.hpp>
 
@@ -34,6 +35,7 @@ namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
   G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_NORMAL, EdgePlanePriorNormal)
   G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_DISTANCE, EdgePlanePriorDistance)
+  G2O_REGISTER_TYPE(EDGE_PLANE_IDENTITY, EdgePlaneIdentity)
   G2O_REGISTER_TYPE(EDGE_PLANE_PARALLEL, EdgePlaneParallel)
   G2O_REGISTER_TYPE(EDGE_PLANE_PAERPENDICULAR, EdgePlanePerpendicular)
 }
@@ -231,6 +233,17 @@ g2o::EdgePlane* GraphSLAM::add_plane_edge(g2o::VertexPlane* v_plane1, g2o::Verte
     return edge;
 }
 
+g2o::EdgePlaneIdentity* GraphSLAM::add_plane_identity_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector4d& measurement, const Eigen::Matrix4d& information) {
+  g2o::EdgePlaneIdentity* edge(new g2o::EdgePlaneIdentity());
+  edge->setMeasurement(measurement);
+  edge->setInformation(information);
+  edge->vertices()[0] = v_plane1;
+  edge->vertices()[1] = v_plane2;
+  graph->addEdge(edge);
+
+  return edge;
+}
+
 g2o::EdgePlaneParallel* GraphSLAM::add_plane_parallel_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information) {
     g2o::EdgePlaneParallel* edge(new g2o::EdgePlaneParallel());
     edge->setMeasurement(measurement);
@@ -252,7 +265,6 @@ g2o::EdgePlanePerpendicular* GraphSLAM::add_plane_perpendicular_edge(g2o::Vertex
 
     return edge;
 }
-
 
 void GraphSLAM::add_robust_kernel(g2o::HyperGraph::Edge* edge, const std::string& kernel_type, double kernel_size) {
   if(kernel_type == "NONE") {

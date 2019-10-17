@@ -7,6 +7,8 @@
 
 namespace g2o {
 
+std::string kernel_type(g2o::RobustKernel* kernel);
+
 bool save_robust_kernels(const std::string& filename, g2o::SparseOptimizer* graph);
 
 bool load_robust_kernels(const std::string& filename, g2o::SparseOptimizer* graph);
