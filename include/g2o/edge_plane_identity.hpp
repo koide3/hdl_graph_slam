@@ -67,40 +67,8 @@ public:
     _measurement = m;
   }
 
-  virtual bool setMeasurementData(const number_t* d) override {
-    Eigen::Map<const Eigen::Vector4d> m(d);
-    _measurement = m;
-    return true;
-  }
-
-  virtual bool getMeasurementData(number_t* d) const override {
-    Eigen::Map<Eigen::Vector4d> m(d);
-    m = _measurement;
-    return true;
-  }
-
   virtual int measurementDimension() const override {
     return 4;
-  }
-
-  virtual bool setMeasurementFromState() override {
-    const VertexPlane* v1 = static_cast<const VertexPlane*>(_vertices[0]);
-    const VertexPlane* v2 = static_cast<const VertexPlane*>(_vertices[1]);
-
-    Eigen::Vector4d p1 = v1->estimate().toVector();
-    Eigen::Vector4d p2 = v2->estimate().toVector();
-
-    if(p1.dot(p2) < 0.0) {
-      p2 = -p2;
-    }
-
-    _measurement = p2 - p1;
-
-    return true;
-  }
-
-  virtual number_t initialEstimatePossible(const OptimizableGraph::VertexSet&, OptimizableGraph::Vertex*) override {
-    return 0;
   }
 };
 
