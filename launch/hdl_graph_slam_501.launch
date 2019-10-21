@@ -40,7 +40,7 @@
     <param name="odom_frame_id" value="odom" />
     <param name="keyframe_delta_trans" value="0.25" />
     <param name="keyframe_delta_angle" value="1.0" />
-    <param name="keyframe_delta_time" value="10.0" />
+    <param name="keyframe_delta_time" value="10000.0" />
     <param name="transform_thresholding" value="false" />
     <param name="max_acceptable_trans" value="1.0" />
     <param name="max_acceptable_angle" value="1.0" />
