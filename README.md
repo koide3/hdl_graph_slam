@@ -195,7 +195,7 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 The mapping result deeply depends on the parameter setting. In particular, scan matching parameters have a big impact on the result. Tune the parameters accoding to the following instruction:
 
 - ***registration_method***  
-  This parameter allows to change the registration method to be used for odometry estimation and loop detection. If you use a LIDAR with many scan lines (32, 64, or more lines), NDT_OMP could be a good choice. It is fast and accurate for dense point clouds. If you use a 16-line LIDAR, NDT-based methods may not work well because it is not very robust to sparse point clouds. In that case, choose GICP or GICP_OMP. GICP variants are slightly slower than NDT, but more accurate and robust to sparse point clouds. **In short, use GICP for 16-line LIDARS and NDT_OMP for other ones**.  
+   **In short, use GICP for 16-line LIDARS and NDT_OMP for other ones**.  This parameter allows to change the registration method to be used for odometry estimation and loop detection. If you use a LIDAR with many scan lines (32, 64, or more lines), NDT_OMP could be a good choice. It is fast and accurate for dense point clouds. If you use a 16-line LIDAR, NDT-based methods may not work well because it is not very robust to sparse point clouds. In that case, choose GICP or GICP_OMP. GICP variants are slightly slower than NDT, but more accurate and robust to sparse point clouds.
   Note that GICP in PCL1.7 (ROS kinetic) or earlier has a bug in the initial guess handling. **If you are on ROS kinectic or earlier, do not use GICP**.
   
 - ***ndt_resolution***  
