@@ -226,6 +226,7 @@ roslaunch hdl_graph_slam hdl_graph_slam.launch
 
 ## Related packages
 
+- [interactive_slam](https://github.com/koide3/interactive_slam)
 - [hdl_graph_slam](https://github.com/koide3/hdl_graph_slam)
 - [hdl_localization](https://github.com/koide3/hdl_localization)
 - [hdl_people_tracking](https://github.com/koide3/hdl_people_tracking)
