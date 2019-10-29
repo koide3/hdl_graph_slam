@@ -190,6 +190,20 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 
 ## Common Problems
 
+### The mapping result is poor (Parameter tuning guide)
+
+The mapping result deeply depends on the parameter setting. In particular, scan matching parameters have a big impact on the result. Tune the parameters accoding to the following instruction:
+
+- registration_method  
+  This parameter allows to change the registration method to be used for odometry estimation and loop detection. If you use a LIDAR with many scan lines (32, 64, or more lines), NDT_OMP could be a good choice. It is fast and accurate for dense point clouds. If you use a 16-line LIDAR, NDT-based methods may not work well because it is not very robust to sparse point clouds. In that case, choose GICP or GICP_OMP. GICP variants are slightly slower than NDT, but more accurate and robust to sparse point clouds. **In short, use GICP for 16-line LIDARS and NDT_OMP for other ones**.  
+  Note that GICP in PCL1.7 (ROS kinetic) or earlier has a bug in the initial guess handling. **If you are on ROS kinectic or earlier, do not use GICP**.
+  
+- ndt_resolution
+  This parameter decides the voxel size of NDT. Typically larger values are good for outdoor environements (0.5 - 2.0 [m] for indoor, 2.0 - 10.0 [m] for outdoor). If you chose NDT or NDT_OMP, tweak this parameter so you can obtain a good odometry estimation result.
+  
+- other parameters
+  All the configurable parameters are available in the launch file. Copy a template launch file (hdl_graph_slam_501.launch for indoor, hdl_graph_slam_400.launch for outdoor) and tweak parameters in the launch file to adapt it to your application.
+
 ### hdl_graph_slam_nodelet causes memory error
 
 It has been reported that *hdl_graph_slam_nodelet* causes a memory error in some environments. I found that this is caused by a variable (*color*) in g2o::VertexPlane. Since this field is used for only visualization, we can remove it from vertex_plane.h and vertex_plane.cpp in g2o. I made a clone repository of g2o, in which I just removed it
