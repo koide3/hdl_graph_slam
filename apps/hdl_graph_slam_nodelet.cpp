@@ -213,7 +213,7 @@ private:
       const auto& prev_keyframe = i == 0 ? keyframes.back() : keyframe_queue[i - 1];
 
       Eigen::Isometry3d relative_pose = keyframe->odom.inverse() * prev_keyframe->odom;
-      Eigen::MatrixXd information = inf_calclator->calc_information_matrix(prev_keyframe->cloud, keyframe->cloud, relative_pose);
+      Eigen::MatrixXd information = inf_calclator->calc_information_matrix(keyframe->cloud, prev_keyframe->cloud, relative_pose);
       auto edge = graph_slam->add_se3_edge(keyframe->node, prev_keyframe->node, relative_pose, information);
       graph_slam->add_robust_kernel(edge, private_nh.param<std::string>("odometry_edge_robust_kernel", "NONE"), private_nh.param<double>("odometry_edge_robust_kernel_size", 1.0));
     }
