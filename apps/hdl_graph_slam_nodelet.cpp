@@ -607,7 +607,7 @@ private:
    */
   visualization_msgs::MarkerArray create_marker_array(const ros::Time& stamp) const {
     visualization_msgs::MarkerArray markers;
-    markers.markers.resize(5);
+    markers.markers.resize(4);
 
     // node markers
     visualization_msgs::Marker& traj_marker = markers.markers[0];
@@ -620,10 +620,10 @@ private:
     traj_marker.pose.orientation.w = 1.0;
     traj_marker.scale.x = traj_marker.scale.y = traj_marker.scale.z = 0.5;
 
-    visualization_msgs::Marker& imu_marker = markers.markers[4];
+    visualization_msgs::Marker& imu_marker = markers.markers[1];
     imu_marker.header = traj_marker.header;
     imu_marker.ns = "imu";
-    imu_marker.id = 4;
+    imu_marker.id = 1;
     imu_marker.type = visualization_msgs::Marker::SPHERE_LIST;
 
     imu_marker.pose.orientation.w = 1.0;
@@ -662,11 +662,11 @@ private:
     }
 
     // edge markers
-    visualization_msgs::Marker& edge_marker = markers.markers[1];
+    visualization_msgs::Marker& edge_marker = markers.markers[2];
     edge_marker.header.frame_id = "map";
     edge_marker.header.stamp = stamp;
     edge_marker.ns = "edges";
-    edge_marker.id = 1;
+    edge_marker.id = 2;
     edge_marker.type = visualization_msgs::Marker::LINE_LIST;
 
     edge_marker.pose.orientation.w = 1.0;
@@ -779,7 +779,7 @@ private:
     sphere_marker.header.frame_id = "map";
     sphere_marker.header.stamp = stamp;
     sphere_marker.ns = "loop_close_radius";
-    sphere_marker.id = 0;
+    sphere_marker.id = 3;
     sphere_marker.type = visualization_msgs::Marker::SPHERE;
 
     if(!keyframes.empty()) {
