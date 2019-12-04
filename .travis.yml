@@ -9,8 +9,12 @@ matrix:
   include:
     - name: "Xenial kinetic"
       env: ROS_DISTRO=kinetic
+    - name: "Xenial kinetic_llvm"
+      env: ROS_DISTRO=kinetic_llvm
     - name: "Bionic melodic"
       env: ROS_DISTRO=melodic
+    - name: "Bionic melodic_llvm"
+      env: ROS_DISTRO=melodic_llvm
 
 script:
   - docker build -f ./docker/$ROS_DISTRO/Dockerfile .
