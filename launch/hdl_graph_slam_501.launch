@@ -74,13 +74,18 @@
     <!-- typical solvers: gn_var, gn_fix6_3, gn_var_cholmod, lm_var, lm_fix6_3, lm_var_cholmod, ... -->
     <param name="g2o_solver_type" value="lm_var_cholmod" />
     <param name="g2o_solver_num_iterations" value="512" />
-    <!-- keyframe registration params -->
+    <!-- constraint switches -->
     <param name="enable_gps" value="$(arg enable_gps)" />
     <param name="enable_imu_acceleration" value="$(arg enable_imu_acc)" />
     <param name="enable_imu_orientation" value="$(arg enable_imu_ori)" />
+    <!-- keyframe registration params -->
     <param name="max_keyframes_per_update" value="10" />
     <param name="keyframe_delta_trans" value="1.0" />
     <param name="keyframe_delta_angle" value="2.0" />
+    <!-- fix first node for optimization stability -->
+    <param name="fix_first_node" value="true"/>
+    <param name="fix_first_node_stddev" value="10 10 10 1 1 1"/>
+    <param name="fix_first_node_adaptive" value="true"/>
     <!-- loop closure params -->
     <param name="distance_thresh" value="1.0" />
     <param name="accum_distance_thresh" value="3.0" />
