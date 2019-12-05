@@ -199,9 +199,17 @@ private:
       // fix the first node
       if(keyframes.empty() && new_keyframes.size() == 1) {
         if(private_nh.param<bool>("fix_first_node", false)) {
+          Eigen::MatrixXd inf = Eigen::MatrixXd::Identity(6, 6);
+          std::stringstream sst(private_nh.param<std::string>("fix_first_node_stddev", "1 1 1 1 1 1"));
+          for(int i = 0; i < 6; i++) {
+            double stddev = 1.0;
+            sst >> stddev;
+            inf(i, i) = 1.0 / stddev;
+          }
+
           anchor_node = graph_slam->add_se3_node(Eigen::Isometry3d::Identity());
           anchor_node->setFixed(true);
-          anchor_edge = graph_slam->add_se3_edge(anchor_node, keyframe->node, Eigen::Isometry3d::Identity(), Eigen::MatrixXd::Identity(6, 6));
+          anchor_edge = graph_slam->add_se3_edge(anchor_node, keyframe->node, Eigen::Isometry3d::Identity(), inf);
         }
       }
 
@@ -567,6 +575,13 @@ private:
 
     std::copy(new_keyframes.begin(), new_keyframes.end(), std::back_inserter(keyframes));
     new_keyframes.clear();
+
+    // move the first node anchor position to the current estimate of the first node pose
+    // so the first node moves freely while trying to stay around the origin
+    if(anchor_node && private_nh.param<bool>("fix_first_node_adaptive", true)) {
+      Eigen::Isometry3d anchor_target = static_cast<g2o::VertexSE3*>(anchor_edge->vertices()[1])->estimate();
+      anchor_node->setEstimate(anchor_target);
+    }
 
     // optimize the pose graph
     int num_iterations = private_nh.param<int>("g2o_solver_num_iterations", 1024);
