@@ -1,8 +1,12 @@
+#include <string>
+
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <pcl_ros/transforms.h>
 #include <pcl_ros/point_cloud.h>
 #include <tf/transform_listener.h>
+
+#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 
 #include <nodelet/nodelet.h>
@@ -31,8 +35,13 @@ public:
 
     initialize_params();
 
+    if(private_nh.param<bool>("deskewing", true)) {
+      imu_sub = nh.subscribe("/imu/data", 1, &PrefilteringNodelet::imu_callback, this);
+    }
+
     points_sub = nh.subscribe("/velodyne_points", 64, &PrefilteringNodelet::cloud_callback, this);
     points_pub = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points", 32);
+    colored_pub = nh.advertise<sensor_msgs::PointCloud2>("/colored_points", 32);
   }
 
 private:
@@ -87,10 +96,16 @@ private:
     base_link_frame = private_nh.param<std::string>("base_link_frame", "");
   }
 
+  void imu_callback(const sensor_msgs::ImuConstPtr& imu_msg) {
+    imu_queue.push_back(imu_msg);
+  }
+
   void cloud_callback(pcl::PointCloud<PointT>::ConstPtr src_cloud) {
     if(src_cloud->empty()) {
       return;
     }
+
+    src_cloud = deskewing(src_cloud);
 
     // if base_link_frame is defined, transform the input cloud to the frame
     if(!base_link_frame.empty()) {
@@ -162,12 +177,80 @@ private:
     return filtered;
   }
 
+  pcl::PointCloud<PointT>::ConstPtr deskewing(const pcl::PointCloud<PointT>::ConstPtr& cloud) {
+    ros::Time stamp = pcl_conversions::fromPCL(cloud->header.stamp);
+    if(imu_queue.empty()) {
+      return cloud;
+    }
+
+    // the color encodes the point number in the point sequence
+    if(colored_pub.getNumSubscribers()) {
+      pcl::PointCloud<pcl::PointXYZRGB>::Ptr colored(new pcl::PointCloud<pcl::PointXYZRGB>());
+      colored->header = cloud->header;
+      colored->is_dense = cloud->is_dense;
+      colored->width = cloud->width;
+      colored->height = cloud->height;
+      colored->resize(cloud->size());
+
+      for(int i = 0; i < cloud->size(); i++) {
+        double t = static_cast<double>(i) / cloud->size();
+        colored->at(i).getVector4fMap() = cloud->at(i).getVector4fMap();
+        colored->at(i).r = 255 * t;
+        colored->at(i).g = 128;
+        colored->at(i).b = 255 * (1 - t);
+      }
+      colored_pub.publish(colored);
+    }
+
+    sensor_msgs::ImuConstPtr imu_msg = imu_queue.front();
+
+    auto loc = imu_queue.begin();
+    for(; loc != imu_queue.end(); loc++) {
+      imu_msg = (*loc);
+      if((*loc)->header.stamp > stamp) {
+        break;
+      }
+    }
+
+    imu_queue.erase(imu_queue.begin(), loc);
+
+    Eigen::Vector3f ang_v(imu_msg->angular_velocity.x, imu_msg->angular_velocity.y, imu_msg->angular_velocity.z);
+    ang_v *= -1;
+
+    pcl::PointCloud<PointT>::Ptr deskewed(new pcl::PointCloud<PointT>());
+    deskewed->header = cloud->header;
+    deskewed->is_dense = cloud->is_dense;
+    deskewed->width = cloud->width;
+    deskewed->height = cloud->height;
+    deskewed->resize(cloud->size());
+
+    double scan_period = private_nh.param<double>("scan_period", 0.1);
+    for(int i = 0; i < cloud->size(); i++) {
+      const auto& pt = cloud->at(i);
+
+      // TODO: transform IMU data into the LIDAR frame
+      double delta_t = scan_period * static_cast<double>(i) / cloud->size();
+      Eigen::Quaternionf delta_q(1, delta_t / 2.0 * ang_v[0], delta_t / 2.0 * ang_v[1], delta_t / 2.0 * ang_v[2]);
+      Eigen::Vector3f pt_ = delta_q.inverse() * pt.getVector3fMap();
+
+      deskewed->at(i) = cloud->at(i);
+      deskewed->at(i).getVector3fMap() = pt_;
+    }
+
+    return deskewed;
+  }
+
 private:
   ros::NodeHandle nh;
   ros::NodeHandle private_nh;
 
+  ros::Subscriber imu_sub;
+  std::vector<sensor_msgs::ImuConstPtr> imu_queue;
+
   ros::Subscriber points_sub;
   ros::Publisher points_pub;
+
+  ros::Publisher colored_pub;
 
   tf::TransformListener tf_listener;
 
