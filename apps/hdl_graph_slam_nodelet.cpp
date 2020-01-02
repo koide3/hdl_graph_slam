@@ -17,8 +17,9 @@
 #include <pcl_ros/point_cloud.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
-#include <tf_conversions/tf_eigen.h>
-#include <tf/transform_listener.h>
+#include <tf2_eigen/tf2_eigen.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 
 #include <std_msgs/Time.h>
 #include <nav_msgs/Odometry.h>
@@ -129,6 +130,8 @@ public:
     double map_cloud_update_interval = private_nh.param<double>("map_cloud_update_interval", 10.0);
     optimization_timer = mt_nh.createWallTimer(ros::WallDuration(graph_update_interval), &HdlGraphSlamNodelet::optimization_timer_callback, this);
     map_publish_timer = mt_nh.createWallTimer(ros::WallDuration(map_cloud_update_interval), &HdlGraphSlamNodelet::map_points_publish_timer_callback, this);
+
+    tf_listener.reset(new tf2_ros::TransformListener(tf_buffer));
   }
 
 private:
@@ -409,8 +412,8 @@ private:
       quat_imu.quaternion = (*closest_imu)->orientation;
 
       try {
-        tf_listener.transformVector(base_frame_id, acc_imu, acc_base);
-        tf_listener.transformQuaternion(base_frame_id, quat_imu, quat_base);
+        tf_buffer.transform(acc_imu, acc_base, base_frame_id);
+        tf_buffer.transform(quat_imu, quat_base, base_frame_id);
       } catch (std::exception& e) {
         std::cerr << "failed to find transform!!" << std::endl;
         return false;
@@ -931,7 +934,8 @@ private:
   ros::Publisher read_until_pub;
   ros::Publisher map_points_pub;
 
-  tf::TransformListener tf_listener;
+  tf2_ros::Buffer tf_buffer;
+  std::unique_ptr<tf2_ros::TransformListener> tf_listener;
 
   ros::ServiceServer dump_service_server;
   ros::ServiceServer save_map_service_server;

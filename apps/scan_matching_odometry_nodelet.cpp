@@ -5,8 +5,8 @@
 #include <ros/time.h>
 #include <ros/duration.h>
 #include <pcl_ros/point_cloud.h>
-#include <tf_conversions/tf_eigen.h>
-#include <tf/transform_broadcaster.h>
+#include <tf2_eigen/tf2_eigen.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 #include <std_msgs/Time.h>
 #include <nav_msgs/Odometry.h>
@@ -234,8 +234,8 @@ private:
   ros::Subscriber points_sub;
 
   ros::Publisher odom_pub;
-  tf::TransformBroadcaster odom_broadcaster;
-  tf::TransformBroadcaster keyframe_broadcaster;
+  tf2_ros::TransformBroadcaster odom_broadcaster;
+  tf2_ros::TransformBroadcaster keyframe_broadcaster;
 
   std::string points_topic;
   std::string odom_frame_id;

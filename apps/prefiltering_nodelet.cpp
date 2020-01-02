@@ -2,7 +2,8 @@
 #include <ros/time.h>
 #include <pcl_ros/transforms.h>
 #include <pcl_ros/point_cloud.h>
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_eigen/tf2_eigen.h>
 #include <sensor_msgs/PointCloud2.h>
 
 #include <nodelet/nodelet.h>
@@ -33,6 +34,8 @@ public:
 
     points_sub = nh.subscribe("/velodyne_points", 64, &PrefilteringNodelet::cloud_callback, this);
     points_pub = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points", 32);
+
+    tf_listener.reset(new tf2_ros::TransformListener(tf_buffer));
   }
 
 private:
@@ -87,26 +90,29 @@ private:
     base_link_frame = private_nh.param<std::string>("base_link_frame", "");
   }
 
-  void cloud_callback(pcl::PointCloud<PointT>::ConstPtr src_cloud) {
+  void cloud_callback(pcl::PointCloud<PointT>::Ptr src_cloud) {
     if(src_cloud->empty()) {
       return;
     }
 
     // if base_link_frame is defined, transform the input cloud to the frame
     if(!base_link_frame.empty()) {
-      if(!tf_listener.canTransform(base_link_frame, src_cloud->header.frame_id, ros::Time(0))) {
+      if(!tf_buffer.canTransform(base_link_frame, src_cloud->header.frame_id, ros::Time(0))) {
         std::cerr << "failed to find transform between " << base_link_frame << " and " << src_cloud->header.frame_id << std::endl;
       }
 
-      tf::StampedTransform transform;
-      tf_listener.waitForTransform(base_link_frame, src_cloud->header.frame_id, ros::Time(0), ros::Duration(2.0));
-      tf_listener.lookupTransform(base_link_frame, src_cloud->header.frame_id, ros::Time(0), transform);
+      geometry_msgs::TransformStamped transform;
+      transform = tf_buffer.lookupTransform(base_link_frame, src_cloud->header.frame_id, ros::Time(0), ros::Duration(2.0));
 
-      pcl::PointCloud<PointT>::Ptr transformed(new pcl::PointCloud<PointT>());
-      pcl_ros::transformPointCloud(*src_cloud, *transformed, transform);
+      sensor_msgs::PointCloud2::Ptr src_cloud_ros(new sensor_msgs::PointCloud2());
+      pcl::toROSMsg(*src_cloud, *src_cloud_ros);
+
+      sensor_msgs::PointCloud2::Ptr transformed(new sensor_msgs::PointCloud2());
+      Eigen::Matrix4f mat = tf2::transformToEigen(transform).matrix().cast<float>();
+      pcl_ros::transformPointCloud(mat, *src_cloud_ros, *transformed);
       transformed->header.frame_id = base_link_frame;
-      transformed->header.stamp = src_cloud->header.stamp;
-      src_cloud = transformed;
+      transformed->header.stamp = src_cloud_ros->header.stamp;
+      pcl::fromROSMsg(*transformed, *src_cloud);
     }
 
     pcl::PointCloud<PointT>::ConstPtr filtered = distance_filter(src_cloud);
@@ -169,7 +175,8 @@ private:
   ros::Subscriber points_sub;
   ros::Publisher points_pub;
 
-  tf::TransformListener tf_listener;
+  tf2_ros::Buffer tf_buffer;
+  std::unique_ptr<tf2_ros::TransformListener> tf_listener;
 
   std::string base_link_frame;
 

@@ -15,6 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
   geodesy
   nmea_msgs
   sensor_msgs
+  tf2
+  tf2_ros
+  tf2_eigen
   message_generation
   interactive_markers
   ndt_omp

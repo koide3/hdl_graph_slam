@@ -16,6 +16,9 @@
   <build_depend>geodesy</build_depend>
   <build_depend>nmea_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2_eigen</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>libg2o</build_depend>
 
@@ -26,6 +29,9 @@
   <run_depend>nodelet</run_depend>
   <run_depend>nmea_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
+  <run_depend>tf2</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2_eigen</run_depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelet_plugins.xml" />
