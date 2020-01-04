@@ -76,6 +76,7 @@ private:
       pcl::RadiusOutlierRemoval<PointT>::Ptr rad(new pcl::RadiusOutlierRemoval<PointT>());
       rad->setRadiusSearch(radius);
       rad->setMinNeighborsInRadius(min_neighbors);
+      outlier_removal_filter = rad;
     } else {
       std::cout << "outlier_removal: NONE" << std::endl;
     }
