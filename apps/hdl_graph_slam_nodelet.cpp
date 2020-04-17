@@ -17,6 +17,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_eigen/tf2_eigen.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
