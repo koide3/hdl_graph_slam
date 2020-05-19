@@ -35,7 +35,7 @@ public:
 
     initialize_params();
 
-    if(private_nh.param<bool>("deskewing", true)) {
+    if(private_nh.param<bool>("deskewing", false)) {
       imu_sub = nh.subscribe("/imu/data", 1, &PrefilteringNodelet::imu_callback, this);
     }
 
@@ -62,7 +62,7 @@ private:
     } else {
       if(downsample_method != "NONE") {
         std::cerr << "warning: unknown downsampling type (" << downsample_method << ")" << std::endl;
-        std::cerr << "       : use passthrough filter" <<std::endl;
+        std::cerr << "       : use passthrough filter" << std::endl;
       }
       std::cout << "downsample: NONE" << std::endl;
     }
@@ -161,12 +161,10 @@ private:
     pcl::PointCloud<PointT>::Ptr filtered(new pcl::PointCloud<PointT>());
     filtered->reserve(cloud->size());
 
-    std::copy_if(cloud->begin(), cloud->end(), std::back_inserter(filtered->points),
-      [&](const PointT& p) {
-        double d = p.getVector3fMap().norm();
-        return d > distance_near_thresh && d < distance_far_thresh;
-      }
-    );
+    std::copy_if(cloud->begin(), cloud->end(), std::back_inserter(filtered->points), [&](const PointT& p) {
+      double d = p.getVector3fMap().norm();
+      return d > distance_near_thresh && d < distance_far_thresh;
+    });
 
     filtered->width = filtered->size();
     filtered->height = 1;
@@ -262,9 +260,8 @@ private:
 
   pcl::Filter<PointT>::Ptr downsample_filter;
   pcl::Filter<PointT>::Ptr outlier_removal_filter;
-
 };
 
-}
+}  // namespace hdl_graph_slam
 
 PLUGINLIB_EXPORT_CLASS(hdl_graph_slam::PrefilteringNodelet, nodelet::Nodelet)
