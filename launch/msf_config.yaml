@@ -1,0 +1,39 @@
+/msf_lidar_scan_matching/core/data_playback: true
+/msf_lidar_scan_matching/core/fixed_bias: 0
+
+#########IMU PARAMETERS#######
+######## Asctec Firefly IMU
+/msf_lidar_scan_matching/core/core_noise_acc: 0.083
+/msf_lidar_scan_matching/core/core_noise_accbias: 0.0083
+/msf_lidar_scan_matching/core/core_noise_gyr: 0.0013
+/msf_lidar_scan_matching/core/core_noise_gyrbias: 0.00013
+
+/msf_lidar_scan_matching/pose_sensor/fixed_scale: 1
+/msf_lidar_scan_matching/pose_sensor/pose_noise_scale: 0.0
+/msf_lidar_scan_matching/pose_sensor/pose_noise_p_wv: 0.0
+/msf_lidar_scan_matching/pose_sensor/pose_noise_q_wv: 0.0
+/msf_lidar_scan_matching/pose_sensor/pose_noise_q_ic: 0.0
+/msf_lidar_scan_matching/pose_sensor/pose_noise_p_ic: 0.0
+/msf_lidar_scan_matching/pose_sensor/pose_delay: 0.02
+/msf_lidar_scan_matching/pose_sensor/pose_noise_meas_p: 0.05
+/msf_lidar_scan_matching/pose_sensor/pose_noise_meas_q: 0.05
+
+/msf_lidar_scan_matching/pose_sensor/init/q_ic/w: 1.0
+/msf_lidar_scan_matching/pose_sensor/init/q_ic/x: 0.0
+/msf_lidar_scan_matching/pose_sensor/init/q_ic/y: 0.0
+/msf_lidar_scan_matching/pose_sensor/init/q_ic/z: 0.0
+/msf_lidar_scan_matching/pose_sensor/init/p_ic/x: 0.0
+/msf_lidar_scan_matching/pose_sensor/init/p_ic/y: 0.0
+/msf_lidar_scan_matching/pose_sensor/init/p_ic/z: 0.0
+
+/msf_lidar_scan_matching/pose_sensor/pose_fixed_scale: true
+/msf_lidar_scan_matching/pose_sensor/pose_fixed_p_ic: false
+/msf_lidar_scan_matching/pose_sensor/pose_fixed_q_ic: false
+/msf_lidar_scan_matching/pose_sensor/pose_fixed_p_wv: false
+/msf_lidar_scan_matching/pose_sensor/pose_fixed_q_wv: false
+
+/msf_lidar_scan_matching/pose_sensor/pose_absolute_measurements: false
+/msf_lidar_scan_matching/pose_sensor/pose_use_fixed_covariance: true
+/msf_lidar_scan_matching/pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
+
+/msf_lidar_scan_matching/pose_sensor/pose_measurement_minimum_dt: 0.05  # Sets the minimum time in seconds between two pose measurements.

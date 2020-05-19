@@ -5,6 +5,7 @@
 
 #include <ros/ros.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/TransformStamped.h>
 
 namespace hdl_graph_slam {
@@ -37,6 +38,13 @@ static geometry_msgs::TransformStamped matrix2transform(const ros::Time& stamp, 
   odom_trans.transform.rotation = odom_quat;
 
   return odom_trans;
+}
+
+static Eigen::Isometry3d pose2isometry(const geometry_msgs::Pose& pose) {
+  Eigen::Isometry3d mat = Eigen::Isometry3d::Identity();
+  mat.translation() = Eigen::Vector3d(pose.position.x, pose.position.y, pose.position.z);
+  mat.linear() = Eigen::Quaterniond(pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z).toRotationMatrix();
+  return mat;
 }
 
 static Eigen::Isometry3d odom2isometry(const nav_msgs::OdometryConstPtr& odom_msg) {
