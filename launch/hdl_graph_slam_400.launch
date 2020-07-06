@@ -48,6 +48,7 @@
       <param name="downsample_resolution" value="0.1" />
       <!-- ICP, GICP, NDT, GICP_OMP, or NDT_OMP(recommended) -->
       <param name="registration_method" value="NDT_OMP" />
+      <param name="transformation_epsilon" value="0.1" />
       <param name="ndt_resolution" value="1.0" />
       <param name="ndt_num_threads" value="0" />
       <param name="ndt_nn_search_method" value="DIRECT7" />
