@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <hdl_graph_slam/information_matrix_calculator.hpp>
 
 #include <pcl/search/kdtree.h>

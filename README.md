@@ -1,5 +1,5 @@
 # hdl_graph_slam
-***hdl_graph_slam*** is an open source ROS package for real-time 6DOF SLAM using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also supports several graph constraints, such as GPS, IMU acceleration (gravity vector), IMU orientation (magnetic sensor), and floor plane (detected in a point cloud). We have tested this package with Velodyne (HDL32e, VLP16) and RoboSense (16 channels) sensors in indoor and outdoor environments. 
+***hdl_graph_slam*** is an open source ROS package for real-time 6DOF SLAM using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also supports several graph constraints, such as GPS, IMU acceleration (gravity vector), IMU orientation (magnetic sensor), and floor plane (detected in a point cloud). We have tested this package with Velodyne (HDL32e, VLP16) and RoboSense (16 channels) sensors in indoor and outdoor environments.
 
 <img src="imgs/hdl_graph_slam.png" width="712pix" />
 
@@ -134,7 +134,7 @@ rosrun hdl_graph_slam bag_player.py hdl_501_filtered.bag
 
 You'll see a point cloud like:
 
-<img src="imgs/top.png" height="256pix" /> <img src="imgs/birds.png" height="256pix" /> 
+<img src="imgs/top.png" height="256pix" /> <img src="imgs/birds.png" height="256pix" />
 
 You can save the generated map by:
 ```bash
@@ -161,7 +161,7 @@ rviz -d hdl_graph_slam.rviz
 rosbag play --clock hdl_400.bag
 ```
 
-<img src="imgs/hdl_400_points.png" height="256pix" /> <img src="imgs/hdl_400_graph.png" height="256pix" /> 
+<img src="imgs/hdl_400_points.png" height="256pix" /> <img src="imgs/hdl_400_graph.png" height="256pix" />
 
 ## Example with GPS
 Ford Campus Vision and Lidar Data Set [\[URL\]](http://robots.engin.umich.edu/SoftwareData/Ford)
@@ -180,8 +180,8 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 
 1. Define the transformation between your sensors (LIDAR, IMU, GPS) and base_link of your system using static_transform_publisher (see line #11, hdl_graph_slam.launch). All the sensor data will be transformed into the common base_link frame, and then fed to the SLAM algorithm.
 
-2. Remap the point cloud topic of ***prefiltering_nodelet***. Like: 
-    
+2. Remap the point cloud topic of ***prefiltering_nodelet***. Like:
+
 ```bash
   <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" ...
     <remap from="/velodyne_points" to="/rslidar_points"/>
@@ -194,13 +194,13 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 
 The mapping result deeply depends on the parameter setting. In particular, scan matching parameters have a big impact on the result. Tune the parameters accoding to the following instruction:
 
-- ***registration_method***  
-   **In short, use GICP for 16-line LIDARs and NDT_OMP for other ones**.  This parameter allows to change the registration method to be used for odometry estimation and loop detection. If you use a LIDAR with many scan lines (32, 64, or more lines), NDT_OMP could be a good choice. It is fast and accurate for dense point clouds. If you use a 16-line LIDAR, NDT-based methods may not work well because it is not very robust to sparse point clouds. In that case, choose GICP or GICP_OMP. GICP variants are slightly slower than NDT, but more accurate and robust to sparse point clouds.  
+- ***registration_method***
+   **In short, use GICP for 16-line LIDARs and NDT_OMP for other ones**.  This parameter allows to change the registration method to be used for odometry estimation and loop detection. If you use a LIDAR with many scan lines (32, 64, or more lines), NDT_OMP could be a good choice. It is fast and accurate for dense point clouds. If you use a 16-line LIDAR, NDT-based methods may not work well because it is not very robust to sparse point clouds. In that case, choose GICP or GICP_OMP. GICP variants are slightly slower than NDT, but more accurate and robust to sparse point clouds.
   Note that GICP in PCL1.7 (ROS kinetic) or earlier has a bug in the initial guess handling. **If you are on ROS kinectic or earlier, do not use GICP**.
-  
-- ***ndt_resolution***  
+
+- ***ndt_resolution***
   This parameter decides the voxel size of NDT. Typically larger values are good for outdoor environements (0.5 - 2.0 [m] for indoor, 2.0 - 10.0 [m] for outdoor). If you chose NDT or NDT_OMP, tweak this parameter so you can obtain a good odometry estimation result.
-  
+
 - ***other parameters***
   All the configurable parameters are available in the launch file. Copy a template launch file (hdl_graph_slam_501.launch for indoor, hdl_graph_slam_400.launch for outdoor) and tweak parameters in the launch file to adapt it to your application.
 
@@ -221,7 +221,7 @@ sudo make install
 
 ### hdl_graph_slam in docker
 
-If you still have the memory error, try the docker environment. You can build the docker image for *hdl_graph_slam* with: 
+If you still have the memory error, try the docker environment. You can build the docker image for *hdl_graph_slam* with:
 
 ```bash
 roscd hdl_graph_slam
@@ -238,6 +238,13 @@ source /root/catkin_ws/devel/setup.bash
 roslaunch hdl_graph_slam hdl_graph_slam.launch
 ```
 
+## License
+
+This package is released under the BSD-2-Clause License.
+
+
+Note that the cholmod solver in g2o is licensed under GPL. You may need to build g2o without cholmod dependency to avoid the GPL.
+
 ## Related packages
 
 - [interactive_slam](https://github.com/koide3/interactive_slam)
@@ -253,5 +260,5 @@ Kenji Koide, Jun Miura, and Emanuele Menegatti, A Portable 3D LIDAR-based System
 ## Contact
 Kenji Koide, k.koide@aist.go.jp
 
-Active Intelligent Systems Laboratory, Toyohashi University of Technology, Japan [\[URL\]](http://www.aisl.cs.tut.ac.jp)  
+Active Intelligent Systems Laboratory, Toyohashi University of Technology, Japan [\[URL\]](http://www.aisl.cs.tut.ac.jp)
 Robot Innovation Research Center, National Institute of Advanced Industrial Science and Technology, Japan  [\[URL\]](https://unit.aist.go.jp/rirc/en/team/smart_mobility.html)

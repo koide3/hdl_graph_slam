@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <hdl_graph_slam/graph_slam.hpp>
 
 #include <boost/format.hpp>
@@ -24,8 +26,8 @@
 #include <g2o/robust_kernel_io.hpp>
 
 G2O_USE_OPTIMIZATION_LIBRARY(pcg)
-G2O_USE_OPTIMIZATION_LIBRARY(cholmod)
-G2O_USE_OPTIMIZATION_LIBRARY(csparse)
+G2O_USE_OPTIMIZATION_LIBRARY(cholmod)   // be aware of that cholmod brings GPL dependency
+G2O_USE_OPTIMIZATION_LIBRARY(csparse)   // be aware of that csparse brings LGPL unless it is dynamically linked
 
 namespace g2o {
   G2O_REGISTER_TYPE(EDGE_SE3_PLANE, EdgeSE3Plane)

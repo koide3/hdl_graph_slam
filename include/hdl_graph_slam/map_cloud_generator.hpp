@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef MAP_CLOUD_GENERATOR_HPP
 #define MAP_CLOUD_GENERATOR_HPP
 

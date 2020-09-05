@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <hdl_graph_slam/map_cloud_generator.hpp>
 
 #include <pcl/octree/octree_search.h>

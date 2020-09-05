@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef GRAPH_SLAM_HPP
 #define GRAPH_SLAM_HPP
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <hdl_graph_slam/registrations.hpp>
 
 #include <iostream>

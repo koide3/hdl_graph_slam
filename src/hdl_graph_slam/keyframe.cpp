@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <hdl_graph_slam/keyframe.hpp>
 
 #include <boost/filesystem.hpp>

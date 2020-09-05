@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <g2o/robust_kernel_io.hpp>
 
 #include <fstream>

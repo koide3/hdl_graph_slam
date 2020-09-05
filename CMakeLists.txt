@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: BSD-2-Clause
 cmake_minimum_required(VERSION 2.8.3)
 project(hdl_graph_slam)
 
@@ -115,8 +116,8 @@ target_link_libraries(hdl_graph_slam_nodelet
   ${G2O_CORE_LIBRARY}
   ${G2O_STUFF_LIBRARY}
   ${G2O_SOLVER_PCG}
-  ${G2O_SOLVER_CSPARSE}
-  ${G2O_SOLVER_CHOLMOD}
+  ${G2O_SOLVER_CSPARSE}   # be aware of that CSPARSE is released under LGPL
+  ${G2O_SOLVER_CHOLMOD}   # be aware of that cholmod is released under GPL
   ${G2O_TYPES_SLAM3D}
   ${G2O_TYPES_SLAM3D_ADDONS}
 )

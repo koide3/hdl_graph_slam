@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef ROS_UTILS_HPP
 #define ROS_UTILS_HPP
 

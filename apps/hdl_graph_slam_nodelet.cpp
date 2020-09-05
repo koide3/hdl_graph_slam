@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include <ctime>
 #include <mutex>
 #include <atomic>

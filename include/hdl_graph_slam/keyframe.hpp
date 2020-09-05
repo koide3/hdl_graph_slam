@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef KEYFRAME_HPP
 #define KEYFRAME_HPP
 

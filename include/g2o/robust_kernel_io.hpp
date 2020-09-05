@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef ROBUST_KERNEL_IO_HPP
 #define ROBUST_KERNEL_IO_HPP
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef KEYFRAME_UPDATER_HPP
 #define KEYFRAME_UPDATER_HPP
 

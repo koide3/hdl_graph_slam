@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef ROS_TIME_HASH_HPP
 #define ROS_TIME_HASH_HPP
 

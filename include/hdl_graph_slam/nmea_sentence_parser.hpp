@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef NMEA_SENTENCE_PARSER_HPP
 #define NMEA_SENTENCE_PARSER_HPP
 

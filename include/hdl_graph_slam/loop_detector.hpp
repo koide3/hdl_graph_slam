@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef LOOP_DETECTOR_HPP
 #define LOOP_DETECTOR_HPP
 
