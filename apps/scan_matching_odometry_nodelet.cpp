@@ -90,7 +90,7 @@ private:
     } else {
       if(downsample_method != "NONE") {
         std::cerr << "warning: unknown downsampling type (" << downsample_method << ")" << std::endl;
-        std::cerr << "       : use passthrough filter" <<std::endl;
+        std::cerr << "       : use passthrough filter" << std::endl;
       }
       std::cout << "downsample: NONE" << std::endl;
       boost::shared_ptr<pcl::PassThrough<PointT>> passthrough(new pcl::PassThrough<PointT>());
@@ -300,6 +300,6 @@ private:
   pcl::Registration<PointT, PointT>::Ptr registration;
 };
 
-}
+}  // namespace hdl_graph_slam
 
 PLUGINLIB_EXPORT_CLASS(hdl_graph_slam::ScanMatchingOdometryNodelet, nodelet::Nodelet)

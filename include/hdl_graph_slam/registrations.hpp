@@ -16,6 +16,6 @@ namespace hdl_graph_slam {
  */
 boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_registration_method(ros::NodeHandle& pnh);
 
-}
+}  // namespace hdl_graph_slam
 
-#endif //
+#endif  //

@@ -55,17 +55,17 @@ public:
   }
 
 public:
-  char status;                  // Status A=active or V=Void.
+  char status;  // Status A=active or V=Void.
 
-  int hour;                     // Fix taken at 12:35:19 UTC
+  int hour;  // Fix taken at 12:35:19 UTC
   int minute;
   int second;
 
-  double latitude;              //
+  double latitude;  //
   double longitude;
 
-  double speed_knots;           // Speed over the ground in knots
-  double track_angle_degree;    // Track angle in degrees True
+  double speed_knots;         // Speed over the ground in knots
+  double track_angle_degree;  // Track angle in degrees True
 
   int year;
   int month;
@@ -103,7 +103,6 @@ public:
   }
 };
 
-}
+}  // namespace hdl_graph_slam
 
-#endif // NMEA_SENTENCE_PARSER_HPP
-
+#endif  // NMEA_SENTENCE_PARSER_HPP

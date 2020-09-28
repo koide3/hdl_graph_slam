@@ -48,7 +48,7 @@ public:
     Eigen::Vector3d normal1 = v1->estimate().normal();
     Eigen::Vector3d normal2 = v2->estimate().normal();
 
-    if (normal1.dot(normal2) < 0.0) {
+    if(normal1.dot(normal2) < 0.0) {
       normal2 = -normal2;
     }
 
@@ -56,7 +56,7 @@ public:
   }
   virtual bool read(std::istream& is) override {
     Eigen::Vector3d v;
-    for (int i = 0; i < 3; ++i) {
+    for(int i = 0; i < 3; ++i) {
       is >> v[i];
     }
 
@@ -86,9 +86,13 @@ public:
     return os.good();
   }
 
-  virtual void setMeasurement(const Eigen::Vector3d& m) override { _measurement = m; }
+  virtual void setMeasurement(const Eigen::Vector3d& m) override {
+    _measurement = m;
+  }
 
-  virtual int measurementDimension() const override { return 3; }
+  virtual int measurementDimension() const override {
+    return 3;
+  }
 };
 
 class EdgePlanePerpendicular : public BaseBinaryEdge<1, Eigen::Vector3d, VertexPlane, VertexPlane> {
@@ -111,7 +115,7 @@ public:
 
   virtual bool read(std::istream& is) override {
     Eigen::Vector3d v;
-    for (int i = 0; i < 3; ++i) {
+    for(int i = 0; i < 3; ++i) {
       is >> v[i];
     }
 
@@ -119,7 +123,7 @@ public:
     for(int i = 0; i < information().rows(); ++i) {
       for(int j = i; j < information().cols(); ++j) {
         is >> information()(i, j);
-        if (i != j) {
+        if(i != j) {
           information()(j, i) = information()(i, j);
         }
       }
@@ -129,7 +133,7 @@ public:
   }
 
   virtual bool write(std::ostream& os) const override {
-    for (int i = 0; i < 3; ++i) {
+    for(int i = 0; i < 3; ++i) {
       os << _measurement[i] << " ";
     }
 
@@ -141,9 +145,13 @@ public:
     return os.good();
   }
 
-  virtual void setMeasurement(const Eigen::Vector3d& m) override { _measurement = m; }
+  virtual void setMeasurement(const Eigen::Vector3d& m) override {
+    _measurement = m;
+  }
 
-  virtual int measurementDimension() const override { return 3; }
+  virtual int measurementDimension() const override {
+    return 3;
+  }
 };
 
 }  // namespace g2o

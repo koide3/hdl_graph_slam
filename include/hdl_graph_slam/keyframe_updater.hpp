@@ -19,10 +19,7 @@ public:
    * @brief constructor
    * @param pnh
    */
-  KeyframeUpdater(ros::NodeHandle& pnh)
-    : is_first(true),
-      prev_keypose(Eigen::Isometry3d::Identity())
-  {
+  KeyframeUpdater(ros::NodeHandle& pnh) : is_first(true), prev_keypose(Eigen::Isometry3d::Identity()) {
     keyframe_delta_trans = pnh.param<double>("keyframe_delta_trans", 2.0);
     keyframe_delta_angle = pnh.param<double>("keyframe_delta_angle", 2.0);
 
@@ -67,14 +64,14 @@ public:
 
 private:
   // parameters
-  double keyframe_delta_trans;      //
-  double keyframe_delta_angle;      //
+  double keyframe_delta_trans;  //
+  double keyframe_delta_angle;  //
 
   bool is_first;
   double accum_distance;
   Eigen::Isometry3d prev_keypose;
 };
 
-}
+}  // namespace hdl_graph_slam
 
-#endif // KEYFRAME_UPDATOR_HPP
+#endif  // KEYFRAME_UPDATOR_HPP
