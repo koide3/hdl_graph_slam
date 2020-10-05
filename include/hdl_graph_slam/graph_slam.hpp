@@ -9,24 +9,24 @@
 #include <g2o/core/hyper_graph.h>
 
 namespace g2o {
-  class VertexSE3;
-  class VertexPlane;
-  class VertexPointXYZ;
-  class EdgeSE3;
-  class EdgeSE3Plane;
-  class EdgeSE3PointXYZ;
-  class EdgeSE3PriorXY;
-  class EdgeSE3PriorXYZ;
-  class EdgeSE3PriorVec;
-  class EdgeSE3PriorQuat;
-  class EdgePlane;
-  class EdgePlaneIdentity;
-  class EdgePlaneParallel;
-  class EdgePlanePerpendicular;
-  class EdgePlanePriorNormal;
-  class EdgePlanePriorDistance;
-  class RobustKernelFactory;
-}
+class VertexSE3;
+class VertexPlane;
+class VertexPointXYZ;
+class EdgeSE3;
+class EdgeSE3Plane;
+class EdgeSE3PointXYZ;
+class EdgeSE3PriorXY;
+class EdgeSE3PriorXYZ;
+class EdgeSE3PriorVec;
+class EdgeSE3PriorQuat;
+class EdgePlane;
+class EdgePlaneIdentity;
+class EdgePlaneParallel;
+class EdgePlanePerpendicular;
+class EdgePlanePriorNormal;
+class EdgePlanePriorDistance;
+class RobustKernelFactory;
+}  // namespace g2o
 
 namespace hdl_graph_slam {
 
@@ -136,11 +136,12 @@ public:
    * @param filename  output filename
    */
   bool load(const std::string& filename);
+
 public:
   g2o::RobustKernelFactory* robust_kernel_factory;
   std::unique_ptr<g2o::HyperGraph> graph;  // g2o graph
 };
 
-}
+}  // namespace hdl_graph_slam
 
-#endif // GRAPH_SLAM_HPP
+#endif  // GRAPH_SLAM_HPP

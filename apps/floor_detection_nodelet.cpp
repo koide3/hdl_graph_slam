@@ -47,19 +47,18 @@ public:
     floor_points_pub = nh.advertise<sensor_msgs::PointCloud2>("/floor_detection/floor_points", 32);
   }
 
-
 private:
   /**
    * @brief initialize parameters
    */
   void initialize_params() {
-    tilt_deg = private_nh.param<double>("tilt_deg", 0.0);                          // approximate sensor tilt angle [deg]
-    sensor_height = private_nh.param<double>("sensor_height", 2.0);                // approximate sensor height [m]
-    height_clip_range= private_nh.param<double>("height_clip_range", 1.0);         // points with heights in [sensor_height - height_clip_range, sensor_height + height_clip_range] will be used for floor detection
-    floor_pts_thresh = private_nh.param<int>("floor_pts_thresh", 512);             // minimum number of support points of RANSAC to accept a detected floor plane
-    floor_normal_thresh = private_nh.param<double>("floor_normal_thresh", 10.0);   // verticality check thresold for the detected floor plane [deg]
-    use_normal_filtering = private_nh.param<bool>("use_normal_filtering", true);   // if true, points with "non-"vertical normals will be filtered before RANSAC
-    normal_filter_thresh = private_nh.param<double>("normal_filter_thresh", 20.0); // "non-"verticality check threshold [deg]
+    tilt_deg = private_nh.param<double>("tilt_deg", 0.0);                           // approximate sensor tilt angle [deg]
+    sensor_height = private_nh.param<double>("sensor_height", 2.0);                 // approximate sensor height [m]
+    height_clip_range = private_nh.param<double>("height_clip_range", 1.0);         // points with heights in [sensor_height - height_clip_range, sensor_height + height_clip_range] will be used for floor detection
+    floor_pts_thresh = private_nh.param<int>("floor_pts_thresh", 512);              // minimum number of support points of RANSAC to accept a detected floor plane
+    floor_normal_thresh = private_nh.param<double>("floor_normal_thresh", 10.0);    // verticality check thresold for the detected floor plane [deg]
+    use_normal_filtering = private_nh.param<bool>("use_normal_filtering", true);    // if true, points with "non-"vertical normals will be filtered before RANSAC
+    normal_filter_thresh = private_nh.param<double>("normal_filter_thresh", 20.0);  // "non-"verticality check threshold [deg]
 
     points_topic = private_nh.param<std::string>("points_topic", "/velodyne_points");
   }
@@ -84,7 +83,7 @@ private:
     coeffs.header = cloud_msg->header;
     if(floor) {
       coeffs.coeffs.resize(4);
-      for(int i=0; i<4; i++) {
+      for(int i = 0; i < 4; i++) {
         coeffs.coeffs[i] = (*floor)[i];
       }
     }
@@ -222,9 +221,9 @@ private:
     pcl::PointCloud<PointT>::Ptr filtered(new pcl::PointCloud<PointT>);
     filtered->reserve(cloud->size());
 
-    for (int i = 0; i < cloud->size(); i++) {
+    for(int i = 0; i < cloud->size(); i++) {
       float dot = normals->at(i).getNormalVector3fMap().normalized().dot(Eigen::Vector3f::UnitZ());
-      if (std::abs(dot) > std::cos(normal_filter_thresh * M_PI / 180.0)) {
+      if(std::abs(dot) > std::cos(normal_filter_thresh * M_PI / 180.0)) {
         filtered->push_back(cloud->at(i));
       }
     }
@@ -235,7 +234,6 @@ private:
 
     return filtered;
   }
-
 
 private:
   ros::NodeHandle nh;
@@ -264,6 +262,6 @@ private:
   double normal_filter_thresh;
 };
 
-}
+}  // namespace hdl_graph_slam
 
 PLUGINLIB_EXPORT_CLASS(hdl_graph_slam::FloorDetectionNodelet, nodelet::Nodelet)

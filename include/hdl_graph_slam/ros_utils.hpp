@@ -65,6 +65,6 @@ static Eigen::Isometry3d odom2isometry(const nav_msgs::OdometryConstPtr& odom_ms
   return isometry;
 }
 
-}
+}  // namespace hdl_graph_slam
 
-#endif // ROS_UTILS_HPP
+#endif  // ROS_UTILS_HPP

@@ -27,9 +27,8 @@ public:
    * @return generated map point cloud
    */
   pcl::PointCloud<PointT>::Ptr generate(const std::vector<KeyFrameSnapshot::Ptr>& keyframes, double resolution) const;
-
 };
 
-}
+}  // namespace hdl_graph_slam
 
-#endif // MAP_POINTCLOUD_GENERATOR_HPP
+#endif  // MAP_POINTCLOUD_GENERATOR_HPP

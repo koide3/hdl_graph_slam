@@ -26,21 +26,21 @@
 #include <g2o/robust_kernel_io.hpp>
 
 G2O_USE_OPTIMIZATION_LIBRARY(pcg)
-G2O_USE_OPTIMIZATION_LIBRARY(cholmod)   // be aware of that cholmod brings GPL dependency
-G2O_USE_OPTIMIZATION_LIBRARY(csparse)   // be aware of that csparse brings LGPL unless it is dynamically linked
+G2O_USE_OPTIMIZATION_LIBRARY(cholmod)  // be aware of that cholmod brings GPL dependency
+G2O_USE_OPTIMIZATION_LIBRARY(csparse)  // be aware of that csparse brings LGPL unless it is dynamically linked
 
 namespace g2o {
-  G2O_REGISTER_TYPE(EDGE_SE3_PLANE, EdgeSE3Plane)
-  G2O_REGISTER_TYPE(EDGE_SE3_PRIORXY, EdgeSE3PriorXY)
-  G2O_REGISTER_TYPE(EDGE_SE3_PRIORXYZ, EdgeSE3PriorXYZ)
-  G2O_REGISTER_TYPE(EDGE_SE3_PRIORVEC, EdgeSE3PriorVec)
-  G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
-  G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_NORMAL, EdgePlanePriorNormal)
-  G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_DISTANCE, EdgePlanePriorDistance)
-  G2O_REGISTER_TYPE(EDGE_PLANE_IDENTITY, EdgePlaneIdentity)
-  G2O_REGISTER_TYPE(EDGE_PLANE_PARALLEL, EdgePlaneParallel)
-  G2O_REGISTER_TYPE(EDGE_PLANE_PAERPENDICULAR, EdgePlanePerpendicular)
-}
+G2O_REGISTER_TYPE(EDGE_SE3_PLANE, EdgeSE3Plane)
+G2O_REGISTER_TYPE(EDGE_SE3_PRIORXY, EdgeSE3PriorXY)
+G2O_REGISTER_TYPE(EDGE_SE3_PRIORXYZ, EdgeSE3PriorXYZ)
+G2O_REGISTER_TYPE(EDGE_SE3_PRIORVEC, EdgeSE3PriorVec)
+G2O_REGISTER_TYPE(EDGE_SE3_PRIORQUAT, EdgeSE3PriorQuat)
+G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_NORMAL, EdgePlanePriorNormal)
+G2O_REGISTER_TYPE(EDGE_PLANE_PRIOR_DISTANCE, EdgePlanePriorDistance)
+G2O_REGISTER_TYPE(EDGE_PLANE_IDENTITY, EdgePlaneIdentity)
+G2O_REGISTER_TYPE(EDGE_PLANE_PARALLEL, EdgePlaneParallel)
+G2O_REGISTER_TYPE(EDGE_PLANE_PAERPENDICULAR, EdgePlanePerpendicular)
+}  // namespace g2o
 
 namespace hdl_graph_slam {
 
@@ -57,7 +57,7 @@ GraphSLAM::GraphSLAM(const std::string& solver_type) {
   g2o::OptimizationAlgorithm* solver = solver_factory->construct(solver_type, solver_property);
   graph->setAlgorithm(solver);
 
-  if (!graph->solver()) {
+  if(!graph->solver()) {
     std::cerr << std::endl;
     std::cerr << "error : failed to allocate solver!!" << std::endl;
     solver_factory->listSolvers(std::cerr);
@@ -97,8 +97,12 @@ void GraphSLAM::set_solver(const std::string& solver_type) {
   std::cout << "done" << std::endl;
 }
 
-int GraphSLAM::num_vertices() const { return graph->vertices().size(); }
-int GraphSLAM::num_edges() const { return graph->edges().size(); }
+int GraphSLAM::num_vertices() const {
+  return graph->vertices().size();
+}
+int GraphSLAM::num_edges() const {
+  return graph->edges().size();
+}
 
 g2o::VertexSE3* GraphSLAM::add_se3_node(const Eigen::Isometry3d& pose) {
   g2o::VertexSE3* vertex(new g2o::VertexSE3());
@@ -225,14 +229,14 @@ g2o::EdgeSE3PriorQuat* GraphSLAM::add_se3_prior_quat_edge(g2o::VertexSE3* v_se3,
 }
 
 g2o::EdgePlane* GraphSLAM::add_plane_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector4d& measurement, const Eigen::Matrix4d& information) {
-    g2o::EdgePlane* edge(new g2o::EdgePlane());
-    edge->setMeasurement(measurement);
-    edge->setInformation(information);
-    edge->vertices()[0] = v_plane1;
-    edge->vertices()[1] = v_plane2;
-    graph->addEdge(edge);
+  g2o::EdgePlane* edge(new g2o::EdgePlane());
+  edge->setMeasurement(measurement);
+  edge->setInformation(information);
+  edge->vertices()[0] = v_plane1;
+  edge->vertices()[1] = v_plane2;
+  graph->addEdge(edge);
 
-    return edge;
+  return edge;
 }
 
 g2o::EdgePlaneIdentity* GraphSLAM::add_plane_identity_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector4d& measurement, const Eigen::Matrix4d& information) {
@@ -247,25 +251,25 @@ g2o::EdgePlaneIdentity* GraphSLAM::add_plane_identity_edge(g2o::VertexPlane* v_p
 }
 
 g2o::EdgePlaneParallel* GraphSLAM::add_plane_parallel_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::Matrix3d& information) {
-    g2o::EdgePlaneParallel* edge(new g2o::EdgePlaneParallel());
-    edge->setMeasurement(measurement);
-    edge->setInformation(information);
-    edge->vertices()[0] = v_plane1;
-    edge->vertices()[1] = v_plane2;
-    graph->addEdge(edge);
+  g2o::EdgePlaneParallel* edge(new g2o::EdgePlaneParallel());
+  edge->setMeasurement(measurement);
+  edge->setInformation(information);
+  edge->vertices()[0] = v_plane1;
+  edge->vertices()[1] = v_plane2;
+  graph->addEdge(edge);
 
-    return edge;
+  return edge;
 }
 
 g2o::EdgePlanePerpendicular* GraphSLAM::add_plane_perpendicular_edge(g2o::VertexPlane* v_plane1, g2o::VertexPlane* v_plane2, const Eigen::Vector3d& measurement, const Eigen::MatrixXd& information) {
-    g2o::EdgePlanePerpendicular* edge(new g2o::EdgePlanePerpendicular());
-    edge->setMeasurement(measurement);
-    edge->setInformation(information);
-    edge->vertices()[0] = v_plane1;
-    edge->vertices()[1] = v_plane2;
-    graph->addEdge(edge);
+  g2o::EdgePlanePerpendicular* edge(new g2o::EdgePlanePerpendicular());
+  edge->setMeasurement(measurement);
+  edge->setInformation(information);
+  edge->vertices()[0] = v_plane1;
+  edge->vertices()[1] = v_plane2;
+  graph->addEdge(edge);
 
-    return edge;
+  return edge;
 }
 
 void GraphSLAM::add_robust_kernel(g2o::HyperGraph::Edge* edge, const std::string& kernel_type, double kernel_size) {
@@ -326,22 +330,22 @@ void GraphSLAM::save(const std::string& filename) {
 }
 
 bool GraphSLAM::load(const std::string& filename) {
-    std::cout << "loading pose graph..." << std::endl;
-    g2o::SparseOptimizer* graph = dynamic_cast<g2o::SparseOptimizer*>(this->graph.get());
+  std::cout << "loading pose graph..." << std::endl;
+  g2o::SparseOptimizer* graph = dynamic_cast<g2o::SparseOptimizer*>(this->graph.get());
 
-    std::ifstream ifs(filename);
-    if(!graph->load(ifs, true)) {
-        return false;
-    }
+  std::ifstream ifs(filename);
+  if(!graph->load(ifs, true)) {
+    return false;
+  }
 
-    std::cout << "nodes  : " << graph->vertices().size() << std::endl;
-    std::cout << "edges  : " << graph->edges().size() << std::endl;
+  std::cout << "nodes  : " << graph->vertices().size() << std::endl;
+  std::cout << "edges  : " << graph->edges().size() << std::endl;
 
-    if(!g2o::load_robust_kernels(filename + ".kernels", graph)) {
-        return false;
-    }
+  if(!g2o::load_robust_kernels(filename + ".kernels", graph)) {
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
-}
+}  // namespace hdl_graph_slam

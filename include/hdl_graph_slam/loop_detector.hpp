@@ -17,11 +17,7 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using Ptr = std::shared_ptr<Loop>;
 
-  Loop(const KeyFrame::Ptr& key1, const KeyFrame::Ptr& key2, const Eigen::Matrix4f& relpose)
-    : key1(key1),
-      key2(key2),
-      relative_pose(relpose)
-  {}
+  Loop(const KeyFrame::Ptr& key1, const KeyFrame::Ptr& key2, const Eigen::Matrix4f& relpose) : key1(key1), key2(key2), relative_pose(relpose) {}
 
 public:
   KeyFrame::Ptr key1;
@@ -175,14 +171,14 @@ private:
   double accum_distance_thresh;           // traveled distance between ...
   double distance_from_last_edge_thresh;  // a new loop edge must far from the last one at least this distance
 
-  double fitness_score_max_range;         // maximum allowable distance between corresponding points
-  double fitness_score_thresh;            // threshold for scan matching
+  double fitness_score_max_range;  // maximum allowable distance between corresponding points
+  double fitness_score_thresh;     // threshold for scan matching
 
   double last_edge_accum_distance;
 
   pcl::Registration<PointT, PointT>::Ptr registration;
 };
 
-}
+}  // namespace hdl_graph_slam
 
-#endif // LOOP_DETECTOR_HPP
+#endif  // LOOP_DETECTOR_HPP

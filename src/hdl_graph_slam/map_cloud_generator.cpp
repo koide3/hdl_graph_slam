@@ -6,12 +6,9 @@
 
 namespace hdl_graph_slam {
 
-MapCloudGenerator::MapCloudGenerator() {
-}
+MapCloudGenerator::MapCloudGenerator() {}
 
-MapCloudGenerator::~MapCloudGenerator() {
-
-}
+MapCloudGenerator::~MapCloudGenerator() {}
 
 pcl::PointCloud<MapCloudGenerator::PointT>::Ptr MapCloudGenerator::generate(const std::vector<KeyFrameSnapshot::Ptr>& keyframes, double resolution) const {
   if(keyframes.empty()) {
@@ -50,4 +47,4 @@ pcl::PointCloud<MapCloudGenerator::PointT>::Ptr MapCloudGenerator::generate(cons
   return filtered;
 }
 
-}
+}  // namespace hdl_graph_slam
