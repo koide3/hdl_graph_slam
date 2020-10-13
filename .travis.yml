@@ -15,6 +15,10 @@ matrix:
       env: ROS_DISTRO=melodic
     - name: "Bionic melodic_llvm"
       env: ROS_DISTRO=melodic_llvm
+    - name: "Focal Fossa noetic"
+      env: ROS_DISTRO=noetic
+    - name: "Focal Fossa noetic_llvm"
+      env: ROS_DISTRO=noetic_llvm
 
 script:
   - docker build -f ./docker/$ROS_DISTRO/Dockerfile .
