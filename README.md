@@ -5,7 +5,7 @@
 
 [video](https://drive.google.com/open?id=0B9f5zFkpn4soSG96Tkt4SFFTbms)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1175635f00394e789b457b44690ce72c)](https://app.codacy.com/app/koide3/hdl_graph_slam?utm_source=github.com&utm_medium=referral&utm_content=koide3/hdl_graph_slam&utm_campaign=Badge_Grade_Dashboard) [![Build Status](https://travis-ci.org/koide3/hdl_graph_slam.svg?branch=master)](https://travis-ci.org/koide3/hdl_graph_slam) on kinetic & melodic
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1175635f00394e789b457b44690ce72c)](https://app.codacy.com/app/koide3/hdl_graph_slam?utm_source=github.com&utm_medium=referral&utm_content=koide3/hdl_graph_slam&utm_campaign=Badge_Grade_Dashboard) [![Build Status](https://travis-ci.org/koide3/hdl_graph_slam.svg?branch=master)](https://travis-ci.org/koide3/hdl_graph_slam) on melodic & noetic
 
 ## Nodelets
 ***hdl_graph_slam*** consists of four nodelets.
@@ -63,7 +63,7 @@ All the configurable parameters are listed in *launch/hdl_graph_slam.launch* as 
 ***hdl_graph_slam*** requires the following libraries:
 
 - OpenMP
-- PCL 1.7
+- PCL
 - g2o
 - suitesparse
 
@@ -73,31 +73,17 @@ The following ROS packages are required:
 - nmea_msgs
 - pcl_ros
 - [ndt_omp](https://github.com/koide3/ndt_omp)
+- [fast_gicp](https://github.com/SMRT-AIST/fast_gicp)
 
 ```bash
-# for indigo
-sudo apt-get install ros-indigo-geodesy ros-indigo-pcl_ros ros-indigo-nmea-msgs
-# for kinetic
-sudo apt-get install ros-kinetic-geodesy ros-kinetic-pcl-ros ros-kinetic-nmea-msgs ros-kinetic-libg2o
 # for melodic
 sudo apt-get install ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs ros-melodic-libg2o
+# for noetic
+sudo apt-get install ros-noetic-geodesy ros-noetic-pcl-ros ros-noetic-nmea-msgs ros-noetic-libg2o
 
 cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
-```
-
-Note that, in case use are using ros indigo, ***hdl_graph_slam*** cannot be built with the ros g2o binaries (ros-indigo-libg2o). ~~Install the latest g2o:~~
-The latest g2o causes segfault. Use commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* instead of the latest one:
-
-```bash
-sudo apt-get install libsuitesparse-dev
-git clone https://github.com/RainerKuemmerle/g2o.git
-cd g2o
-git checkout a48ff8c42136f18fbe215b02bfeca48fa0c67507
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=RELEASE
-make -j8
-sudo make install
+git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
 ```
 
 **[optional]** *bag_player.py* script requires ProgressBar2.
@@ -203,40 +189,6 @@ The mapping result deeply depends on the parameter setting. In particular, scan 
 
 - ***other parameters***
   All the configurable parameters are available in the launch file. Copy a template launch file (hdl_graph_slam_501.launch for indoor, hdl_graph_slam_400.launch for outdoor) and tweak parameters in the launch file to adapt it to your application.
-
-### hdl_graph_slam_nodelet causes memory error (ROS indigo)
-
-It has been reported that *hdl_graph_slam_nodelet* causes a memory error in some environments with ROS indigo. ~~I found that this is caused by a variable (*color*) in g2o::VertexPlane. Since this field is used for only visualization, we can remove it from vertex_plane.h and vertex_plane.cpp in g2o. I made a clone repository of g2o, in which I just removed it
- from the commit *a48ff8c42136f18fbe215b02bfeca48fa0c67507* of g2o. If you face this memory error problem, try to install it instead of the original g2o repository. Do not forget to checkout *hdl_graph_slam* branch.~~ We strongly recommend to use ROS kinetic or later. The prebuilt g2o libraries in them do not cause this kind of memory errors.
-
-```bash
-git clone https://github.com/koide3/g2o.git
-cd g2o
-git checkout hdl_graph_slam
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=RELEASE
-make -j8
-sudo make install
-```
-
-### hdl_graph_slam in docker
-
-If you still have the memory error, try the docker environment. You can build the docker image for *hdl_graph_slam* with:
-
-```bash
-roscd hdl_graph_slam
-sudo docker build --tag hdl_graph_slam -f docker/kinetic/Dockerfile .
-# you can also use melodic environment
-# sudo docker build --tag hdl_graph_slam -f docker/melodic/Dockerfile .
-```
-
-After building the image, you can launch hdl_graph_slam with:
-
-```bash
-sudo docker run -it --net=host --rm hdl_graph_slam bash
-source /root/catkin_ws/devel/setup.bash
-roslaunch hdl_graph_slam hdl_graph_slam.launch
-```
 
 ## License
 

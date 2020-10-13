@@ -14,7 +14,8 @@ RUN mkdir -p /root/catkin_ws/src
 WORKDIR /root/catkin_ws/src
 RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_init_workspace'
 RUN git clone https://github.com/koide3/ndt_omp.git
-# RUN git clone https://github.com/koide3/hdl_graph_slam.git && cd hdl_graph_slam && git checkout arch-melodic
+RUN git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+
 COPY . /root/catkin_ws/src/hdl_graph_slam/
 
 
