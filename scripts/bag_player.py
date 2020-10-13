@@ -4,8 +4,13 @@ import sys
 import yaml
 import time
 import curses
-import StringIO
 import argparse
+
+try:
+    from StringIO import StringIO ## for Python 2
+except ImportError:
+    from io import StringIO ## for Python 3
+
 
 import rospy
 import rosbag
@@ -18,9 +23,9 @@ from progressbar import ProgressBar
 
 class BagPlayer:
 	def __init__(self, bagfile, start, duration):
-		print 'opening...',
+		print('opening...',)
 		self.bag = rosbag.Bag(bagfile, 'r')
-		print 'done'
+		print('done')
 
 		self.message_generator = self.bag.read_messages()
 
@@ -28,7 +33,7 @@ class BagPlayer:
 		self.duration = float(info_dict['duration'])
 		self.endtime = float(info_dict['end'])
 
-		self.progress = ProgressBar(0, self.duration, term_width=80, fd=StringIO.StringIO())
+		self.progress = ProgressBar(0, self.duration, term_width=80, fd=StringIO())
 
 		self.publishers = {}
 		for con in self.bag._get_connections():
@@ -50,7 +55,7 @@ class BagPlayer:
 		for topic_name, msg_type in rospy.get_published_topics():
 			if 'read_until' in topic_name and 'std_msgs/Header' in msg_type:
 				if topic_name not in self.time_subs:
-					print 'ADD', topic_name
+					print('ADD', topic_name)
 					self.time_subs[topic_name] = rospy.Subscriber(topic_name, Header, self.time_callback, topic_name)
 
 	def time_callback(self, header_msg, topic_name):
@@ -61,7 +66,7 @@ class BagPlayer:
 			self.target_times[header_msg.frame_id][topic_name] = header_msg.stamp
 
 	def play_realtime(self, duration):
-		topic, msg, stamp = self.message_generator.next()
+		topic, msg, stamp = next(self.message_generator)
 		stamp_wall = time.time()
 
 		start_stamp = stamp
@@ -89,7 +94,7 @@ class BagPlayer:
 				self.clock_pub.publish(clock_msg)
 				self.publishers[topic].publish(msg)
 
-			topic, msg, stamp = self.message_generator.next()
+			topic, msg, stamp = next(self.message_generator)
 
 		return topic, msg, stamp
 
@@ -128,7 +133,7 @@ class BagPlayer:
 		self.stdscr.addstr(line, 50, '(x%.2f)' % self.processing_speed)
 
 		elapsed = (stamp - self.start_stamp).to_sec()
-		self.progress.fd = StringIO.StringIO()
+		self.progress.fd = StringIO()
 		try:
 			self.progress.update(elapsed)
 		except:
@@ -158,11 +163,11 @@ class BagPlayer:
 		return True
 
 	def play(self):
-		print 'play realtime for 3.0[sec]'
+		print('play realtime for 3.0[sec]')
 		topic, msg, stamp = self.play_realtime(rospy.Duration(5.0))
 		self.update_time_subs()
 
-		print 'play as fast as possible'
+		print('play as fast as possible')
 		self.stdscr = curses.initscr()
 		curses.start_color()
 		curses.noecho()
@@ -187,9 +192,9 @@ class BagPlayer:
 
 				self.clock_pub.publish(clock_msg)
 				self.publishers[topic].publish(msg)
-				topic, msg, stamp = self.message_generator.next()
+				topic, msg, stamp = next(self.message_generator)
 		except:
-			print sys.exc_info()[0]
+			print(sys.exc_info()[0])
 			clock_msg = Clock()
 			clock_msg.clock = stamp + rospy.Duration(30.0)
 			self.clock_pub.publish(clock_msg)
@@ -208,7 +213,7 @@ def main():
 	args = parser.parse_args(myargv[1:])
 
 	if len(sys.argv) < 2:
-		print 'usage bag_player src_bagname'
+		print('usage bag_player src_bagname')
 		return
 
 	rospy.init_node('bag_player')

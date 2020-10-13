@@ -25,21 +25,17 @@ class Map2OdomPublisher:
 		map_frame_id = self.odom_msg.header.frame_id
 		odom_frame_id = self.odom_msg.child_frame_id
 
-                self.broadcaster.sendTransform(pos, quat, rospy.Time.now(), odom_frame_id, map_frame_id)
+		self.broadcaster.sendTransform(pos, quat, rospy.Time.now(), odom_frame_id, map_frame_id)
 
 
 def main():
 	rospy.init_node('map2odom_publisher')
 	node = Map2OdomPublisher()
 
-        rate = rospy.Rate(100.0)
+	rate = rospy.Rate(10.0)
 	while not rospy.is_shutdown():
 		node.spin()
 		rate.sleep()
 
 if __name__ == '__main__':
-    try:
-        main()
-    except:
-        print 'shutdown'
-
+	main()

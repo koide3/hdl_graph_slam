@@ -46,11 +46,17 @@
     <param name="max_acceptable_angle" value="1.0" />
     <param name="downsample_method" value="NONE" />
     <param name="downsample_resolution" value="0.1" />
-    <!-- ICP, GICP, NDT, GICP_OMP, or NDT_OMP(recommended) -->
-    <param name="registration_method" value="NDT_OMP" />
-    <param name="ndt_resolution" value="1.0" />
-    <param name="ndt_num_threads" value="0" />
-    <param name="ndt_nn_search_method" value="DIRECT7" />
+    <!-- ICP, GICP, NDT, GICP_OMP, NDT_OMP, FAST_GICP(recommended), or FAST_VGICP -->
+    <param name="registration_method" value="FAST_GICP" />
+    <param name="reg_num_threads" value="0" />
+    <param name="reg_transformation_epsilon" value="0.1"/>
+    <param name="reg_maximum_iterations" value="64"/>
+    <param name="reg_max_correspondence_distance" value="2.0"/>
+    <param name="reg_max_optimizer_iterations" value="20"/>
+    <param name="reg_use_reciprocal_correspondences" value="false"/>
+    <param name="reg_correspondence_randomness" value="20"/>
+    <param name="reg_resolution" value="1.0" />
+    <param name="reg_nn_search_method" value="DIRECT7" />
   </node>
 
   <!-- floor_detection_nodelet -->
@@ -92,10 +98,16 @@
     <param name="min_edge_interval" value="1.0" />
     <param name="fitness_score_thresh" value="0.5" />
     <!-- scan matching params -->
-    <param name="registration_method" value="NDT_OMP" />
-    <param name="ndt_resolution" value="1.0" />
-    <param name="ndt_num_threads" value="0" />
-    <param name="ndt_nn_search_method" value="DIRECT7" />
+    <param name="registration_method" value="FAST_GICP" />
+    <param name="reg_num_threads" value="0" />
+    <param name="reg_transformation_epsilon" value="0.1"/>
+    <param name="reg_maximum_iterations" value="64"/>
+    <param name="reg_max_correspondence_distance" value="2.0"/>
+    <param name="reg_max_optimizer_iterations" value="20"/>
+    <param name="reg_use_reciprocal_correspondences" value="false"/>
+    <param name="reg_correspondence_randomness" value="20"/>
+    <param name="reg_resolution" value="1.0" />
+    <param name="reg_nn_search_method" value="DIRECT7" />
     <!-- edge params -->
     <!-- GPS -->
     <param name="gps_edge_robust_kernel" value="NONE" />
