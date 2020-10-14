@@ -12,6 +12,7 @@ set(CMAKE_BUILD_TYPE "RELEASE")
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   pcl_ros
   geodesy
   nmea_msgs
@@ -21,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   ndt_omp
   fast_gicp
 )
+catkin_python_setup()
 
 find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
@@ -124,3 +126,10 @@ target_link_libraries(hdl_graph_slam_nodelet
 )
 add_dependencies(hdl_graph_slam_nodelet ${PROJECT_NAME}_gencpp)
 
+catkin_install_python(
+  PROGRAMS
+    src/${PROJECT_NAME}/bag_player.py
+    src/${PROJECT_NAME}/ford2bag.py
+    src/${PROJECT_NAME}/map2odom_publisher.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
