@@ -440,7 +440,7 @@ private:
     auto remove_loc = std::upper_bound(imu_queue.begin(), imu_queue.end(), keyframes.back()->stamp, [=](const ros::Time& stamp, const sensor_msgs::ImuConstPtr& imu) { return stamp < imu->header.stamp; });
     imu_queue.erase(imu_queue.begin(), remove_loc);
 
-    return true;
+    return updated;
   }
 
   /**
@@ -819,7 +819,6 @@ private:
       time(&rawtime);
       const auto timeinfo = localtime(&rawtime);
       strftime(buffer.data(), sizeof(buffer), "%d-%m-%Y %H:%M:%S", timeinfo);
-      std::string directory(buffer.data());
     }
 
     if(!boost::filesystem::is_directory(directory)) {
