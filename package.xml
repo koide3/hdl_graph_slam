@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="3">
   <name>hdl_graph_slam</name>
   <version>0.0.0</version>
   <description>The hdl_graph_slam package</description>
@@ -13,6 +13,7 @@
   <build_depend>fast_gicp</build_depend>
   <build_depend>pcl_ros</build_depend>
   <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
   <build_depend>nodelet</build_depend>
   <build_depend>geodesy</build_depend>
   <build_depend>nmea_msgs</build_depend>
@@ -20,14 +21,20 @@
   <build_depend>message_generation</build_depend>
   <build_depend>libg2o</build_depend>
 
-  <run_depend>ndt_omp</run_depend>
-  <run_depend>fast_gicp</run_depend>
-  <run_depend>pcl_ros</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>geodesy</run_depend>
-  <run_depend>nodelet</run_depend>
-  <run_depend>nmea_msgs</run_depend>
-  <run_depend>sensor_msgs</run_depend>
+  <exec_depend>ndt_omp</exec_depend>
+  <exec_depend>fast_gicp</exec_depend>
+  <exec_depend>pcl_ros</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>geodesy</exec_depend>
+  <exec_depend>nodelet</exec_depend>
+  <exec_depend>nmea_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-scipy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-scipy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-progressbar</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-progressbar</exec_depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelet_plugins.xml" />
