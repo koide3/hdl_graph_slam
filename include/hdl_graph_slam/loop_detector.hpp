@@ -134,7 +134,11 @@ private:
     pcl::PointCloud<PointT>::Ptr aligned(new pcl::PointCloud<PointT>());
     for(const auto& candidate : candidate_keyframes) {
       registration->setInputSource(candidate->cloud);
-      Eigen::Matrix4f guess = (new_keyframe->node->estimate().inverse() * candidate->node->estimate()).matrix().cast<float>();
+      Eigen::Isometry3d new_keyframe_estimate = new_keyframe->node->estimate();
+      new_keyframe_estimate.linear() = Eigen::Quaterniond(new_keyframe_estimate.linear()).normalized().toRotationMatrix();
+      Eigen::Isometry3d candidate_estimate = candidate->node->estimate();
+      candidate_estimate.linear() = Eigen::Quaterniond(candidate_estimate.linear()).normalized().toRotationMatrix();
+      Eigen::Matrix4f guess = (new_keyframe_estimate.inverse() * candidate_estimate).matrix().cast<float>();
       guess(2, 3) = 0.0;
       registration->align(*aligned, guess);
       std::cout << "." << std::flush;
