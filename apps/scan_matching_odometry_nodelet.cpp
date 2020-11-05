@@ -52,6 +52,7 @@ public:
     read_until_pub = nh.advertise<std_msgs::Header>("/scan_matching_odometry/read_until", 32);
     odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 32);
     trans_pub = nh.advertise<geometry_msgs::TransformStamped>("/scan_matching_odometry/transform", 32);
+    aligned_points_pub = nh.advertise<sensor_msgs::PointCloud2>("/aligned_points", 32);
   }
 
 private:
@@ -223,6 +224,13 @@ private:
       keyframe_stamp = stamp;
       prev_trans.setIdentity();
     }
+    
+    if (aligned_points_pub.getNumSubscribers() > 0)
+    {
+      pcl::transformPointCloud (*cloud, *aligned, odom);
+      aligned->header.frame_id=odom_frame_id;
+      aligned_points_pub.publish(aligned);
+    }
 
     return odom;
   }
@@ -269,6 +277,7 @@ private:
 
   ros::Publisher odom_pub;
   ros::Publisher trans_pub;
+  ros::Publisher aligned_points_pub;
   tf::TransformBroadcaster odom_broadcaster;
   tf::TransformBroadcaster keyframe_broadcaster;
 

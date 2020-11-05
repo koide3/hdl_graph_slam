@@ -518,7 +518,7 @@ private:
     snapshot = keyframes_snapshot;
     keyframes_snapshot_mutex.unlock();
 
-    auto cloud = map_cloud_generator->generate(snapshot, 0.05);
+    auto cloud = map_cloud_generator->generate(snapshot, map_cloud_resolution);
     if(!cloud) {
       return;
     }
