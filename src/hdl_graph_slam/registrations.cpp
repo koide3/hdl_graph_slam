@@ -74,7 +74,7 @@ boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_regi
       std::cerr << "       : use NDT" << std::endl;
     }
 
-    double ndt_resolution = pnh.param<double>("ndt_resolution", 0.5);
+    double ndt_resolution = pnh.param<double>("reg_resolution", 0.5);
     if(registration_method.find("OMP") == std::string::npos) {
       std::cout << "registration: NDT " << ndt_resolution << std::endl;
       boost::shared_ptr<pcl::NormalDistributionsTransform<PointT, PointT>> ndt(new pcl::NormalDistributionsTransform<PointT, PointT>());
@@ -83,7 +83,7 @@ boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_regi
       ndt->setResolution(ndt_resolution);
       return ndt;
     } else {
-      int num_threads = pnh.param<int>("ndt_num_threads", 0);
+      int num_threads = pnh.param<int>("reg_num_threads", 0);
       std::string nn_search_method = pnh.param<std::string>("reg_nn_search_method", "DIRECT7");
       std::cout << "registration: NDT_OMP " << nn_search_method << " " << ndt_resolution << " (" << num_threads << " threads)" << std::endl;
       boost::shared_ptr<pclomp::NormalDistributionsTransform<PointT, PointT>> ndt(new pclomp::NormalDistributionsTransform<PointT, PointT>());

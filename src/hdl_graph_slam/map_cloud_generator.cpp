@@ -33,6 +33,9 @@ pcl::PointCloud<MapCloudGenerator::PointT>::Ptr MapCloudGenerator::generate(cons
   cloud->height = 1;
   cloud->is_dense = false;
 
+  if (resolution <=0.0)
+    return cloud; // To get unfiltered point cloud with intensity
+
   pcl::octree::OctreePointCloud<PointT> octree(resolution);
   octree.setInputCloud(cloud);
   octree.addPointsFromInputCloud();
