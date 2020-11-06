@@ -35,3 +35,6 @@ cd hdl_graph_slam/docker
 
 roslaunch hdl_graph_slam hdl_graph_slam_400.launch
 ```
+
+
+![hdl_graph_slam](https://user-images.githubusercontent.com/31344317/98347836-4fed5a00-205b-11eb-931c-158f6cd056bf.gif)
