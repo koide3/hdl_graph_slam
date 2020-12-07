@@ -36,27 +36,27 @@
 
   <!-- scan_matching_odometry_nodelet -->
   <node pkg="nodelet" type="nodelet" name="scan_matching_odometry_nodelet" args="load hdl_graph_slam/ScanMatchingOdometryNodelet $(arg nodelet_manager)">
-      <param name="points_topic" value="$(arg points_topic)" />
-      <param name="odom_frame_id" value="odom" />
-      <param name="keyframe_delta_trans" value="1.0" />
-      <param name="keyframe_delta_angle" value="1.0" />
-      <param name="keyframe_delta_time" value="10000.0" />
-      <param name="transform_thresholding" value="false" />
-      <param name="max_acceptable_trans" value="1.0" />
-      <param name="max_acceptable_angle" value="1.0" />
-      <param name="downsample_method" value="NONE" />
-      <param name="downsample_resolution" value="0.1" />
-      <!-- ICP, GICP, NDT, GICP_OMP, NDT_OMP, FAST_GICP(recommended), or FAST_VGICP -->
-      <param name="registration_method" value="FAST_GICP" />
-      <param name="reg_num_threads" value="0" />
-      <param name="reg_transformation_epsilon" value="0.1"/>
-      <param name="reg_maximum_iterations" value="64"/>
-      <param name="reg_max_correspondence_distance" value="2.0"/>
-      <param name="reg_max_optimizer_iterations" value="20"/>
-      <param name="reg_use_reciprocal_correspondences" value="false"/>
-      <param name="reg_correspondence_randomness" value="20"/>
-      <param name="reg_resolution" value="1.0" />
-      <param name="reg_nn_search_method" value="DIRECT7" />
+    <param name="points_topic" value="$(arg points_topic)" />
+    <param name="odom_frame_id" value="odom" />
+    <param name="keyframe_delta_trans" value="1.0" />
+    <param name="keyframe_delta_angle" value="1.0" />
+    <param name="keyframe_delta_time" value="10000.0" />
+    <param name="transform_thresholding" value="false" />
+    <param name="max_acceptable_trans" value="1.0" />
+    <param name="max_acceptable_angle" value="1.0" />
+    <param name="downsample_method" value="NONE" />
+    <param name="downsample_resolution" value="0.1" />
+    <!-- ICP, GICP, NDT, GICP_OMP, NDT_OMP, FAST_GICP(recommended), or FAST_VGICP -->
+    <param name="registration_method" value="FAST_GICP" />
+    <param name="reg_num_threads" value="0" />
+    <param name="reg_transformation_epsilon" value="0.1"/>
+    <param name="reg_maximum_iterations" value="64"/>
+    <param name="reg_max_correspondence_distance" value="2.0"/>
+    <param name="reg_max_optimizer_iterations" value="20"/>
+    <param name="reg_use_reciprocal_correspondences" value="false"/>
+    <param name="reg_correspondence_randomness" value="20"/>
+    <param name="reg_resolution" value="1.0" />
+    <param name="reg_nn_search_method" value="DIRECT7" />
   </node>
 
   <!-- floor_detection_nodelet -->

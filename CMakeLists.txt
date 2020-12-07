@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   geodesy
   nmea_msgs
   sensor_msgs
+  geometry_msgs
   message_generation
   interactive_markers
   ndt_omp
@@ -49,6 +50,7 @@ endif()
 ########################
 add_message_files(FILES
   FloorCoeffs.msg
+  ScanMatchingStatus.msg
 )
 
 add_service_files(FILES
@@ -56,7 +58,7 @@ add_service_files(FILES
   DumpGraph.srv
 )
 
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 
 ###################################
 ## catkin specific configuration ##

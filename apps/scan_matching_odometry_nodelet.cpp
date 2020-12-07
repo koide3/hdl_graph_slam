@@ -25,6 +25,7 @@
 
 #include <hdl_graph_slam/ros_utils.hpp>
 #include <hdl_graph_slam/registrations.hpp>
+#include <hdl_graph_slam/ScanMatchingStatus.h>
 
 namespace hdl_graph_slam {
 
@@ -52,6 +53,7 @@ public:
     read_until_pub = nh.advertise<std_msgs::Header>("/scan_matching_odometry/read_until", 32);
     odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 32);
     trans_pub = nh.advertise<geometry_msgs::TransformStamped>("/scan_matching_odometry/transform", 32);
+    status_pub = private_nh.advertise<ScanMatchingStatus>("/scan_matching_odometry/status", 8);
     aligned_points_pub = nh.advertise<sensor_msgs::PointCloud2>("/aligned_points", 32);
   }
 
@@ -187,6 +189,8 @@ private:
     pcl::PointCloud<PointT>::Ptr aligned(new pcl::PointCloud<PointT>());
     registration->align(*aligned, prev_trans * msf_delta.matrix());
 
+    publish_scan_matching_status(stamp, cloud->header.frame_id, *registration);
+
     if(!registration->hasConverged()) {
       NODELET_INFO_STREAM("scan matching has not converged!!");
       NODELET_INFO_STREAM("ignore this frame(" << stamp << ")");
@@ -224,7 +228,7 @@ private:
       keyframe_stamp = stamp;
       prev_trans.setIdentity();
     }
-    
+
     if (aligned_points_pub.getNumSubscribers() > 0)
     {
       pcl::transformPointCloud (*cloud, *aligned, odom);
@@ -266,6 +270,47 @@ private:
     odom_pub.publish(odom);
   }
 
+  /**
+   * @brief publish scan matching status
+   */
+  void publish_scan_matching_status(const ros::Time& stamp, const std::string& frame_id, const pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>& reg) {
+    if(!status_pub.getNumSubscribers()) {
+      return;
+    }
+
+    ScanMatchingStatus status;
+    status.header.frame_id = frame_id;
+    status.header.stamp = stamp;
+    status.has_converged = registration->hasConverged();
+    status.matching_score = registration->getFitnessScore();
+
+    const double max_correspondence_dist = 0.5;
+
+    int num_inliers = 0;
+    std::vector<int> k_indices;
+    std::vector<float> k_sq_dists;
+    for(const auto& pt: *reg.getInputCloud()) {
+      reg.getSearchMethodTarget()->nearestKSearch(pt, 1, k_indices, k_sq_dists);
+      if(k_sq_dists[0] < max_correspondence_dist * max_correspondence_dist) {
+        num_inliers++;
+      }
+    }
+    status.inlier_fraction = static_cast<float>(num_inliers) / reg.getInputCloud()->size();
+
+    Eigen::Quaternionf quat(registration->getFinalTransformation().block<3, 3>(0, 0));
+    Eigen::Vector3f trans = registration->getFinalTransformation().block<3, 1>(0, 3);
+
+    status.relative_pose.position.x = trans.x();
+    status.relative_pose.position.y = trans.y();
+    status.relative_pose.position.z = trans.z();
+    status.relative_pose.orientation.x = quat.x();
+    status.relative_pose.orientation.y = quat.y();
+    status.relative_pose.orientation.z = quat.z();
+    status.relative_pose.orientation.w = quat.w();
+
+    status_pub.publish(status);
+  }
+
 private:
   // ROS topics
   ros::NodeHandle nh;
@@ -278,6 +323,7 @@ private:
   ros::Publisher odom_pub;
   ros::Publisher trans_pub;
   ros::Publisher aligned_points_pub;
+  ros::Publisher status_pub;
   tf::TransformBroadcaster odom_broadcaster;
   tf::TransformBroadcaster keyframe_broadcaster;
 
