@@ -282,7 +282,7 @@ private:
     status.header.frame_id = frame_id;
     status.header.stamp = stamp;
     status.has_converged = registration->hasConverged();
-    status.matching_score = registration->getFitnessScore();
+    status.matching_error = registration->getFitnessScore();
 
     const double max_correspondence_dist = 0.5;
 
