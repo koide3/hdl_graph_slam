@@ -307,16 +307,19 @@ private:
 
     const double max_correspondence_dist = 0.5;
 
+    const pcl::PointCloud<pcl::PointXYZI>::ConstPtr src_cloud = registration->getInputCloud();
+
     int num_inliers = 0;
     std::vector<int> k_indices;
     std::vector<float> k_sq_dists;
-    for(const auto& pt: *registration->getInputCloud()) {
+    for(int i=0; i<src_cloud->size(); i++) {
+      const auto& pt = src_cloud->at(i);
       registration->getSearchMethodTarget()->nearestKSearch(pt, 1, k_indices, k_sq_dists);
       if(k_sq_dists[0] < max_correspondence_dist * max_correspondence_dist) {
         num_inliers++;
       }
     }
-    status.inlier_fraction = static_cast<float>(num_inliers) / registration->getInputCloud()->size();
+    status.inlier_fraction = static_cast<float>(num_inliers) / src_cloud->size();
 
     status.relative_pose = isometry2pose(Eigen::Isometry3f(registration->getFinalTransformation()).cast<double>());
 
