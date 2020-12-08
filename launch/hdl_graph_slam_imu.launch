@@ -33,7 +33,7 @@
   <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" args="load hdl_graph_slam/PrefilteringNodelet $(arg nodelet_manager)" output="screen">
     <remap from="/velodyne_points" to="$(arg points_topic)" />
     <remap from="/imu/data" to="$(arg imu_topic)" />
-    <param name="deskewing" value="true" />
+    <param name="deskewing" value="$(arg enable_imu_frontend)" />
     <param name="scan_period" value="0.1" />
     <!-- in case base_link_frame is blank, mapping will be performed in the lidar frame -->
     <param name="base_link_frame" value="base_link" />
