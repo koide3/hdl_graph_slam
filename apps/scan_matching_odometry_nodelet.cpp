@@ -208,7 +208,7 @@ private:
     pcl::PointCloud<PointT>::Ptr aligned(new pcl::PointCloud<PointT>());
     registration->align(*aligned, prev_trans * msf_delta.matrix());
 
-    publish_scan_matching_status(stamp, cloud->header.frame_id, msf_source, msf_delta);
+    publish_scan_matching_status(stamp, cloud->header.frame_id, aligned, msf_source, msf_delta);
 
     if(!registration->hasConverged()) {
       NODELET_INFO_STREAM("scan matching has not converged!!");
@@ -294,7 +294,7 @@ private:
   /**
    * @brief publish scan matching status
    */
-  void publish_scan_matching_status(const ros::Time& stamp, const std::string& frame_id, const std::string& msf_source, const Eigen::Isometry3f& msf_delta) {
+  void publish_scan_matching_status(const ros::Time& stamp, const std::string& frame_id, pcl::PointCloud<pcl::PointXYZI>::ConstPtr aligned, const std::string& msf_source, const Eigen::Isometry3f& msf_delta) {
     if(!status_pub.getNumSubscribers()) {
       return;
     }
@@ -307,19 +307,17 @@ private:
 
     const double max_correspondence_dist = 0.5;
 
-    const pcl::PointCloud<pcl::PointXYZI>::ConstPtr src_cloud = registration->getInputCloud();
-
     int num_inliers = 0;
     std::vector<int> k_indices;
     std::vector<float> k_sq_dists;
-    for(int i=0; i<src_cloud->size(); i++) {
-      const auto& pt = src_cloud->at(i);
+    for(int i=0; i<aligned->size(); i++) {
+      const auto& pt = aligned->at(i);
       registration->getSearchMethodTarget()->nearestKSearch(pt, 1, k_indices, k_sq_dists);
       if(k_sq_dists[0] < max_correspondence_dist * max_correspondence_dist) {
         num_inliers++;
       }
     }
-    status.inlier_fraction = static_cast<float>(num_inliers) / src_cloud->size();
+    status.inlier_fraction = static_cast<float>(num_inliers) / aligned->size();
 
     status.relative_pose = isometry2pose(Eigen::Isometry3f(registration->getFinalTransformation()).cast<double>());
 
