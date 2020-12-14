@@ -44,6 +44,12 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+find_library(VGICP_CUDA_FOUND NAMES fast_vgicp_cuda)
+message(STATUS "VGICP_CUDA_FOUND:" ${VGICP_CUDA_FOUND})
+if(VGICP_CUDA_FOUND)
+  add_definitions(-DUSE_VGICP_CUDA)
+endif()
+
 ########################
 ## message generation ##
 ########################

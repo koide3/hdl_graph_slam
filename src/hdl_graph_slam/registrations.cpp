@@ -13,6 +13,10 @@
 #include <fast_gicp/gicp/fast_gicp.hpp>
 #include <fast_gicp/gicp/fast_vgicp.hpp>
 
+#ifdef USE_VGICP_CUDA
+#include <fast_gicp/gicp/fast_vgicp_cuda.hpp>
+#endif
+
 namespace hdl_graph_slam {
 
 boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_registration_method(ros::NodeHandle& pnh) {
@@ -23,16 +27,28 @@ boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_regi
   if(registration_method == "FAST_GICP") {
     std::cout << "registration: FAST_GICP" << std::endl;
     boost::shared_ptr<fast_gicp::FastGICP<PointT, PointT>> gicp(new fast_gicp::FastGICP<PointT, PointT>());
-    gicp->setNumThreads(pnh.param<int>("reg_num_threads", 0.01));
+    gicp->setNumThreads(pnh.param<int>("reg_num_threads", 0));
     gicp->setTransformationEpsilon(pnh.param<double>("reg_transformation_epsilon", 0.01));
     gicp->setMaximumIterations(pnh.param<int>("reg_maximum_iterations", 64));
     gicp->setMaxCorrespondenceDistance(pnh.param<double>("reg_max_correspondence_distance", 2.5));
     gicp->setCorrespondenceRandomness(pnh.param<int>("reg_correspondence_randomness", 20));
     return gicp;
-  } else if(registration_method == "FAST_VGICP") {
+  }
+#ifdef USE_VGICP_CUDA
+  else if(registration_method == "FAST_VGICP_CUDA") {
+    std::cout << "registration: FAST_VGICP_CUDA" << std::endl;
+    boost::shared_ptr<fast_gicp::FastVGICPCuda<PointT, PointT>> vgicp(new fast_gicp::FastVGICPCuda<PointT, PointT>());
+    vgicp->setResolution(pnh.param<double>("reg_resolution", 1.0));
+    vgicp->setTransformationEpsilon(pnh.param<double>("reg_transformation_epsilon", 0.01));
+    vgicp->setMaximumIterations(pnh.param<int>("reg_maximum_iterations", 64));
+    vgicp->setCorrespondenceRandomness(pnh.param<int>("reg_correspondence_randomness", 20));
+    return vgicp;
+  }
+#endif
+  else if(registration_method == "FAST_VGICP") {
     std::cout << "registration: FAST_VGICP" << std::endl;
     boost::shared_ptr<fast_gicp::FastVGICP<PointT, PointT>> vgicp(new fast_gicp::FastVGICP<PointT, PointT>());
-    vgicp->setNumThreads(pnh.param<int>("reg_num_threads", 0.01));
+    vgicp->setNumThreads(pnh.param<int>("reg_num_threads", 0));
     vgicp->setResolution(pnh.param<double>("reg_resolution", 1.0));
     vgicp->setTransformationEpsilon(pnh.param<double>("reg_transformation_epsilon", 0.01));
     vgicp->setMaximumIterations(pnh.param<int>("reg_maximum_iterations", 64));
