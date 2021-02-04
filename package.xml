@@ -18,6 +18,7 @@
   <build_depend>geodesy</build_depend>
   <build_depend>nmea_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>libg2o</build_depend>
 
@@ -30,7 +31,8 @@
   <exec_depend>nodelet</exec_depend>
   <exec_depend>nmea_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
-  
+  <exec_depend>message_generation</exec_depend>
+
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-scipy</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-scipy</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-progressbar</exec_depend>

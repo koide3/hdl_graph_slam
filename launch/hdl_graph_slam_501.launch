@@ -6,7 +6,14 @@
   <arg name="enable_gps" default="false" />
   <arg name="enable_imu_acc" default="false" />
   <arg name="enable_imu_ori" default="false" />
+
   <arg name="points_topic" default="/velodyne_points" />
+  <arg name="map_frame_id" default="map" />
+  <arg name="lidar_odom_frame_id" default="odom" />
+
+  <!-- optional arguments -->
+  <arg name="enable_robot_odometry_init_guess" default="false" />
+  <arg name="robot_odom_frame_id" default="robot_odom" />
 
   <!-- transformation between lidar and base_link -->
   <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 base_link velodyne 10" />
@@ -37,11 +44,13 @@
   <!-- scan_matching_odometry_nodelet -->
   <node pkg="nodelet" type="nodelet" name="scan_matching_odometry_nodelet" args="load hdl_graph_slam/ScanMatchingOdometryNodelet $(arg nodelet_manager)">
     <param name="points_topic" value="$(arg points_topic)" />
-    <param name="odom_frame_id" value="odom" />
+    <param name="odom_frame_id" value="$(arg lidar_odom_frame_id)" />
+    <param name="robot_odom_frame_id" value="$(arg robot_odom_frame_id)" />
     <param name="keyframe_delta_trans" value="0.25" />
     <param name="keyframe_delta_angle" value="1.0" />
     <param name="keyframe_delta_time" value="10000.0" />
     <param name="transform_thresholding" value="false" />
+    <param name="enable_robot_odometry_init_guess" value="$(arg enable_robot_odometry_init_guess)" />
     <param name="max_acceptable_trans" value="1.0" />
     <param name="max_acceptable_angle" value="1.0" />
     <param name="downsample_method" value="NONE" />
@@ -74,8 +83,8 @@
   <node pkg="nodelet" type="nodelet" name="hdl_graph_slam_nodelet" args="load hdl_graph_slam/HdlGraphSlamNodelet $(arg nodelet_manager)">
     <param name="points_topic" value="$(arg points_topic)" />
     <!-- frame settings -->
-    <param name="map_frame_id" value="map" />
-    <param name="odom_frame_id" value="odom" />
+    <param name="map_frame_id" value="$(arg map_frame_id)" />
+    <param name="odom_frame_id" value="$(arg lidar_odom_frame_id)" />
     <!-- optimization params -->
     <!-- typical solvers: gn_var, gn_fix6_3, gn_var_cholmod, lm_var, lm_fix6_3, lm_var_cholmod, ... -->
     <param name="g2o_solver_type" value="lm_var_cholmod" />
