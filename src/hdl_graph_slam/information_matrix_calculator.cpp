@@ -8,7 +8,7 @@
 namespace hdl_graph_slam {
 
 InformationMatrixCalculator::InformationMatrixCalculator(ros::NodeHandle& nh) {
-  use_const_inf_matrix = nh.param<double>("use_const_inf_matrix", false);
+  use_const_inf_matrix = nh.param<bool>("use_const_inf_matrix", false);
   const_stddev_x = nh.param<double>("const_stddev_x", 0.5);
   const_stddev_q = nh.param<double>("const_stddev_q", 0.1);
 
