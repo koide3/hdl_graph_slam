@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <unordered_map>
+#include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -837,7 +838,7 @@ private:
 
     if(zero_utm) {
       std::ofstream zero_utm_ofs(directory + "/zero_utm");
-      zero_utm_ofs << *zero_utm << std::endl;
+      zero_utm_ofs << boost::format("%.6f %.6f %.6f") % zero_utm->x() % zero_utm->y() % zero_utm->z() << std::endl;
     }
 
     std::ofstream ofs(directory + "/special_nodes.csv");
