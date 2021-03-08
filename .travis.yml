@@ -27,7 +27,7 @@ matrix:
     env: ROS_DISTRO=noetic_llvm
 
 script:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || true
   - docker build -f ./docker/$ROS_DISTRO/Dockerfile .
 
 env:
