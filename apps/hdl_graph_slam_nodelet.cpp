@@ -880,7 +880,7 @@ private:
 
     if(zero_utm) {
       std::ofstream ofs(req.destination + ".utm");
-      ofs << (*zero_utm).transpose() << std::endl;
+      ofs << boost::format("%.6f %.6f %.6f") % zero_utm->x() % zero_utm->y() % zero_utm->z() << std::endl;
     }
 
     int ret = pcl::io::savePCDFileBinary(req.destination, *cloud);
