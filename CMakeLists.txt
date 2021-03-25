@@ -109,6 +109,7 @@ target_link_libraries(scan_matching_odometry_nodelet
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
+add_dependencies(scan_matching_odometry_nodelet ${PROJECT_NAME}_gencpp)
 
 
 add_library(hdl_graph_slam_nodelet
