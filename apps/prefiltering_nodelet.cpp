@@ -131,7 +131,7 @@ private:
     filtered = downsample(filtered);
     filtered = outlier_removal(filtered);
 
-    points_pub.publish(filtered);
+    points_pub.publish(*filtered);
   }
 
   pcl::PointCloud<PointT>::ConstPtr downsample(const pcl::PointCloud<PointT>::ConstPtr& cloud) const {
@@ -200,7 +200,7 @@ private:
         colored->at(i).g = 128;
         colored->at(i).b = 255 * (1 - t);
       }
-      colored_pub.publish(colored);
+      colored_pub.publish(*colored);
     }
 
     sensor_msgs::ImuConstPtr imu_msg = imu_queue.front();
