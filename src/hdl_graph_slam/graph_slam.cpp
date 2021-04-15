@@ -334,7 +334,7 @@ bool GraphSLAM::load(const std::string& filename) {
   g2o::SparseOptimizer* graph = dynamic_cast<g2o::SparseOptimizer*>(this->graph.get());
 
   std::ifstream ifs(filename);
-  if(!graph->load(ifs, true)) {
+  if(!graph->load(ifs)) {
     return false;
   }
 
