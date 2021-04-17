@@ -84,12 +84,12 @@ private:
     double downsample_resolution = pnh.param<double>("downsample_resolution", 0.1);
     if(downsample_method == "VOXELGRID") {
       std::cout << "downsample: VOXELGRID " << downsample_resolution << std::endl;
-      boost::shared_ptr<pcl::VoxelGrid<PointT>> voxelgrid(new pcl::VoxelGrid<PointT>());
+      pcl::shared_ptr<pcl::VoxelGrid<PointT>> voxelgrid(new pcl::VoxelGrid<PointT>());
       voxelgrid->setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
       downsample_filter = voxelgrid;
     } else if(downsample_method == "APPROX_VOXELGRID") {
       std::cout << "downsample: APPROX_VOXELGRID " << downsample_resolution << std::endl;
-      boost::shared_ptr<pcl::ApproximateVoxelGrid<PointT>> approx_voxelgrid(new pcl::ApproximateVoxelGrid<PointT>());
+      pcl::shared_ptr<pcl::ApproximateVoxelGrid<PointT>> approx_voxelgrid(new pcl::ApproximateVoxelGrid<PointT>());
       approx_voxelgrid->setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
       downsample_filter = approx_voxelgrid;
     } else {
@@ -98,7 +98,7 @@ private:
         std::cerr << "       : use passthrough filter" << std::endl;
       }
       std::cout << "downsample: NONE" << std::endl;
-      boost::shared_ptr<pcl::PassThrough<PointT>> passthrough(new pcl::PassThrough<PointT>());
+      pcl::shared_ptr<pcl::PassThrough<PointT>> passthrough(new pcl::PassThrough<PointT>());
       downsample_filter = passthrough;
     }
 
