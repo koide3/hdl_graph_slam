@@ -103,7 +103,8 @@ private:
     imu_queue.push_back(imu_msg);
   }
 
-  void cloud_callback(pcl::PointCloud<PointT>::ConstPtr src_cloud) {
+  void cloud_callback(const pcl::PointCloud<PointT>& src_cloud_r) {
+    pcl::PointCloud<PointT>::ConstPtr src_cloud = src_cloud_r.makeShared();
     if(src_cloud->empty()) {
       return;
     }
