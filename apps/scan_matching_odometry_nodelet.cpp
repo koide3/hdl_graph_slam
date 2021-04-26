@@ -67,6 +67,7 @@ private:
     points_topic = pnh.param<std::string>("points_topic", "/velodyne_points");
     odom_frame_id = pnh.param<std::string>("odom_frame_id", "odom");
     robot_odom_frame_id = pnh.param<std::string>("robot_odom_frame_id", "robot_odom");
+    publish_tf = pnh.param<bool>("publish_tf", true);
 
     // The minimum tranlational distance and rotation angle between keyframes.
     // If this value is zero, frames are always compared with the previous frame
@@ -271,7 +272,8 @@ private:
     trans_pub.publish(odom_trans);
 
     // broadcast the transform over tf
-    odom_broadcaster.sendTransform(odom_trans);
+    if(publish_tf)
+      odom_broadcaster.sendTransform(odom_trans);
 
     // publish the transform
     nav_msgs::Odometry odom;
@@ -354,7 +356,7 @@ private:
   std::string odom_frame_id;
   std::string robot_odom_frame_id;
   ros::Publisher read_until_pub;
-
+  
   // keyframe parameters
   double keyframe_delta_trans;  // minimum distance between keyframes
   double keyframe_delta_angle;  //
@@ -368,6 +370,7 @@ private:
   // odometry calculation
   geometry_msgs::PoseWithCovarianceStampedConstPtr msf_pose;
   geometry_msgs::PoseWithCovarianceStampedConstPtr msf_pose_after_update;
+  bool publish_tf; 
 
   ros::Time prev_time;
   Eigen::Matrix4f prev_trans;                  // previous estimated transform from keyframe
