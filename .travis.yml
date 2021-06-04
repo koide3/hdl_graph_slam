@@ -1,19 +1,9 @@
 sudo: required
 language: generic
-dist: xenial
+dist: focal
 
 services:
 - docker
-
-cache:
-  directories:
-    - docker_cache
-
-before_install:
-  - docker load -i docker_cache/images.tar || true
-
-before_cache:
-  - docker save -o docker_cache/images.tar $(docker images -a -q)
 
 matrix:
   include:

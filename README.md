@@ -78,12 +78,22 @@ The following ROS packages are required:
 ```bash
 # for melodic
 sudo apt-get install ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs ros-melodic-libg2o
+cd catkin_ws/src
+git clone https://github.com/koide3/ndt_omp.git -b melodic
+git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+git clone https://github.com/koide3/hdl_graph_slam
+
+cd .. && catkin_make -DCMAKE_BUILD_TYPE=Release
+
 # for noetic
 sudo apt-get install ros-noetic-geodesy ros-noetic-pcl-ros ros-noetic-nmea-msgs ros-noetic-libg2o
 
 cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
 git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+git clone https://github.com/koide3/hdl_graph_slam
+
+cd .. && catkin_make -DCMAKE_BUILD_TYPE=Release
 ```
 
 **[optional]** *bag_player.py* script requires ProgressBar2.
@@ -112,7 +122,7 @@ rviz -d hdl_graph_slam.rviz
 rosbag play --clock hdl_501_filtered.bag
 ```
 
-We also provide bag_player.py which adjusts the playback speed according to the processing speed. It allows to process data as fast as possible.
+We also provide bag_player.py which automatically adjusts the playback speed and processes data as fast as possible.
 
 ```bash
 rosrun hdl_graph_slam bag_player.py hdl_501_filtered.bag
@@ -178,11 +188,10 @@ rosrun hdl_graph_slam bag_player.py dataset-2.bag
 
 ### Parameter tuning guide
 
-The mapping result deeply depends on the parameter setting. In particular, scan matching parameters have a big impact on the result. Tune the parameters accoding to the following instruction:
+The mapping quality largely depends on the parameter setting. In particular, scan matching parameters have a big impact on the result. Tune the parameters accoding to the following instructions:
 
 - ***registration_method***
-   **In short, use GICP for 16-line LIDARs and NDT_OMP for other ones**.  This parameter allows to change the registration method to be used for odometry estimation and loop detection. If you use a LIDAR with many scan lines (32, 64, or more lines), NDT_OMP could be a good choice. It is fast and accurate for dense point clouds. If you use a 16-line LIDAR, NDT-based methods may not work well because it is not very robust to sparse point clouds. In that case, choose GICP or GICP_OMP. GICP variants are slightly slower than NDT, but more accurate and robust to sparse point clouds.
-  Note that GICP in PCL1.7 (ROS kinetic) or earlier has a bug in the initial guess handling. **If you are on ROS kinectic or earlier, do not use GICP**.
+  **[updated] In short, use FAST_GICP for most cases and FAST_VGICP or NDT_OMP if the processing speed matters** This parameter allows to change the registration method to be used for odometry estimation and loop detection. Note that GICP in PCL1.7 (ROS kinetic) or earlier has a bug in the initial guess handling. **If you are on ROS kinectic or earlier, do not use GICP**.
 
 - ***ndt_resolution***
   This parameter decides the voxel size of NDT. Typically larger values are good for outdoor environements (0.5 - 2.0 [m] for indoor, 2.0 - 10.0 [m] for outdoor). If you chose NDT or NDT_OMP, tweak this parameter so you can obtain a good odometry estimation result.
