@@ -78,12 +78,22 @@ The following ROS packages are required:
 ```bash
 # for melodic
 sudo apt-get install ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs ros-melodic-libg2o
+cd catkin_ws/src
+git clone https://github.com/koide3/ndt_omp.git -b melodic
+git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+git clone https://github.com/koide3/hdl_graph_slam
+
+cd .. && catkin_make -DCMAKE_BUILD_TYPE=Release
+
 # for noetic
 sudo apt-get install ros-noetic-geodesy ros-noetic-pcl-ros ros-noetic-nmea-msgs ros-noetic-libg2o
 
 cd catkin_ws/src
 git clone https://github.com/koide3/ndt_omp.git
 git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+git clone https://github.com/koide3/hdl_graph_slam
+
+cd .. && catkin_make -DCMAKE_BUILD_TYPE=Release
 ```
 
 **[optional]** *bag_player.py* script requires ProgressBar2.
