@@ -103,7 +103,8 @@ private:
     imu_queue.push_back(imu_msg);
   }
 
-  void cloud_callback(pcl::PointCloud<PointT>::ConstPtr src_cloud) {
+  void cloud_callback(const pcl::PointCloud<PointT>& src_cloud_r) {
+    pcl::PointCloud<PointT>::ConstPtr src_cloud = src_cloud_r.makeShared();
     if(src_cloud->empty()) {
       return;
     }
@@ -131,7 +132,7 @@ private:
     filtered = downsample(filtered);
     filtered = outlier_removal(filtered);
 
-    points_pub.publish(filtered);
+    points_pub.publish(*filtered);
   }
 
   pcl::PointCloud<PointT>::ConstPtr downsample(const pcl::PointCloud<PointT>::ConstPtr& cloud) const {
@@ -200,7 +201,7 @@ private:
         colored->at(i).g = 128;
         colored->at(i).b = 255 * (1 - t);
       }
-      colored_pub.publish(colored);
+      colored_pub.publish(*colored);
     }
 
     sensor_msgs::ImuConstPtr imu_msg = imu_queue.front();

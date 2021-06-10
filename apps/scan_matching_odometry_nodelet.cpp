@@ -254,7 +254,7 @@ private:
     {
       pcl::transformPointCloud (*cloud, *aligned, odom);
       aligned->header.frame_id=odom_frame_id;
-      aligned_points_pub.publish(aligned);
+      aligned_points_pub.publish(*aligned);
     }
 
     return odom;

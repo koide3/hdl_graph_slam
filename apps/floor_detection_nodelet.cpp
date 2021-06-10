@@ -124,7 +124,7 @@ private:
 
     if(floor_filtered_pub.getNumSubscribers()) {
       filtered->header = cloud->header;
-      floor_filtered_pub.publish(filtered);
+      floor_filtered_pub.publish(*filtered);
     }
 
     // too few points for RANSAC
@@ -171,7 +171,7 @@ private:
       extract.filter(*inlier_cloud);
       inlier_cloud->header = cloud->header;
 
-      floor_points_pub.publish(inlier_cloud);
+      floor_points_pub.publish(*inlier_cloud);
     }
 
     return Eigen::Vector4f(coeffs);
