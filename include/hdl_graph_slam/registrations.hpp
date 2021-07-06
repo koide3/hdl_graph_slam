@@ -14,7 +14,7 @@ namespace hdl_graph_slam {
  * @param pnh
  * @return selected scan matching
  */
-boost::shared_ptr<pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>> select_registration_method(ros::NodeHandle& pnh);
+pcl::Registration<pcl::PointXYZI, pcl::PointXYZI>::Ptr select_registration_method(ros::NodeHandle& pnh);
 
 }  // namespace hdl_graph_slam
 
