@@ -33,6 +33,7 @@
 #include <geographic_msgs/GeoPointStamped.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <hdl_graph_slam/FloorCoeffs.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <hdl_graph_slam/SaveMap.h>
 #include <hdl_graph_slam/DumpGraph.h>
@@ -78,6 +79,7 @@ public:
     map_frame_id = private_nh.param<std::string>("map_frame_id", "map");
     odom_frame_id = private_nh.param<std::string>("odom_frame_id", "odom");
     map_cloud_resolution = private_nh.param<double>("map_cloud_resolution", 0.05);
+    wait_trans_odom2map  = private_nh.param<bool>("wait_trans_odom2map", false);
     trans_odom2map.setIdentity();
 
     max_keyframes_per_update = private_nh.param<int>("max_keyframes_per_update", 10);
@@ -106,6 +108,13 @@ public:
 
     points_topic = private_nh.param<std::string>("points_topic", "/velodyne_points");
 
+    got_trans_odom2map = false;    
+    while (wait_trans_odom2map) {
+      init_odom2map_sub = nh.subscribe("/odom2map/initial_pose", 1, &HdlGraphSlamNodelet::init_map2odom_pose_callback, this); 
+      ROS_WARN("Waiting for the Initial Transform between odom and map frame");
+      usleep(1e6);
+    }
+    
     // subscribers
     odom_sub.reset(new message_filters::Subscriber<nav_msgs::Odometry>(mt_nh, "/odom", 256));
     cloud_sub.reset(new message_filters::Subscriber<sensor_msgs::PointCloud2>(mt_nh, "/filtered_points", 32));
@@ -137,12 +146,40 @@ public:
   }
 
 private:
+    /**
+   * @brief receive the initial transform between map and odom frame
+   * @param map2odom_pose_msg 
+   */
+  void init_map2odom_pose_callback(const geometry_msgs::PoseStamped pose_msg) {
+    if(got_trans_odom2map)
+      return;
+
+    Eigen::Matrix3f mat3 = Eigen::Quaternionf(pose_msg.pose.orientation.w, 
+                                              pose_msg.pose.orientation.x, 
+                                              pose_msg.pose.orientation.y, 
+                                              pose_msg.pose.orientation.z).toRotationMatrix();
+
+    trans_odom2map.block<3,3>(0,0) = mat3;
+    trans_odom2map(0,3) = pose_msg.pose.position.x;
+    trans_odom2map(1,3) = pose_msg.pose.position.y;
+    trans_odom2map(2,3) = pose_msg.pose.position.z;
+
+    if(trans_odom2map.isIdentity())
+      return;
+    else {
+      got_trans_odom2map = true; 
+      wait_trans_odom2map = false;
+    }
+  }
+
+
   /**
    * @brief received point clouds are pushed to #keyframe_queue
    * @param odom_msg
    * @param cloud_msg
    */
   void cloud_callback(const nav_msgs::OdometryConstPtr& odom_msg, const sensor_msgs::PointCloud2::ConstPtr& cloud_msg) {
+
     const ros::Time& stamp = cloud_msg->header.stamp;
     Eigen::Isometry3d odom = odom2isometry(odom_msg);
 
@@ -912,10 +949,12 @@ private:
 
   std::string map_frame_id;
   std::string odom_frame_id;
-
+  
+  bool wait_trans_odom2map, got_trans_odom2map;
   std::mutex trans_odom2map_mutex;
   Eigen::Matrix4f trans_odom2map;
   ros::Publisher odom2map_pub;
+  ros::Subscriber init_odom2map_sub;
 
   std::string points_topic;
   ros::Publisher read_until_pub;
