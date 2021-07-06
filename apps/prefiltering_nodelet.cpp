@@ -53,9 +53,9 @@ private:
 
     if(downsample_method == "VOXELGRID") {
       std::cout << "downsample: VOXELGRID " << downsample_resolution << std::endl;
-      pcl::VoxelGrid<PointT>::Ptr voxelgrid(new pcl::VoxelGrid<PointT>());
+      auto voxelgrid = new pcl::VoxelGrid<PointT>();
       voxelgrid->setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
-      downsample_filter = voxelgrid;
+      downsample_filter.reset(voxelgrid);
     } else if(downsample_method == "APPROX_VOXELGRID") {
       std::cout << "downsample: APPROX_VOXELGRID " << downsample_resolution << std::endl;
       pcl::ApproximateVoxelGrid<PointT>::Ptr approx_voxelgrid(new pcl::ApproximateVoxelGrid<PointT>());
