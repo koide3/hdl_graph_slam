@@ -108,10 +108,11 @@ public:
 
     points_topic = private_nh.param<std::string>("points_topic", "/velodyne_points");
 
-    got_trans_odom2map = false;    
-    while (wait_trans_odom2map) {
-      init_odom2map_sub = nh.subscribe("/odom2map/initial_pose", 1, &HdlGraphSlamNodelet::init_map2odom_pose_callback, this); 
+    init_odom2map_sub = nh.subscribe("/odom2map/initial_pose", 1, &HdlGraphSlamNodelet::init_map2odom_pose_callback, this); 
+
+    while(wait_trans_odom2map && !got_trans_odom2map) {
       ROS_WARN("Waiting for the Initial Transform between odom and map frame");
+      ros::spinOnce();
       usleep(1e6);
     }
     
@@ -131,7 +132,7 @@ public:
 
     // publishers
     markers_pub = mt_nh.advertise<visualization_msgs::MarkerArray>("/hdl_graph_slam/markers", 16);
-    odom2map_pub = mt_nh.advertise<geometry_msgs::TransformStamped>("/hdl_graph_slam/odom2pub", 16);
+    odom2map_pub = mt_nh.advertise<geometry_msgs::TransformStamped>("/hdl_graph_slam/odom2map", 16);
     map_points_pub = mt_nh.advertise<sensor_msgs::PointCloud2>("/hdl_graph_slam/map_points", 1, true);
     read_until_pub = mt_nh.advertise<std_msgs::Header>("/hdl_graph_slam/read_until", 32);
 
@@ -151,6 +152,7 @@ private:
    * @param map2odom_pose_msg 
    */
   void init_map2odom_pose_callback(const geometry_msgs::PoseStamped pose_msg) {
+    
     if(got_trans_odom2map)
       return;
 
@@ -168,7 +170,6 @@ private:
       return;
     else {
       got_trans_odom2map = true; 
-      wait_trans_odom2map = false;
     }
   }
 
@@ -631,15 +632,11 @@ private:
     keyframes_snapshot_mutex.unlock();
     graph_updated = true;
 
-    if(odom2map_pub.getNumSubscribers()) {
-      geometry_msgs::TransformStamped ts = matrix2transform(keyframe->stamp, trans.matrix().cast<float>(), map_frame_id, odom_frame_id);
-      odom2map_pub.publish(ts);
-    }
-
-    if(markers_pub.getNumSubscribers()) {
-      auto markers = create_marker_array(ros::Time::now());
-      markers_pub.publish(markers);
-    }
+    geometry_msgs::TransformStamped ts = matrix2transform(keyframe->stamp, trans.matrix().cast<float>(), map_frame_id, odom_frame_id);
+    odom2map_pub.publish(ts);
+    
+    auto markers = create_marker_array(ros::Time::now());
+    markers_pub.publish(markers);
   }
 
   /**
