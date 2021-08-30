@@ -1,40 +1,52 @@
 <?xml version="1.0"?>
 <launch>
   <!-- arguments -->
-  <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
-  <arg name="enable_floor_detection" default="false" />
-  <arg name="enable_gps" default="false" />
+  <arg name="nodelet_manager" default="hdl_graph_slam_nodelet_manager" />
+  <arg name="enable_floor_detection" default="true" />
+  <arg name="enable_gps" default="true" />
   <arg name="enable_imu_acc" default="false" />
   <arg name="enable_imu_ori" default="false" />
 
+  <!-- hdl_graph_slam will publish its estimated pose from odom to base_link within the following structure -->
+  <!-- ***** map -> odom -> base_link -> velodyne ***** -->
+  <!-- these can be named in the following -->
+  <!-- topic for hdl to find velodyne points -->
   <arg name="points_topic" default="/velodyne_points" />
-  <arg name="map_frame_id" default="map" />
-  <arg name="lidar_odom_frame_id" default="odom" />
+  <!-- what should the map frame be called -->
+  <arg name="map_frame_id" default="slam_map" />
+  <!-- what should the base link frame be called -->
+  <arg name="base_link_frame_id" default="slam_base_link" />
+  <!-- what should the odom frame be called -->
+  <arg name="lidar_odom_frame_id" default="slam_odom" />
+
+  <!-- hdl_graph_slam will also publish an odom message -->
+  <!-- what should the topic be for odom messages published by hdl-graph-slam -->
+  <arg name="published_odom_topic" default="/hdl_graph_slam/odom" />
 
   <!-- optional arguments -->
   <arg name="enable_robot_odometry_init_guess" default="false" />
   <arg name="robot_odom_frame_id" default="robot_odom" />
 
   <!-- transformation between lidar and base_link -->
-  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 base_link velodyne 10" />
+  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 $(arg base_link_frame_id) velodyne 10" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
-  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
+   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/> 
 
   <!-- prefiltering_nodelet -->
   <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" args="load hdl_graph_slam/PrefilteringNodelet $(arg nodelet_manager)">
     <remap from="/velodyne_points" to="$(arg points_topic)" />
     <!-- in case base_link_frame is blank, mapping will be performed in the lidar frame -->
-    <param name="base_link_frame" value="base_link" />
+    <param name="base_link_frame" value="$(arg base_link_frame_id)" />
     <!-- distance filter -->
-    <param name="use_distance_filter" value="true" />
+    <param name="use_distance_filter" value="false" />
     <param name="distance_near_thresh" value="0.1" />
-    <param name="distance_far_thresh" value="100.0" />
+    <param name="distance_far_thresh" value="1000.0" />
     <!-- NONE, VOXELGRID, or APPROX_VOXELGRID -->
     <param name="downsample_method" value="VOXELGRID" />
     <param name="downsample_resolution" value="0.1" />
     <!-- NONE, RADIUS, or STATISTICAL -->
-    <param name="outlier_removal_method" value="RADIUS" />
+    <param name="outlier_removal_method" value="NONE" />
     <param name="statistical_mean_k" value="30" />
     <param name="statistical_stddev" value="1.2" />
     <param name="radius_radius" value="0.5" />
@@ -44,6 +56,8 @@
   <!-- scan_matching_odometry_nodelet -->
   <node pkg="nodelet" type="nodelet" name="scan_matching_odometry_nodelet" args="load hdl_graph_slam/ScanMatchingOdometryNodelet $(arg nodelet_manager)">
     <param name="points_topic" value="$(arg points_topic)" />
+    <!-- published_odom_topic -->
+    <param name="published_odom_topic" value="$(arg published_odom_topic)" />
     <param name="odom_frame_id" value="$(arg lidar_odom_frame_id)" />
     <param name="robot_odom_frame_id" value="$(arg robot_odom_frame_id)" />
     <param name="keyframe_delta_trans" value="1.0" />
@@ -82,6 +96,8 @@
   <!-- hdl_graph_slam_nodelet -->
   <node pkg="nodelet" type="nodelet" name="hdl_graph_slam_nodelet" args="load hdl_graph_slam/HdlGraphSlamNodelet $(arg nodelet_manager)">
     <param name="points_topic" value="$(arg points_topic)" />
+    <!-- published_odom_topic -->
+    <param name="published_odom_topic" value="$(arg published_odom_topic)" />
     <!-- frame settings -->
     <param name="map_frame_id" value="$(arg map_frame_id)" />
     <param name="odom_frame_id" value="$(arg lidar_odom_frame_id)" />
@@ -102,13 +118,14 @@
     <param name="fix_first_node_stddev" value="10 10 10 1 1 1"/>
     <param name="fix_first_node_adaptive" value="true"/>
     <!-- loop closure params -->
-    <param name="distance_thresh" value="10.0" />
-    <param name="accum_distance_thresh" value="15.0" />
+    <param name="distance_thresh" value="20.0" />
+    <param name="accum_distance_thresh" value="35.0" />
     <param name="min_edge_interval" value="5.0" />
     <param name="fitness_score_thresh" value="0.5" />
+    
     <!-- scan matching params -->
     <param name="registration_method" value="FAST_GICP" />
-    <param name="reg_num_threads" value="0" />
+    <param name="reg_num_threads" value="4" />
     <param name="reg_transformation_epsilon" value="0.01"/>
     <param name="reg_maximum_iterations" value="64"/>
     <param name="reg_max_correspondence_distance" value="2.5"/>
@@ -152,5 +169,8 @@
     <param name="map_cloud_resolution" value="0.05" />
   </node>
 
-  <node pkg="hdl_graph_slam" type="map2odom_publisher.py" name="map2odom_publisher" />
+  <node pkg="hdl_graph_slam" type="map2odom_publisher.py" name="map2odom_publisher" >
+     <param name="map_frame_id" value="$(arg map_frame_id)" />
+     <param name="odom_frame_id" value="$(arg lidar_odom_frame_id)" />
+  </node>
 </launch>

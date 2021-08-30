@@ -52,7 +52,7 @@ public:
 
     points_sub = nh.subscribe("/filtered_points", 256, &ScanMatchingOdometryNodelet::cloud_callback, this);
     read_until_pub = nh.advertise<std_msgs::Header>("/scan_matching_odometry/read_until", 32);
-    odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 32);
+    odom_pub = nh.advertise<nav_msgs::Odometry>(published_odom_topic, 32);
     trans_pub = nh.advertise<geometry_msgs::TransformStamped>("/scan_matching_odometry/transform", 32);
     status_pub = private_nh.advertise<ScanMatchingStatus>("/scan_matching_odometry/status", 8);
     aligned_points_pub = nh.advertise<sensor_msgs::PointCloud2>("/aligned_points", 32);
@@ -64,6 +64,7 @@ private:
    */
   void initialize_params() {
     auto& pnh = private_nh;
+    published_odom_topic = private_nh.param<std::string>("published_odom_topic", "/hdl_graph_slam/odom");
     points_topic = pnh.param<std::string>("points_topic", "/velodyne_points");
     odom_frame_id = pnh.param<std::string>("odom_frame_id", "odom");
     robot_odom_frame_id = pnh.param<std::string>("robot_odom_frame_id", "robot_odom");
@@ -350,6 +351,7 @@ private:
   tf::TransformBroadcaster odom_broadcaster;
   tf::TransformBroadcaster keyframe_broadcaster;
 
+  std::string published_odom_topic;
   std::string points_topic;
   std::string odom_frame_id;
   std::string robot_odom_frame_id;
