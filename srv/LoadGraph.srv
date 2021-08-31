@@ -1,4 +1,4 @@
 
-string destination
+string path
 ---
 bool success
