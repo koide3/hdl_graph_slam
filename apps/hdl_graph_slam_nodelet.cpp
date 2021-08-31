@@ -35,6 +35,7 @@
 #include <hdl_graph_slam/FloorCoeffs.h>
 
 #include <hdl_graph_slam/SaveMap.h>
+#include <hdl_graph_slam/LoadGraph.h>
 #include <hdl_graph_slam/DumpGraph.h>
 
 #include <nodelet/nodelet.h>
@@ -814,39 +815,33 @@ private:
    * @param res
    * @return
    */
-  bool load_service(hdl_graph_slam::DumpGraphRequest& req, hdl_graph_slam::DumpGraphResponse& res) {
+  bool load_service(hdl_graph_slam::LoadGraphRequest& req, hdl_graph_slam::LoadGraphResponse& res) {
     std::lock_guard<std::mutex> lock(main_thread_mutex);
 
     std::string directory = req.destination;
 
     std::cout << "loading data from:" << directory << std::endl;
 
-    // load graph 
+    // Load graph.
     graph_slam->load(directory + "/graph.g2o");
-    std::cout << "graph loaded" << std::endl;
-    // load keyframes
-
+    
+    // Load keyframes by looping through key frame indexes that we expect to see.
     for(int i = 0; i < 1000; i++) { // un magic this max iterator
       std::stringstream sst;
       sst << boost::format("%s/%06d") % directory % i;
       std::string keyframeDir = sst.str();
 
-      std::cout << "loading keyframe:" << keyframeDir << std::endl;
-
-      // If keyframeDir doesnt exist, then we have run out so lets stop looking
+      // If keyframeDir doesnt exist, then we have run out so lets stop looking.
       if(!boost::filesystem::is_directory(keyframeDir)) {
-        std::cout << "keyframe did not exist: " << keyframeDir << " - finishing keyframes"<<std::endl;
         break;
       }
 
-      std::cout << "keyframe exists:" << keyframeDir << std::endl;
-
       KeyFrame::Ptr keyframe(new KeyFrame(keyframeDir, graph_slam->graph.get()));
       keyframes.push_back(keyframe);
-      std::cout << "keyframe loaded:" << keyframeDir << std::endl;
     }
-   
-    // load special nodes
+    std::cout << "loaded " << keyframes.size() << " keyframes" <<std::endl;
+    
+    // Load special nodes.
     std::ifstream ifs(directory + "/special_nodes.csv");
     if(!ifs) {
       return false;
@@ -854,17 +849,16 @@ private:
     while(!ifs.eof()) {
       std::string token;
       ifs >> token;
-      std::cout << "token:" << token << std::endl;
-
       if(token == "anchor_node") {
         int id = 0;
         ifs >> id;
         anchor_node = static_cast<g2o::VertexSE3*>(graph_slam->graph->vertex(id));
-        std::cout << "anchor_node:" << id << std::endl;
       } else if(token == "anchor_edge") {
         int id = 0;
         ifs >> id; 
-
+        // We have no way of directly pulling the edge based on the edge ID that we have just read in.
+        // Fortunatly anchor edges are always attached to the anchor node so we can iterate over 
+        // the edges that listed against the node untill we find the one that matches our ID.
         if(anchor_node){
           auto edges = anchor_node->edges();
 
@@ -877,21 +871,16 @@ private:
             }
           } 
         }
-        std::cout << "anchor_edge:" << id << std::endl;
       } else if(token == "floor_node") {
         int id = 0;
         ifs >> id;
         floor_plane_node = static_cast<g2o::VertexPlane*>(graph_slam->graph->vertex(id));
-        std::cout << "floor_node:" << id << std::endl;
       }
     }
+    std::cout << "loaded special nodes - anchor_node: "<< anchor_node->id() << " anchor_edge: "<< anchor_edge->id() << " floor_node: "<< floor_plane_node->id() << std::endl;
 
-
-    std::cout << "load - keyframes len:"<< keyframes.size() << std::endl;
-    res.success = true;
     
-
-
+    // Update our keyframe snapshot so we can publish a map update, trigger update with graph_updated = true.
     std::vector<KeyFrameSnapshot::Ptr> snapshot(keyframes.size());
     std::transform(keyframes.begin(), keyframes.end(), snapshot.begin(), [=](const KeyFrame::Ptr& k) { return std::make_shared<KeyFrameSnapshot>(k); });
 
@@ -900,6 +889,9 @@ private:
     keyframes_snapshot_mutex.unlock();
     graph_updated = true;
 
+    res.success = true;
+
+    std::cout << "snapshot updated" << std::endl << "loading successful" <<std::endl;
 
     return true;
   }
