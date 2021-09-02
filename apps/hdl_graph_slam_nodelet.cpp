@@ -818,7 +818,7 @@ private:
   bool load_service(hdl_graph_slam::LoadGraphRequest& req, hdl_graph_slam::LoadGraphResponse& res) {
     std::lock_guard<std::mutex> lock(main_thread_mutex);
 
-    std::string directory = req.destination;
+    std::string directory = req.path;
 
     std::cout << "loading data from:" << directory << std::endl;
 
