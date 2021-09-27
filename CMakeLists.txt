@@ -153,3 +153,7 @@ install(TARGETS
   scan_matching_odometry_nodelet 
   hdl_graph_slam_nodelet
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+install(DIRECTORY include/
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
