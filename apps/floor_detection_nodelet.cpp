@@ -3,6 +3,8 @@
 #include <memory>
 #include <iostream>
 
+#include <boost/optional.hpp>
+
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <pcl_ros/point_cloud.h>
