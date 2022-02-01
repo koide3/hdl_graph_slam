@@ -32,6 +32,7 @@
   <exec_depend>nmea_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>message_generation</exec_depend>
+  <exec_depend>msf_updates</exec_depend>
 
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-scipy</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-scipy</exec_depend>
