@@ -23,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  tf_conversions
 )
 catkin_python_setup()
 
@@ -80,6 +81,7 @@ catkin_package(
     roscpp
     sensor_msgs
     std_msgs
+    tf_conversions
 #  DEPENDS system_lib
 )
 
