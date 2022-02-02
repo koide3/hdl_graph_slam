@@ -11,6 +11,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>libg2o</build_depend>
   <build_depend>message_generation</build_depend>
+  <depend>eigen</depend>
   <depend>fast_gicp</depend>
   <depend>geodesy</depend>
   <depend>geometry_msgs</depend>
