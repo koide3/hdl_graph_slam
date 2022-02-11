@@ -11,17 +11,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(CMAKE_BUILD_TYPE "RELEASE")
 
 find_package(catkin REQUIRED COMPONENTS
+  fast_gicp
+  geodesy
+  geometry_msgs
+  interactive_markers
+  message_generation
+  ndt_omp
+  nmea_msgs
+  pcl_ros
   roscpp
   rospy
-  pcl_ros
-  geodesy
-  nmea_msgs
   sensor_msgs
-  geometry_msgs
-  message_generation
-  interactive_markers
-  ndt_omp
-  fast_gicp
+  std_msgs
+  tf_conversions
 )
 catkin_python_setup()
 
@@ -72,7 +74,14 @@ generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES hdl_graph_slam_nodelet
-#  CATKIN_DEPENDS pcl_ros roscpp sensor_msgs
+  CATKIN_DEPENDS
+    geometry_msgs
+    message_runtime
+    nmea_msgs
+    roscpp
+    sensor_msgs
+    std_msgs
+    tf_conversions
 #  DEPENDS system_lib
 )
 
@@ -148,9 +157,9 @@ install(FILES nodelet_plugins.xml
 )
 
 install(TARGETS
-  prefiltering_nodelet 
+  prefiltering_nodelet
   floor_detection_nodelet
-  scan_matching_odometry_nodelet 
+  scan_matching_odometry_nodelet
   hdl_graph_slam_nodelet
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
