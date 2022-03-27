@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ROS_DISTRO: [melodic, melodic_llvm, noetic, noetic_llvm]
+        ROS_DISTRO: [melodic]
 
     steps:
       - uses: actions/checkout@v2
