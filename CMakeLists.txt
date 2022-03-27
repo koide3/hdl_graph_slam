@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 cmake_minimum_required(VERSION 2.8.3)
-project(hdl_graph_slam)
+project(delta_graph_slam)
+set(EX_PROJECT_NAME "hdl_graph_slam")
 
 # Can we use C++17 in indigo?
 add_definitions(-msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2)
@@ -107,7 +108,7 @@ target_link_libraries(floor_detection_nodelet
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-add_dependencies(floor_detection_nodelet ${PROJECT_NAME}_gencpp)
+add_dependencies(floor_detection_nodelet ${EX_PROJECT_NAME}_gencpp)
 
 
 add_library(scan_matching_odometry_nodelet
@@ -118,7 +119,7 @@ target_link_libraries(scan_matching_odometry_nodelet
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-add_dependencies(scan_matching_odometry_nodelet ${PROJECT_NAME}_gencpp)
+add_dependencies(scan_matching_odometry_nodelet ${EX_PROJECT_NAME}_gencpp)
 
 
 add_library(hdl_graph_slam_nodelet
@@ -142,13 +143,13 @@ target_link_libraries(hdl_graph_slam_nodelet
   ${G2O_TYPES_SLAM3D}
   ${G2O_TYPES_SLAM3D_ADDONS}
 )
-add_dependencies(hdl_graph_slam_nodelet ${PROJECT_NAME}_gencpp)
+add_dependencies(hdl_graph_slam_nodelet ${EX_PROJECT_NAME}_gencpp)
 
 catkin_install_python(
   PROGRAMS
-    src/${PROJECT_NAME}/bag_player.py
-    src/${PROJECT_NAME}/ford2bag.py
-    src/${PROJECT_NAME}/map2odom_publisher.py
+    src/${EX_PROJECT_NAME}/bag_player.py
+    src/${EX_PROJECT_NAME}/ford2bag.py
+    src/${EX_PROJECT_NAME}/map2odom_publisher.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

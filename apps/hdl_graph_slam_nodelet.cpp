@@ -82,7 +82,6 @@ public:
 
     max_keyframes_per_update = private_nh.param<int>("max_keyframes_per_update", 10);
 
-    //
     anchor_node = nullptr;
     anchor_edge = nullptr;
     floor_plane_node = nullptr;
@@ -612,7 +611,7 @@ private:
    */
   visualization_msgs::MarkerArray create_marker_array(const ros::Time& stamp) const {
     visualization_msgs::MarkerArray markers;
-    markers.markers.resize(4);
+    markers.markers.resize(3);
 
     // node markers
     visualization_msgs::Marker& traj_marker = markers.markers[0];
@@ -624,15 +623,6 @@ private:
 
     traj_marker.pose.orientation.w = 1.0;
     traj_marker.scale.x = traj_marker.scale.y = traj_marker.scale.z = 0.5;
-
-    visualization_msgs::Marker& imu_marker = markers.markers[1];
-    imu_marker.header = traj_marker.header;
-    imu_marker.ns = "imu";
-    imu_marker.id = 1;
-    imu_marker.type = visualization_msgs::Marker::SPHERE_LIST;
-
-    imu_marker.pose.orientation.w = 1.0;
-    imu_marker.scale.x = imu_marker.scale.y = imu_marker.scale.z = 0.75;
 
     traj_marker.points.resize(keyframes.size());
     traj_marker.colors.resize(keyframes.size());
@@ -647,27 +637,10 @@ private:
       traj_marker.colors[i].g = p;
       traj_marker.colors[i].b = 0.0;
       traj_marker.colors[i].a = 1.0;
-
-      if(keyframes[i]->acceleration) {
-        Eigen::Vector3d pos = keyframes[i]->node->estimate().translation();
-        geometry_msgs::Point point;
-        point.x = pos.x();
-        point.y = pos.y();
-        point.z = pos.z();
-
-        std_msgs::ColorRGBA color;
-        color.r = 0.0;
-        color.g = 0.0;
-        color.b = 1.0;
-        color.a = 0.1;
-
-        imu_marker.points.push_back(point);
-        imu_marker.colors.push_back(color);
-      }
     }
 
     // edge markers
-    visualization_msgs::Marker& edge_marker = markers.markers[2];
+    visualization_msgs::Marker& edge_marker = markers.markers[1];
     edge_marker.header.frame_id = "map";
     edge_marker.header.stamp = stamp;
     edge_marker.ns = "edges";
@@ -780,7 +753,7 @@ private:
     }
 
     // sphere
-    visualization_msgs::Marker& sphere_marker = markers.markers[3];
+    visualization_msgs::Marker& sphere_marker = markers.markers[2];
     sphere_marker.header.frame_id = "map";
     sphere_marker.header.stamp = stamp;
     sphere_marker.ns = "loop_close_radius";
@@ -797,7 +770,7 @@ private:
     sphere_marker.scale.x = sphere_marker.scale.y = sphere_marker.scale.z = loop_detector->get_distance_thresh() * 2.0;
 
     sphere_marker.color.r = 1.0;
-    sphere_marker.color.a = 0.3;
+    sphere_marker.color.a = 0.1;
 
     return markers;
   }

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>hdl_graph_slam</name>
+  <name>delta_graph_slam</name>
   <version>0.0.0</version>
-  <description>The hdl_graph_slam package</description>
+  <description>The delta_graph_slam package</description>
 
   <maintainer email="koide@aisl.cs.tut.ac.jp">koide</maintainer>
 

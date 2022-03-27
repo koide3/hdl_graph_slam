@@ -1,3 +1,34 @@
+# delta_graph_slam
+## Our extension of hdl_graph_slam
+In order to use this repo remeber to:
+
+1. Install the `curlpp` library using the command:
+  ```bash
+  apt-get update; apt-get install -y libcurlpp-dev
+  ```
+
+2. Install the ros package:
+```bash
+sudo apt-get install ros-melodic-geodesy ros-melodic-pcl-ros \
+ros-melodic-nmea-msgs ros-melodic-libg2o ros-melodic-eigen-conversions
+```
+
+
+3. Clone this repository in the `src` directory of your ros workspace
+
+4. Clone this extras package in the `src` directory:
+```bash
+git clone https://github.com/koide3/ndt_omp.git
+git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
+git clone -b 3.0.3 https://github.com/nobleo/rviz_satellite.git
+```
+## Build and run commands
+```bash
+catkin_make -DCMAKE_BUILD_TYPE=Release -j4 --only-pkg-with-deps delta_graph_slam
+roslaunch delta_graph_slam kitti.launch
+rosbag play --clock kitti_2011_09_30_drive_0027_synced.bag --topics /kitti/velo/pointcloud -r 0.1
+```
+
 # hdl_graph_slam
 ***hdl_graph_slam*** is an open source ROS package for real-time 6DOF SLAM using a 3D LIDAR. It is based on 3D Graph SLAM with NDT scan matching-based odometry estimation and loop detection. It also supports several graph constraints, such as GPS, IMU acceleration (gravity vector), IMU orientation (magnetic sensor), and floor plane (detected in a point cloud). We have tested this package with Velodyne (HDL32e, VLP16) and RoboSense (16 channels) sensors in indoor and outdoor environments.
 
