@@ -26,7 +26,7 @@ git clone -b 3.0.3 https://github.com/nobleo/rviz_satellite.git
 ```bash
 catkin_make -DCMAKE_BUILD_TYPE=Release -j4 --only-pkg-with-deps delta_graph_slam
 roslaunch delta_graph_slam kitti.launch
-rosbag play --clock kitti_2011_09_30_drive_0027_synced.bag --topics /kitti/velo/pointcloud -r 0.1
+rosbag play --clock kitti_2011_09_30_drive_0027_synced.bag --topics /kitti/velo/pointcloud /kitti/oxts/gps/fix -r 0.1
 ```
 
 # hdl_graph_slam

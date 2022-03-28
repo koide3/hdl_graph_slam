@@ -26,8 +26,9 @@
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
 
   <!-- delta_graph_slam_nodelet -->
-  <node pkg="nodelet" type="nodelet" name="delta_graph_slam_nodelet" args="load hdl_graph_slam/DeltaGraphSlamNodelet $(arg nodelet_manager)" />
-
+  <node pkg="nodelet" type="nodelet" name="delta_graph_slam_nodelet" args="load hdl_graph_slam/DeltaGraphSlamNodelet $(arg nodelet_manager)" >
+    <remap from="/gps/navsat" to="$(arg gps_topic)" />
+  </node>
   <!-- prefiltering_nodelet -->
   <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" args="load hdl_graph_slam/PrefilteringNodelet $(arg nodelet_manager)">
     <remap from="/velodyne_points" to="$(arg points_topic)" />
