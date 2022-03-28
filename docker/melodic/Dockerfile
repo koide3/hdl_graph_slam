@@ -17,7 +17,7 @@ RUN git clone https://github.com/SMRT-AIST/fast_gicp.git --recursive
 COPY . /root/catkin_ws/src/hdl_graph_slam/
 
 WORKDIR /root/catkin_ws
-RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_make'
+RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_make -j4'
 RUN sed -i "6i source \"/root/catkin_ws/devel/setup.bash\"" /ros_entrypoint.sh
 
 WORKDIR /

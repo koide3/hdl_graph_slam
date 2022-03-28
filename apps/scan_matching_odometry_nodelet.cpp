@@ -26,7 +26,7 @@
 
 #include <hdl_graph_slam/ros_utils.hpp>
 #include <hdl_graph_slam/registrations.hpp>
-#include <hdl_graph_slam/ScanMatchingStatus.h>
+#include <delta_graph_slam/ScanMatchingStatus.h>
 
 namespace hdl_graph_slam {
 
@@ -54,7 +54,7 @@ public:
     read_until_pub = nh.advertise<std_msgs::Header>("/scan_matching_odometry/read_until", 32);
     odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 32);
     trans_pub = nh.advertise<geometry_msgs::TransformStamped>("/scan_matching_odometry/transform", 32);
-    status_pub = private_nh.advertise<ScanMatchingStatus>("/scan_matching_odometry/status", 8);
+    status_pub = private_nh.advertise<delta_graph_slam::ScanMatchingStatus>("/scan_matching_odometry/status", 8);
     aligned_points_pub = nh.advertise<sensor_msgs::PointCloud2>("/aligned_points", 32);
   }
 
@@ -299,7 +299,7 @@ private:
       return;
     }
 
-    ScanMatchingStatus status;
+    delta_graph_slam::ScanMatchingStatus status;
     status.header.frame_id = frame_id;
     status.header.stamp = stamp;
     status.has_converged = registration->hasConverged();

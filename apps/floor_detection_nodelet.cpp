@@ -11,7 +11,7 @@
 
 #include <std_msgs/Time.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <hdl_graph_slam/FloorCoeffs.h>
+#include <delta_graph_slam/FloorCoeffs.h>
 
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
@@ -42,7 +42,7 @@ public:
     initialize_params();
 
     points_sub = nh.subscribe("/filtered_points", 256, &FloorDetectionNodelet::cloud_callback, this);
-    floor_pub = nh.advertise<hdl_graph_slam::FloorCoeffs>("/floor_detection/floor_coeffs", 32);
+    floor_pub = nh.advertise<delta_graph_slam::FloorCoeffs>("/floor_detection/floor_coeffs", 32);
 
     read_until_pub = nh.advertise<std_msgs::Header>("/floor_detection/read_until", 32);
     floor_filtered_pub = nh.advertise<sensor_msgs::PointCloud2>("/floor_detection/floor_filtered_points", 32);
@@ -81,7 +81,7 @@ private:
     boost::optional<Eigen::Vector4f> floor = detect(cloud);
 
     // publish the detected floor coefficients
-    hdl_graph_slam::FloorCoeffs coeffs;
+    delta_graph_slam::FloorCoeffs coeffs;
     coeffs.header = cloud_msg->header;
     if(floor) {
       coeffs.coeffs.resize(4);

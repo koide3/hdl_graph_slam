@@ -108,7 +108,7 @@ target_link_libraries(floor_detection_nodelet
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-add_dependencies(floor_detection_nodelet ${EX_PROJECT_NAME}_gencpp)
+add_dependencies(floor_detection_nodelet ${PROJECT_NAME}_gencpp)
 
 
 add_library(scan_matching_odometry_nodelet
@@ -119,7 +119,7 @@ target_link_libraries(scan_matching_odometry_nodelet
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-add_dependencies(scan_matching_odometry_nodelet ${EX_PROJECT_NAME}_gencpp)
+add_dependencies(scan_matching_odometry_nodelet ${PROJECT_NAME}_gencpp)
 
 
 add_library(hdl_graph_slam_nodelet
@@ -143,7 +143,7 @@ target_link_libraries(hdl_graph_slam_nodelet
   ${G2O_TYPES_SLAM3D}
   ${G2O_TYPES_SLAM3D_ADDONS}
 )
-add_dependencies(hdl_graph_slam_nodelet ${EX_PROJECT_NAME}_gencpp)
+add_dependencies(hdl_graph_slam_nodelet ${PROJECT_NAME}_gencpp)
 
 catkin_install_python(
   PROGRAMS
