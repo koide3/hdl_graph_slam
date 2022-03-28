@@ -13,3 +13,7 @@
 <library path="lib/libhdl_graph_slam_nodelet">
   <class name="hdl_graph_slam/HdlGraphSlamNodelet" type="hdl_graph_slam::HdlGraphSlamNodelet" base_class_type="nodelet::Nodelet" />
 </library>
+
+<library path="lib/libdelta_graph_slam_nodelet">
+  <class name="hdl_graph_slam/DeltaGraphSlamNodelet" type="hdl_graph_slam::DeltaGraphSlamNodelet" base_class_type="nodelet::Nodelet" />
+</library>

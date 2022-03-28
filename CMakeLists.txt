@@ -96,6 +96,8 @@ include_directories(
 )
 
 # nodelets
+add_library(delta_graph_slam_nodelet apps/delta_graph_slam_nodelet.cpp)
+
 add_library(prefiltering_nodelet apps/prefiltering_nodelet.cpp)
 target_link_libraries(prefiltering_nodelet
   ${catkin_LIBRARIES}

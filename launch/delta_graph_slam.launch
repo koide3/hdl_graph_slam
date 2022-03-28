@@ -5,7 +5,7 @@
   <!-- arguments -->
   <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
   <arg name="enable_floor_detection" default="true" />
-  <arg name="enable_gps" default="false" />
+  <arg name="enable_gps" default="true" />
   <arg name="enable_imu_acc" default="false" />
   <arg name="enable_imu_ori" default="false" />
 
@@ -24,6 +24,9 @@
 
   <!-- in case you use velodyne_driver, comment out the following line -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
+
+  <!-- delta_graph_slam_nodelet -->
+  <node pkg="nodelet" type="nodelet" name="delta_graph_slam_nodelet" args="load hdl_graph_slam/DeltaGraphSlamNodelet $(arg nodelet_manager)" />
 
   <!-- prefiltering_nodelet -->
   <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" args="load hdl_graph_slam/PrefilteringNodelet $(arg nodelet_manager)">
