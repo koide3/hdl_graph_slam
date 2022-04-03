@@ -163,8 +163,9 @@ PointT3 BuildingTools::toUtm(Eigen::Vector3d pt, Eigen::Vector3d zero_utm) {
 std::vector<Building> BuildingTools::getBuildings(double lat, double lon, double rad, Eigen::Vector2d zero_utm, std::string host){
 	std::string result = downloadBuildings(lat, lon, rad, host);
 	Eigen::Vector3d v;
-	v.block<2,1>(0,0) = zero_utm;
-	v(2) = 0;
+	v[0] = zero_utm[0];
+	v[1] = zero_utm[1];
+	v[2] = 0;
 	std::vector<Building> tmp = parseBuildings(result,v);
 	return tmp;
 }

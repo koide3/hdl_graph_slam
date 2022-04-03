@@ -103,6 +103,7 @@ add_library(delta_graph_slam_nodelet
   src/hdl_graph_slam/building_node.cpp
 )
 target_link_libraries(delta_graph_slam_nodelet
+  ${catkin_LIBRARIES}
   curlpp
 )
 

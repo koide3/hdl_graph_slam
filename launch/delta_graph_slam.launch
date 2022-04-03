@@ -29,6 +29,7 @@
   <node pkg="nodelet" type="nodelet" name="delta_graph_slam_nodelet" args="load hdl_graph_slam/DeltaGraphSlamNodelet $(arg nodelet_manager)" >
     <remap from="/gps/navsat" to="$(arg gps_topic)" />
   </node>
+  
   <!-- prefiltering_nodelet -->
   <node pkg="nodelet" type="nodelet" name="prefiltering_nodelet" args="load hdl_graph_slam/PrefilteringNodelet $(arg nodelet_manager)">
     <remap from="/velodyne_points" to="$(arg points_topic)" />
@@ -131,7 +132,7 @@
     <!-- GPS -->
     <param name="gps_edge_robust_kernel" value="NONE" />
     <param name="gps_edge_robust_kernel_size" value="1.0" />
-    <param name="gps_edge_stddev_xy" value="20.0" />
+    <param name="gps_edge_stddev_xy" value="5.0" />
     <param name="gps_edge_stddev_z" value="5.0" />
     <!-- IMU orientation -->
     <param name="imu_orientation_edge_robust_kernel" value="NONE" />

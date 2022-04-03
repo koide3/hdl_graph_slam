@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get install -y --no-install-recommends \
   wget nano build-essential libomp-dev clang lld\
   ros-melodic-geodesy ros-melodic-pcl-ros ros-melodic-nmea-msgs \
-  ros-melodic-rviz ros-melodic-tf-conversions ros-melodic-libg2o \
+  ros-melodic-rviz ros-melodic-tf-conversions ros-melodic-libg2o libcurlpp-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 

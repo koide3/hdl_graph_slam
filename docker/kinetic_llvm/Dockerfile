@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && apt-get install --no-install-recommends -y \
  wget nano build-essential libomp-dev clang lld-6.0 \
  ros-kinetic-geodesy ros-kinetic-pcl-ros ros-kinetic-nmea-msgs \
- ros-kinetic-rviz ros-kinetic-tf-conversions ros-kinetic-libg2o \
+ ros-kinetic-rviz ros-kinetic-tf-conversions ros-kinetic-libg2o libcurlpp-dev \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
