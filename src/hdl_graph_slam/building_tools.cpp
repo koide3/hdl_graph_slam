@@ -125,18 +125,15 @@ std::string BuildingTools::downloadBuildings(double lat, double lon, double rad,
 	try {
 		std::string url = host + "/api/interpreter?data=way[%27building%27](around:" + std::to_string(rad) + "," + std::to_string(lat) + "," + std::to_string(lon) + ");%20(._;%3E;);out;";
 		std::cout << url << std::endl;
-		curlpp::Cleanup cleaner;
+
 		curlpp::Easy request;
+		curlpp::options::Url url_opt(url);
 
 		// Setting the URL to retrive.
+		request.setOpt(url_opt);
+
 		std::ostringstream os;
-		curlpp::options::WriteStream ws(&os);
-
-		
-		request.setOpt(new curlpp::options::Url(url));
-		request.setOpt(ws);
-		request.perform();
-
+		os << request;
 		result = os.str();
 	}
 	catch ( curlpp::LogicError & e ) {
