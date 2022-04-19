@@ -20,7 +20,7 @@
   <arg name="robot_odom_frame_id" default="robot_odom" />
 
   <!-- transformation between lidar and base_link -->
-  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 base_link velo_link 10" />
+  <node pkg="tf" type="static_transform_publisher" name="base2lidar_publisher" args="0 0 0 0 0 0 base_link velo_link 10" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
@@ -87,7 +87,7 @@
     <param name="use_normal_filtering" value="true" />
     <param name="normal_filter_thresh" value="20.0" />
   </node>
-
+  
   <!-- hdl_graph_slam_nodelet -->
   <node pkg="nodelet" type="nodelet" name="hdl_graph_slam_nodelet" args="load hdl_graph_slam/HdlGraphSlamNodelet $(arg nodelet_manager)">
     <param name="points_topic" value="$(arg points_topic)" />

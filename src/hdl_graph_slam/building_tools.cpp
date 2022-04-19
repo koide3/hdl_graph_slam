@@ -1,129 +1,25 @@
 #include "hdl_graph_slam/building_tools.hpp"
 
-//DEBUG = 1 -> print debug lines
-//DEBUG different from 1 -> print nothing
-#define DEBUG 0
-
 namespace hdl_graph_slam {
 
-BuildingTools::BuildingTools(void) {
+std::vector<Building::Ptr> BuildingTools::getBuildings(double lat, double lon) {
+
+	downloadBuildings(lat, lon);
+	parseBuildings(lat, lon);
+
+	return buildings;
 }
 
-std::vector<Building> BuildingTools::parseBuildings(std::string result, Eigen::Vector3d zero_utm) {
-	std::stringstream ss(result);
-	boost::property_tree::ptree pt;
-	read_xml(ss, pt);
-	std::vector< Node> nodes;
-	std::vector<Building> b;
+void BuildingTools::downloadBuildings(double lat, double lon) {
+
+	if(!xml_tree.empty()){
+		std::cout << "OpenStreetMap xml tree already buffered" << std::endl;
+		return;
+	}
+
+	std::string xml_response;
 	try {
-		BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("osm") ) {
-			if( v.first == "node" ) {
-					Node n;
-				n.id = v.second.get<std::string>("<xmlattr>.id");
-				n.lat = v.second.get<double>("<xmlattr>.lat");
-				n.lon = v.second.get<double>("<xmlattr>.lon");
-				nodes.push_back(n);
-			}
-			if(v.first == "way") {
-				Building btemp;
-				std::vector<std::string> nd_refs;
-				std::map<std::string,std::string> tags;
-				std::string way_id = v.second.get<std::string>("<xmlattr>.id");
-				btemp.id = way_id;
-
-				for(boost::property_tree::ptree::const_iterator v1 = v.second.begin(); v1 != v.second.end(); ++v1) {
-					if(v1->first == "nd") {
-						std::string nd_ref = v1->second.get<std::string>("<xmlattr>.ref");
-						nd_refs.push_back(nd_ref);
-					}
-					if(v1->first == "tag") {
-						std::string key = v1->second.get<std::string>("<xmlattr>.k");
-						std::string value = v1->second.get<std::string>("<xmlattr>.v");
-						tags[key] = value;
-					}
-				}
-				btemp.tags = tags;
-				pcl::PointCloud<PointT3>::Ptr pc_temp(new pcl::PointCloud<PointT3>);
-				*pc_temp = *(buildPointCloud(nd_refs,nodes,zero_utm));
-				btemp.geometry = pc_temp;
-				btemp.vertices = getVertices(nd_refs,nodes,zero_utm);
-				b.push_back(btemp);
-			}
-		}
-	}
-	catch(boost::property_tree::ptree_error & e){
-		std::cerr<< "No xml! error:" << e.what() << std::endl;
-	}
-	return b;
-}
-
-pcl::PointCloud<PointT3>::Ptr BuildingTools::getVertices(std::vector<std::string> nd_refs, std::vector< Node> nodes, Eigen::Vector3d zero_utm) {
-	pcl::PointCloud<PointT3>::Ptr pc_temp(new pcl::PointCloud<PointT3>);
-	for(std::vector<std::string>::const_iterator it = nd_refs.begin(); it != nd_refs.end(); ++it) {
-		Node n = getNode(*it, nodes);
-		PointT3 pt_temp = toUtm(Eigen::Vector3d(n.lat, n.lon, 0), zero_utm);
-		pc_temp->push_back(pt_temp);
-	}
-	return pc_temp;		
-}
-
-pcl::PointCloud<PointT3>::Ptr BuildingTools::buildPointCloud(std::vector<std::string> nd_refs, std::vector< Node> nodes, Eigen::Vector3d zero_utm) {
-	pcl::PointCloud<PointT3>::Ptr pc_temp(new pcl::PointCloud<PointT3>);
-	Eigen::Vector3d previous;
-	int first = 1;
-	for(std::vector<std::string>::const_iterator it = nd_refs.begin(); it != nd_refs.end(); ++it) {
-		Node n = getNode(*it, nodes);
-		Eigen::Vector3d pt_temp;
-		pt_temp(0) = n.lat;
-		pt_temp(1) = n.lon;
-		pt_temp(2) = 0;
-		if(first) {
-			first = 0;
-			previous = pt_temp;
-		} else {
-			*pc_temp += *(interpolate(toUtm(previous, zero_utm), toUtm(pt_temp, zero_utm)));
-			previous = pt_temp;
-		}
-
-	}
-	return pc_temp;
-}
-
-BuildingTools::Node BuildingTools::getNode(std::string nd_ref, std::vector< Node> nodes) {
-	Node n_temp;
-	n_temp.id = "";
-	n_temp.lat = 0;
-	n_temp.lon = 0;
-	for(std::vector< Node>::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-		if(nd_ref.compare(it->id) == 0) {
-			n_temp = *it;
-			break;
-		}
-	}
-	return n_temp;
-}
-
-pcl::PointCloud<PointT3>::Ptr BuildingTools::interpolate(PointT3 a, PointT3 b) {
-	// linear interpolation: return 1/sample_step points between a and b
-	const float sample_step = 0.001;
-	pcl::PointCloud<PointT3>::Ptr pc_temp(new pcl::PointCloud<PointT3>);
-
-	for(float i=0;i<=1;i=i+sample_step) {
-		PointT3 pt;
-
-		pt.x = a.x + i*(b.x - a.x);
-		pt.y = a.y + i*(b.y - a.y);
-		pt.z = 0;
-
-		pc_temp->push_back(pt);
-	}
-	return pc_temp;
-}
-
-std::string BuildingTools::downloadBuildings(double lat, double lon, double rad, std::string host) {
-	std::string result;
-	try {
-		std::string url = host + "/api/interpreter?data=way[%27building%27](around:" + std::to_string(rad) + "," + std::to_string(lat) + "," + std::to_string(lon) + ");%20(._;%3E;);out;";
+		std::string url = string_format("%s/api/interpreter?data=way[%27building%27](around:%f,%f,%f);%20(._;%%3E;);out;", host.data(), buffer_radius, lat, lon);
 		std::cout << url << std::endl;
 
 		curlpp::Easy request;
@@ -134,37 +30,172 @@ std::string BuildingTools::downloadBuildings(double lat, double lon, double rad,
 
 		std::ostringstream os;
 		os << request;
-		result = os.str();
+		xml_response = os.str();
 	}
 	catch ( curlpp::LogicError & e ) {
 		std::cout << "curlpp logic error: " << e.what() << std::endl;
+		return;
 	}
 	catch ( curlpp::RuntimeError & e ) {
 		std::cout << "curlpp runtime error: " << e.what() << std::endl;
+		return;
 	}
-	return result;
+
+	std::stringstream xml_stream(xml_response);
+	read_xml(xml_stream, xml_tree);
+	nodes.clear();
+
+	try {
+	BOOST_FOREACH(pt::ptree::value_type &tree_node, xml_tree.get_child("osm")) {
+		if(tree_node.first == "node") {
+			Node node;
+			node.id = tree_node.second.get<std::string>("<xmlattr>.id");
+			node.lat = tree_node.second.get<double>("<xmlattr>.lat");
+			node.lon = tree_node.second.get<double>("<xmlattr>.lon");
+			nodes.push_back(node);
+		}
+	}} catch(pt::ptree_error &e) {
+		std::cerr<< "No xml! error:" << e.what() << std::endl;
+	}
+
+	buffer_center = toEnu(Eigen::Vector3d(lat, lon, 0)).getVector3fMap();
 }
 
-// toUtm converts to utm and already refer to zero_utm
-PointT3 BuildingTools::toUtm(Eigen::Vector3d pt, Eigen::Vector3d zero_utm) {
-	geographic_msgs::GeoPoint pt_lla;
-	geodesy::UTMPoint pt_utm;
+void BuildingTools::parseBuildings(double lat, double lon) {
 
-	pt_lla.latitude = pt(0);
-	pt_lla.longitude = pt(1);
-	pt_lla.altitude = 0;
-	geodesy::fromMsg(pt_lla, pt_utm); 
-	return PointT3((pt_utm.easting-zero_utm(0)), (pt_utm.northing-zero_utm(1)), 0);
+	if(xml_tree.empty()){
+		std::cout << "OpenStreetMap xml tree not buffered" << std::endl;
+		return;
+	}
+
+	try {
+	BOOST_FOREACH(pt::ptree::value_type &tree_node, xml_tree.get_child("osm")) {
+		if(tree_node.first == "way") {
+			std::string id = tree_node.second.get<std::string>("<xmlattr>.id");
+
+			if(buildings_map.count(id) || !isBuildingInRadius(tree_node, lat, lon)){
+				continue;
+			}
+			std::cout << "parsing new building..." << std::endl;
+
+			Building::Ptr new_building(new Building);
+			std::vector<std::string> nd_refs;
+			std::map<std::string,std::string> tags;
+
+			BOOST_FOREACH(pt::ptree::value_type &tree_node_2, tree_node.second) {
+				if(tree_node_2.first == "nd") {
+					std::string nd_ref = tree_node_2.second.get<std::string>("<xmlattr>.ref");
+					nd_refs.push_back(nd_ref);
+				} else if(tree_node_2.first == "tag") {
+					std::string key = tree_node_2.second.get<std::string>("<xmlattr>.k");
+					std::string value = tree_node_2.second.get<std::string>("<xmlattr>.v");
+					tags[key] = value;
+				}
+			}
+			new_building->id = id;
+			new_building->tags = tags;
+			pcl::PointCloud<PointT3>::Ptr building_pointcloud(buildPointCloud(nd_refs));
+			new_building->geometry = building_pointcloud;
+			new_building->vertices = getVertices(nd_refs);
+
+			buildings.push_back(new_building);
+			buildings_map[id] = new_building;
+		}
+	}} catch(pt::ptree_error &e) {
+		std::cerr<< "No xml! error:" << e.what() << std::endl;
+	}
 }
 
-std::vector<Building> BuildingTools::getBuildings(double lat, double lon, double rad, Eigen::Vector2d zero_utm, std::string host){
-	std::string result = downloadBuildings(lat, lon, rad, host);
-	Eigen::Vector3d v;
-	v[0] = zero_utm[0];
-	v[1] = zero_utm[1];
-	v[2] = 0;
-	std::vector<Building> tmp = parseBuildings(result,v);
-	return tmp;
+pcl::PointCloud<PointT3>::Ptr BuildingTools::getVertices(std::vector<std::string> nd_refs) {
+	pcl::PointCloud<PointT3>::Ptr building_pointcloud(new pcl::PointCloud<PointT3>);
+	for(std::string nd_ref : nd_refs) {
+		Node node = getNode(nd_ref);
+		PointT3 pointXYZ = toEnu(Eigen::Vector3d(node.lat, node.lon, 0));
+		building_pointcloud->push_back(pointXYZ);
+	}
+	return building_pointcloud;		
+}
+
+pcl::PointCloud<PointT3>::Ptr BuildingTools::buildPointCloud(std::vector<std::string> nd_refs) {
+	pcl::PointCloud<PointT3>::Ptr building_pointcloud(new pcl::PointCloud<PointT3>);
+	Eigen::Vector3d previous;
+	int first = 1;
+	for(std::string nd_ref : nd_refs) {
+		Node node = getNode(nd_ref);
+		Eigen::Vector3d pointXYZ;
+		pointXYZ(0) = node.lat;
+		pointXYZ(1) = node.lon;
+		pointXYZ(2) = 0;
+		if(first) {
+			first = 0;
+			previous = pointXYZ;
+		} else {
+			*building_pointcloud += *(interpolate(toEnu(previous), toEnu(pointXYZ)));
+			previous = pointXYZ;
+		}
+	}
+	return building_pointcloud;
+}
+
+BuildingTools::Node BuildingTools::getNode(std::string nd_ref) {
+	for(Node &node : nodes) {
+		if(nd_ref.compare(node.id) == 0) {
+			return node;
+		}
+	}
+	return Node();
+}
+
+pcl::PointCloud<PointT3>::Ptr BuildingTools::interpolate(PointT3 a, PointT3 b) {
+	// linear interpolation: return a line of points between a and b (1 every 10cm)
+	const float sample_step = 0.01;
+	pcl::PointCloud<PointT3>::Ptr building_pointcloud(new pcl::PointCloud<PointT3>);
+	Eigen::Vector3f AtoB = b.getVector3fMap()-a.getVector3fMap();
+	Eigen::Vector3f AtoBnormalized = AtoB.normalized();
+	float AtoBnorm = AtoB.norm();
+
+	for(float i=0; i<=AtoBnorm; i=i+sample_step) {
+		PointT3 pointXYZ;
+
+		pointXYZ.x = a.x + i*AtoBnormalized.x();
+		pointXYZ.y = a.y + i*AtoBnormalized.y();
+		pointXYZ.z = 0;
+
+		building_pointcloud->push_back(pointXYZ);
+	}
+	return building_pointcloud;
+}
+
+// toEnu converts to enu coordinates from lla
+PointT3 BuildingTools::toEnu(Eigen::Vector3d lla) {
+	geographic_msgs::GeoPoint gps_msg;
+	geodesy::UTMPoint utm;
+
+	gps_msg.latitude = lla(0);
+	gps_msg.longitude = lla(1);
+	gps_msg.altitude = 0;
+	geodesy::fromMsg(gps_msg, utm);
+	
+	return PointT3((utm.easting-zero_utm(0)), (utm.northing-zero_utm(1)), 0);
+}
+
+bool BuildingTools::isBuildingInRadius(pt::ptree::value_type &child_tree_node, double lat, double lon){
+	try {
+	BOOST_FOREACH(pt::ptree::value_type &tree_node, child_tree_node.second) {
+		if(tree_node.first == "nd") {
+			std::string nd_ref = tree_node.second.get<std::string>("<xmlattr>.ref");
+			Node node = getNode(nd_ref);
+			Eigen::Vector3f pointXYZ = toEnu(Eigen::Vector3d(node.lat, node.lon, 0)).getVector3fMap();
+			Eigen::Vector3f enu_coords = toEnu(Eigen::Vector3d(lat, lon, 0)).getVector3fMap();
+
+			if((pointXYZ-enu_coords).norm() < radius){
+				return true;
+			}
+		}
+	}} catch(pt::ptree_error &e) {
+		std::cerr<< "No xml! error:" << e.what() << std::endl;
+	}
+	return false;
 }
 
 }
