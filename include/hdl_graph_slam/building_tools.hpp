@@ -5,9 +5,11 @@
 #include <geodesy/wgs84.h>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/thread/thread.hpp>
 #include <hdl_graph_slam/building.hpp>
 #include <pcl/common/distances.h>
 #include <pcl/io/pcd_io.h>
+#include <mutex>
 #include <fstream>
 #include <regex>
 #include <string>
@@ -40,7 +42,11 @@ class BuildingTools {
 public:
 	typedef boost::shared_ptr<BuildingTools> Ptr;
 	BuildingTools() {}
-	BuildingTools(std::string host, Eigen::Vector2d zero_utm, double radius=40, double buffer_radius=1000): host(host), zero_utm(zero_utm), radius(radius), buffer_radius(buffer_radius) {}
+	BuildingTools(std::string host, Eigen::Vector2d zero_utm, double radius=40, double buffer_radius=60):
+		host(host),
+		zero_utm(zero_utm),
+		radius(radius),
+		buffer_radius(buffer_radius) {}
 	std::vector<Building::Ptr> getBuildings(double lat, double lon);
 private:
 	struct Node {
@@ -55,6 +61,8 @@ private:
 	Eigen::Vector3f buffer_center;
 	std::vector<Node> nodes;
 	pt::ptree xml_tree;
+	std::mutex xml_tree_mutex;
+    boost::thread async_handle;
 	std::map<std::string,Building::Ptr> buildings_map;
 	std::vector<Building::Ptr> buildings;
 	void downloadBuildings(double lat, double lon);

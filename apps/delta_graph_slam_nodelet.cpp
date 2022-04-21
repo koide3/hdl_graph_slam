@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <future>
 #include <geodesy/utm.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -54,7 +53,7 @@ private:
         end_ = ros::WallTime::now();
         // print results
         double execution_time = (end_ - start_).toNSec() * 1e-6;
-        ROS_INFO_STREAM("Exectution time 3 (ms): " << execution_time);
+        ROS_INFO_STREAM("Exectution time (ms): " << execution_time);
 
         if(markers_pub.getNumSubscribers()) {
             create_marker_array();
@@ -93,20 +92,19 @@ private:
 
         // download and parse buildings
         std::vector<Building::Ptr> new_buildings = buildings_manager->getBuildings(lla.latitude, lla.longitude);
-        if(new_buildings.size() > 0) {
-            // buildingsCloud is the cloud containing all buildings
-            pcl::PointCloud<PointT3>::Ptr buildingsCloud(new pcl::PointCloud<PointT3>);
-            for(auto building = new_buildings.begin(); building != new_buildings.end(); building++){
-                *buildingsCloud += *((*building)->geometry);
-            }
 
-            // publish buildings cloud
-            sensor_msgs::PointCloud2Ptr buildingsCloud_msg(new sensor_msgs::PointCloud2());
-            pcl::toROSMsg(*buildingsCloud, *buildingsCloud_msg);
-            buildingsCloud_msg->header.frame_id = "map";
-            buildingsCloud_msg->header.stamp = ros::Time::now();
-            buildings_pub.publish(buildingsCloud_msg);
+        // buildingsCloud is the cloud containing all buildings
+        pcl::PointCloud<PointT3> buildingsCloud;
+        for(Building::Ptr building : new_buildings){
+            buildingsCloud += *(building->geometry);
         }
+
+        // publish buildings cloud
+        sensor_msgs::PointCloud2Ptr buildingsCloud_msg(new sensor_msgs::PointCloud2());
+        pcl::toROSMsg(buildingsCloud, *buildingsCloud_msg);
+        buildingsCloud_msg->header.frame_id = "map";
+        buildingsCloud_msg->header.stamp = ros::Time::now();
+        buildings_pub.publish(buildingsCloud_msg);
     }
 
     /**
@@ -187,7 +185,6 @@ private:
     ros::Publisher markers_pub;
 
     ros::WallTimer optimization_timer;
-    std::future<void> create_buildings_async_handle;
 
     boost::optional<Eigen::Vector2d> zero_utm;
     int zero_utm_zone;

@@ -173,6 +173,7 @@ install(TARGETS
   floor_detection_nodelet
   scan_matching_odometry_nodelet
   hdl_graph_slam_nodelet
+  delta_graph_slam_nodelet
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
 install(DIRECTORY include/

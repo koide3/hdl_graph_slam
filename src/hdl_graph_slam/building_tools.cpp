@@ -3,8 +3,10 @@
 namespace hdl_graph_slam {
 
 std::vector<Building::Ptr> BuildingTools::getBuildings(double lat, double lon) {
-
-	downloadBuildings(lat, lon);
+	
+	if(!async_handle.joinable() || async_handle.try_join_for(boost::chrono::milliseconds(1))){
+		async_handle = boost::thread(boost::bind(&BuildingTools::downloadBuildings, this, lat, lon));
+	}
 	parseBuildings(lat, lon);
 
 	return buildings;
@@ -12,14 +14,21 @@ std::vector<Building::Ptr> BuildingTools::getBuildings(double lat, double lon) {
 
 void BuildingTools::downloadBuildings(double lat, double lon) {
 
-	if(!xml_tree.empty()){
+	Eigen::Vector3f pointXYZ = toEnu(Eigen::Vector3d(lat, lon, 0)).getVector3fMap();
+	if(!xml_tree.empty() && (pointXYZ - buffer_center).norm() < (2.0/3.0 * buffer_radius)){
 		std::cout << "OpenStreetMap xml tree already buffered" << std::endl;
 		return;
 	}
 
 	std::string xml_response;
 	try {
-		std::string url = string_format("%s/api/interpreter?data=way[%27building%27](around:%f,%f,%f);%20(._;%%3E;);out;", host.data(), buffer_radius, lat, lon);
+		std::string url = string_format(
+			"%s/api/interpreter?data=way[%27building%27](around:%f,%f,%f);%20(._;%%3E;);out;",
+			host.data(),
+			buffer_radius,
+			lat,
+			lon
+		);
 		std::cout << url << std::endl;
 
 		curlpp::Easy request;
@@ -41,27 +50,34 @@ void BuildingTools::downloadBuildings(double lat, double lon) {
 		return;
 	}
 
+	pt::ptree xml_tree_tmp;
+	std::vector<Node> nodes_tmp;
 	std::stringstream xml_stream(xml_response);
-	read_xml(xml_stream, xml_tree);
-	nodes.clear();
+	read_xml(xml_stream, xml_tree_tmp);
 
 	try {
-	BOOST_FOREACH(pt::ptree::value_type &tree_node, xml_tree.get_child("osm")) {
+	BOOST_FOREACH(pt::ptree::value_type &tree_node, xml_tree_tmp.get_child("osm")) {
 		if(tree_node.first == "node") {
 			Node node;
 			node.id = tree_node.second.get<std::string>("<xmlattr>.id");
 			node.lat = tree_node.second.get<double>("<xmlattr>.lat");
 			node.lon = tree_node.second.get<double>("<xmlattr>.lon");
-			nodes.push_back(node);
+			nodes_tmp.push_back(node);
 		}
 	}} catch(pt::ptree_error &e) {
 		std::cerr<< "No xml! error:" << e.what() << std::endl;
+		return;
 	}
 
+	// update xml tree thread safe
+	std::lock_guard<std::mutex> lock(xml_tree_mutex);
+	nodes = nodes_tmp;
+	xml_tree = xml_tree_tmp;
 	buffer_center = toEnu(Eigen::Vector3d(lat, lon, 0)).getVector3fMap();
 }
 
 void BuildingTools::parseBuildings(double lat, double lon) {
+	std::lock_guard<std::mutex> lock(xml_tree_mutex);
 
 	if(xml_tree.empty()){
 		std::cout << "OpenStreetMap xml tree not buffered" << std::endl;
