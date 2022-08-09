@@ -3,8 +3,6 @@
 
 <img src="imgs/hdl_graph_slam.png" width="712pix" />
 
-[video](https://drive.google.com/open?id=0B9f5zFkpn4soSG96Tkt4SFFTbms)
-
 [![Build](https://github.com/koide3/hdl_graph_slam/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/hdl_graph_slam/actions/workflows/build.yml) on melodic & noetic
 
 ## Nodelets
