@@ -7,6 +7,7 @@
 #include <ros/time.h>
 
 #include <g2o/core/hyper_graph.h>
+#include <Eigen/Dense>
 
 namespace g2o {
 class VertexSE3;
