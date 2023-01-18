@@ -825,8 +825,16 @@ private:
     // Load graph.
     graph_slam->load(directory + "/graph.g2o");
     
+    // Iterate over the items in this directory and count how many sub directories there are. 
+    // This will give an upper limit on how many keyframe indexes we can expect to find.
+    boost::filesystem::directory_iterator begin(directory), end;
+    int maxDirectoryCount = std::count_if(begin, end,
+        [](const boost::filesystem::directory_entry & d) {
+            return boost::filesystem::is_directory(d.path()); // only return true if a direcotry
+    });
+
     // Load keyframes by looping through key frame indexes that we expect to see.
-    for(int i = 0; i < 10000; i++) { // un magic this max iterator
+    for(int i = 0; i < maxDirectoryCount; i++) {
       std::stringstream sst;
       sst << boost::format("%s/%06d") % directory % i;
       std::string keyframeDir = sst.str();
