@@ -828,23 +828,23 @@ private:
     // Iterate over the items in this directory and count how many sub directories there are. 
     // This will give an upper limit on how many keyframe indexes we can expect to find.
     boost::filesystem::directory_iterator begin(directory), end;
-    int maxDirectoryCount = std::count_if(begin, end,
+    int max_directory_count = std::count_if(begin, end,
         [](const boost::filesystem::directory_entry & d) {
             return boost::filesystem::is_directory(d.path()); // only return true if a direcotry
     });
 
     // Load keyframes by looping through key frame indexes that we expect to see.
-    for(int i = 0; i < maxDirectoryCount; i++) {
+    for(int i = 0; i < max_directory_count; i++) {
       std::stringstream sst;
       sst << boost::format("%s/%06d") % directory % i;
-      std::string keyframeDir = sst.str();
+      std::string key_frame_directory = sst.str();
 
-      // If keyframeDir doesnt exist, then we have run out so lets stop looking.
-      if(!boost::filesystem::is_directory(keyframeDir)) {
+      // If key_frame_directory doesnt exist, then we have run out so lets stop looking.
+      if(!boost::filesystem::is_directory(key_frame_directory)) {
         break;
       }
 
-      KeyFrame::Ptr keyframe(new KeyFrame(keyframeDir, graph_slam->graph.get()));
+      KeyFrame::Ptr keyframe(new KeyFrame(key_frame_directory, graph_slam->graph.get()));
       keyframes.push_back(keyframe);
     }
     std::cout << "loaded " << keyframes.size() << " keyframes" <<std::endl;
