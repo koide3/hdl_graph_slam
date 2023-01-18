@@ -64,7 +64,7 @@ private:
    */
   void initialize_params() {
     auto& pnh = private_nh;
-    published_odom_topic = private_nh.param<std::string>("published_odom_topic", "/hdl_graph_slam/odom");
+    published_odom_topic = private_nh.param<std::string>("published_odom_topic", "/odom");
     points_topic = pnh.param<std::string>("points_topic", "/velodyne_points");
     odom_frame_id = pnh.param<std::string>("odom_frame_id", "odom");
     robot_odom_frame_id = pnh.param<std::string>("robot_odom_frame_id", "robot_odom");

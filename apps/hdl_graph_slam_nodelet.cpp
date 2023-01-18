@@ -76,7 +76,7 @@ public:
     private_nh = getPrivateNodeHandle();
 
     // init parameters
-    published_odom_topic = private_nh.param<std::string>("published_odom_topic", "/hdl_graph_slam/odom");
+    published_odom_topic = private_nh.param<std::string>("published_odom_topic", "/odom");
     map_frame_id = private_nh.param<std::string>("map_frame_id", "map");
     odom_frame_id = private_nh.param<std::string>("odom_frame_id", "odom");
     map_cloud_resolution = private_nh.param<double>("map_cloud_resolution", 0.05);
@@ -826,7 +826,7 @@ private:
     graph_slam->load(directory + "/graph.g2o");
     
     // Load keyframes by looping through key frame indexes that we expect to see.
-    for(int i = 0; i < 1000; i++) { // un magic this max iterator
+    for(int i = 0; i < 10000; i++) { // un magic this max iterator
       std::stringstream sst;
       sst << boost::format("%s/%06d") % directory % i;
       std::string keyframeDir = sst.str();

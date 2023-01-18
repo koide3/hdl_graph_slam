@@ -6,7 +6,7 @@ from geometry_msgs.msg import *
 
 
 class Map2OdomPublisher:
-	def __init__(self, odom_frame_id = 'slam_odom', map_frame_id = 'slam_map'):
+	def __init__(self, odom_frame_id = 'odom', map_frame_id = 'map'):
 		self.default_odom_frame_id = odom_frame_id
 		self.default_map_frame_id = map_frame_id
 		self.broadcaster = tf.TransformBroadcaster()
@@ -34,8 +34,8 @@ def main():
 	rospy.init_node('map2odom_publisher')
 
 	# get some parameters to define what default frame_id's should be used while we wait for our first odom message
-	map_frame_id = rospy.get_param('~map_frame_id', 'slam_map')
-	odom_frame_id = rospy.get_param('~odom_frame_id', 'slam_odom')
+	map_frame_id = rospy.get_param('~map_frame_id', 'map')
+	odom_frame_id = rospy.get_param('~odom_frame_id', 'odom')
 
 	node = Map2OdomPublisher(odom_frame_id, map_frame_id)	
 

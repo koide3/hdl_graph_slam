@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
   <!-- arguments -->
-  <arg name="nodelet_manager" default="hdl_graph_slam_nodelet_manager" />
-  <arg name="enable_floor_detection" default="true" />
-  <arg name="enable_gps" default="true" />
+  <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
+  <arg name="enable_floor_detection" default="false" />
+  <arg name="enable_gps" default="false" />
   <arg name="enable_imu_acc" default="false" />
   <arg name="enable_imu_ori" default="false" />
 
@@ -13,15 +13,15 @@
   <!-- topic for hdl to find velodyne points -->
   <arg name="points_topic" default="/velodyne_points" />
   <!-- what should the map frame be called -->
-  <arg name="map_frame_id" default="slam_map" />
+  <arg name="map_frame_id" default="map" />
   <!-- what should the base link frame be called -->
-  <arg name="base_link_frame_id" default="slam_base_link" />
+  <arg name="base_link_frame_id" default="base_link" />
   <!-- what should the odom frame be called -->
-  <arg name="lidar_odom_frame_id" default="slam_odom" />
+  <arg name="lidar_odom_frame_id" default="odom" />
 
   <!-- hdl_graph_slam will also publish an odom message -->
   <!-- what should the topic be for odom messages published by hdl-graph-slam -->
-  <arg name="published_odom_topic" default="/hdl_graph_slam/odom" />
+  <arg name="published_odom_topic" default="/odom" />
 
   <!-- optional arguments -->
   <arg name="enable_robot_odometry_init_guess" default="false" />
