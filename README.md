@@ -105,6 +105,7 @@ Bag file (recorded in a small room):
 
 - [hdl_501.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501.bag.tar.gz) (raw data, 344MB)
 - [hdl_501_filtered.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_501_filtered.bag.tar.gz) (downsampled data, 57MB, **Recommended!**)
+- [Mirror link](https://zenodo.org/record/6960371)
 
 ```bash
 rosparam set use_sim_time true
@@ -140,6 +141,7 @@ destination: '/full_path_directory/map.pcd'"
 
 Bag file (recorded in an outdoor environment):
 - [hdl_400.bag.tar.gz](http://www.aisl.cs.tut.ac.jp/databases/hdl_graph_slam/hdl_400.bag.tar.gz) (raw data, about 900MB)
+- [Mirror link](https://zenodo.org/record/6960371)
 
 ```bash
 rosparam set use_sim_time true
