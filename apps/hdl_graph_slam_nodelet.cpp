@@ -902,7 +902,7 @@ private:
       }
       
       // finish with a new line
-      std::cout << std::endl
+      std::cout << std::endl;
     }
 
     // Update our keyframe snapshot so we can publish a map update, trigger update with graph_updated = true.
