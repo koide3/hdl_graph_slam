@@ -885,11 +885,29 @@ private:
         floor_plane_node = static_cast<g2o::VertexPlane*>(graph_slam->graph->vertex(id));
       }
     }
-    std::cout << "loaded special nodes - anchor_node: "<< anchor_node->id() << " anchor_edge: "<< anchor_edge->id() << " floor_node: "<< floor_plane_node->id() << std::endl;
 
-    
+    // check if we have any non null special nodes, if all are null then lets not bother.
+    if(anchor_node->id() || anchor_edge->id() || floor_plane_node->id()) {
+      std::cout << "loaded special nodes - ";
+
+      // check exists before printing information about each special node
+      if(anchor_node->id()) {
+        std::cout << " anchor_node: " << anchor_node->id();
+      }
+      if(anchor_edge->id()) {
+        std::cout << " anchor_edge: " << anchor_edge->id();
+      }
+      if(floor_plane_node->id()) {
+        std::cout << " floor_node: " << floor_plane_node->id();
+      }
+      
+      // finish with a new line
+      std::cout << std::endl
+    }
+
     // Update our keyframe snapshot so we can publish a map update, trigger update with graph_updated = true.
     std::vector<KeyFrameSnapshot::Ptr> snapshot(keyframes.size());
+
     std::transform(keyframes.begin(), keyframes.end(), snapshot.begin(), [=](const KeyFrame::Ptr& k) { return std::make_shared<KeyFrameSnapshot>(k); });
 
     keyframes_snapshot_mutex.lock();
