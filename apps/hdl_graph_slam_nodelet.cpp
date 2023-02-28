@@ -35,6 +35,7 @@
 #include <hdl_graph_slam/FloorCoeffs.h>
 
 #include <hdl_graph_slam/SaveMap.h>
+#include <hdl_graph_slam/LoadGraph.h>
 #include <hdl_graph_slam/DumpGraph.h>
 
 #include <nodelet/nodelet.h>
@@ -75,6 +76,7 @@ public:
     private_nh = getPrivateNodeHandle();
 
     // init parameters
+    published_odom_topic = private_nh.param<std::string>("published_odom_topic", "/odom");
     map_frame_id = private_nh.param<std::string>("map_frame_id", "map");
     odom_frame_id = private_nh.param<std::string>("odom_frame_id", "odom");
     map_cloud_resolution = private_nh.param<double>("map_cloud_resolution", 0.05);
@@ -107,7 +109,7 @@ public:
     points_topic = private_nh.param<std::string>("points_topic", "/velodyne_points");
 
     // subscribers
-    odom_sub.reset(new message_filters::Subscriber<nav_msgs::Odometry>(mt_nh, "/odom", 256));
+    odom_sub.reset(new message_filters::Subscriber<nav_msgs::Odometry>(mt_nh, published_odom_topic, 256));
     cloud_sub.reset(new message_filters::Subscriber<sensor_msgs::PointCloud2>(mt_nh, "/filtered_points", 32));
     sync.reset(new message_filters::Synchronizer<ApproxSyncPolicy>(ApproxSyncPolicy(32), *odom_sub, *cloud_sub));
     sync->registerCallback(boost::bind(&HdlGraphSlamNodelet::cloud_callback, this, _1, _2));
@@ -126,6 +128,8 @@ public:
     map_points_pub = mt_nh.advertise<sensor_msgs::PointCloud2>("/hdl_graph_slam/map_points", 1, true);
     read_until_pub = mt_nh.advertise<std_msgs::Header>("/hdl_graph_slam/read_until", 32);
 
+
+    load_service_server = mt_nh.advertiseService("/hdl_graph_slam/load", &HdlGraphSlamNodelet::load_service, this);
     dump_service_server = mt_nh.advertiseService("/hdl_graph_slam/dump", &HdlGraphSlamNodelet::dump_service, this);
     save_map_service_server = mt_nh.advertiseService("/hdl_graph_slam/save_map", &HdlGraphSlamNodelet::save_map_service, this);
 
@@ -188,6 +192,7 @@ private:
     Eigen::Isometry3d odom2map(trans_odom2map.cast<double>());
     trans_odom2map_mutex.unlock();
 
+    std::cout << "flush_keyframe_queue - keyframes len:"<< keyframes.size() << std::endl;
     int num_processed = 0;
     for(int i = 0; i < std::min<int>(keyframe_queue.size(), max_keyframes_per_update); i++) {
       num_processed = i;
@@ -203,6 +208,7 @@ private:
 
       // fix the first node
       if(keyframes.empty() && new_keyframes.size() == 1) {
+      
         if(private_nh.param<bool>("fix_first_node", false)) {
           Eigen::MatrixXd inf = Eigen::MatrixXd::Identity(6, 6);
           std::stringstream sst(private_nh.param<std::string>("fix_first_node_stddev", "1 1 1 1 1 1"));
@@ -802,6 +808,121 @@ private:
     return markers;
   }
 
+
+  /**
+   * @brief load all data from a directory
+   * @param req
+   * @param res
+   * @return
+   */
+  bool load_service(hdl_graph_slam::LoadGraphRequest& req, hdl_graph_slam::LoadGraphResponse& res) {
+    std::lock_guard<std::mutex> lock(main_thread_mutex);
+
+    std::string directory = req.path;
+
+    std::cout << "loading data from:" << directory << std::endl;
+
+    // Load graph.
+    graph_slam->load(directory + "/graph.g2o");
+    
+    // Iterate over the items in this directory and count how many sub directories there are. 
+    // This will give an upper limit on how many keyframe indexes we can expect to find.
+    boost::filesystem::directory_iterator begin(directory), end;
+    int max_directory_count = std::count_if(begin, end,
+        [](const boost::filesystem::directory_entry & d) {
+            return boost::filesystem::is_directory(d.path()); // only return true if a direcotry
+    });
+
+    // Load keyframes by looping through key frame indexes that we expect to see.
+    for(int i = 0; i < max_directory_count; i++) {
+      std::stringstream sst;
+      sst << boost::format("%s/%06d") % directory % i;
+      std::string key_frame_directory = sst.str();
+
+      // If key_frame_directory doesnt exist, then we have run out so lets stop looking.
+      if(!boost::filesystem::is_directory(key_frame_directory)) {
+        break;
+      }
+
+      KeyFrame::Ptr keyframe(new KeyFrame(key_frame_directory, graph_slam->graph.get()));
+      keyframes.push_back(keyframe);
+    }
+    std::cout << "loaded " << keyframes.size() << " keyframes" <<std::endl;
+    
+    // Load special nodes.
+    std::ifstream ifs(directory + "/special_nodes.csv");
+    if(!ifs) {
+      return false;
+    }
+    while(!ifs.eof()) {
+      std::string token;
+      ifs >> token;
+      if(token == "anchor_node") {
+        int id = 0;
+        ifs >> id;
+        anchor_node = static_cast<g2o::VertexSE3*>(graph_slam->graph->vertex(id));
+      } else if(token == "anchor_edge") {
+        int id = 0;
+        ifs >> id; 
+        // We have no way of directly pulling the edge based on the edge ID that we have just read in.
+        // Fortunatly anchor edges are always attached to the anchor node so we can iterate over 
+        // the edges that listed against the node untill we find the one that matches our ID.
+        if(anchor_node){
+          auto edges = anchor_node->edges();
+
+          for(auto e : edges) {
+            int edgeID =  e->id();
+            if (edgeID == id){
+              anchor_edge = static_cast<g2o::EdgeSE3*>(e);
+
+              break;
+            }
+          } 
+        }
+      } else if(token == "floor_node") {
+        int id = 0;
+        ifs >> id;
+        floor_plane_node = static_cast<g2o::VertexPlane*>(graph_slam->graph->vertex(id));
+      }
+    }
+
+    // check if we have any non null special nodes, if all are null then lets not bother.
+    if(anchor_node->id() || anchor_edge->id() || floor_plane_node->id()) {
+      std::cout << "loaded special nodes - ";
+
+      // check exists before printing information about each special node
+      if(anchor_node->id()) {
+        std::cout << " anchor_node: " << anchor_node->id();
+      }
+      if(anchor_edge->id()) {
+        std::cout << " anchor_edge: " << anchor_edge->id();
+      }
+      if(floor_plane_node->id()) {
+        std::cout << " floor_node: " << floor_plane_node->id();
+      }
+      
+      // finish with a new line
+      std::cout << std::endl
+    }
+
+    // Update our keyframe snapshot so we can publish a map update, trigger update with graph_updated = true.
+    std::vector<KeyFrameSnapshot::Ptr> snapshot(keyframes.size());
+
+    std::transform(keyframes.begin(), keyframes.end(), snapshot.begin(), [=](const KeyFrame::Ptr& k) { return std::make_shared<KeyFrameSnapshot>(k); });
+
+    keyframes_snapshot_mutex.lock();
+    keyframes_snapshot.swap(snapshot);
+    keyframes_snapshot_mutex.unlock();
+    graph_updated = true;
+
+    res.success = true;
+
+    std::cout << "snapshot updated" << std::endl << "loading successful" <<std::endl;
+
+    return true;
+  }
+
+
   /**
    * @brief dump all data to the current directory
    * @param req
@@ -826,9 +947,11 @@ private:
       boost::filesystem::create_directory(directory);
     }
 
-    std::cout << "all data dumped to:" << directory << std::endl;
-
+    std::cout << "dumping data to:" << directory << std::endl;
+    // save graph 
     graph_slam->save(directory + "/graph.g2o");
+
+    // save keyframes
     for(int i = 0; i < keyframes.size(); i++) {
       std::stringstream sst;
       sst << boost::format("%s/%06d") % directory % i;
@@ -910,6 +1033,7 @@ private:
 
   ros::Publisher markers_pub;
 
+  std::string published_odom_topic;
   std::string map_frame_id;
   std::string odom_frame_id;
 
@@ -923,6 +1047,7 @@ private:
 
   tf::TransformListener tf_listener;
 
+  ros::ServiceServer load_service_server;
   ros::ServiceServer dump_service_server;
   ros::ServiceServer save_map_service_server;
 

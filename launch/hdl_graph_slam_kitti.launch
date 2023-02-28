@@ -3,7 +3,7 @@
   <!-- arguments -->
   <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
   <arg name="enable_floor_detection" default="true" />
-  <arg name="enable_gps" default="false" />
+  <arg name="enable_gps" default="true" />
   <arg name="enable_imu_acc" default="false" />
   <arg name="enable_imu_ori" default="false" />
   <arg name="points_topic" default="/velodyne_points" />
@@ -66,7 +66,7 @@
     <param name="sensor_height" value="3.0" />
     <param name="height_clip_range" value="1.0" />
     <param name="floor_pts_thresh" value="512" />
-    <param name="use_normal_filtering" value="true" />
+    <param name="use_normal_filtering" value="false" />
     <param name="normal_filter_thresh" value="20.0" />
   </node>
 
@@ -138,8 +138,8 @@
     <param name="min_stddev_q" value="0.05" />
     <param name="max_stddev_q" value="0.2" />
     <!-- update params -->
-    <param name="graph_update_interval" value="3.0" />
-    <param name="map_cloud_update_interval" value="10.0" />
+    <param name="graph_update_interval" value="1.5" />
+    <param name="map_cloud_update_interval" value="5.0" />
     <param name="map_cloud_resolution" value="0.05" />
   </node>
 

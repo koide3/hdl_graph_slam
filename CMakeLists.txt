@@ -69,6 +69,7 @@ add_message_files(FILES
 
 add_service_files(FILES
   SaveMap.srv
+  LoadGraph.srv
   DumpGraph.srv
 )
 
