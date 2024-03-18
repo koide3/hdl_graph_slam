@@ -5,6 +5,12 @@
 
 [![Build](https://github.com/koide3/hdl_graph_slam/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/hdl_graph_slam/actions/workflows/build.yml) on melodic & noetic
 
+## Third-party extensions
+
+You may be interested in the following nice works built upon hdl_graph_slam:
+
+- Multi-Robot Mapping (ROS2) developed by [Andreas Serov](https://github.com/aserbremen) : [aserbremen/Multi-Robot-Graph-SLAM](https://github.com/aserbremen/Multi-Robot-Graph-SLAM)
+
 ## Nodelets
 ***hdl_graph_slam*** consists of four nodelets.
 
