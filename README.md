@@ -7,7 +7,7 @@
 
 ## Third-party extensions
 
-You may be interested in the following nice works built upon hdl_graph_slam:
+See also the following nice works built upon hdl_graph_slam. Feel free to request to include your work in the list :)
 
 - Multi-Robot Mapping (ROS2) developed by [Andreas Serov](https://github.com/aserbremen) : [aserbremen/Multi-Robot-Graph-SLAM](https://github.com/aserbremen/Multi-Robot-Graph-SLAM)
 
