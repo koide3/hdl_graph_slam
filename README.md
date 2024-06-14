@@ -10,6 +10,7 @@
 See also the following nice works built upon hdl_graph_slam. Feel free to request to include your work in the list :)
 
 - Multi-Robot Mapping (ROS2) developed by [Andreas Serov](https://github.com/aserbremen) : [aserbremen/Multi-Robot-Graph-SLAM](https://github.com/aserbremen/Multi-Robot-Graph-SLAM)
+- [CURB-SG: Collaborative Dynamic 3D Scene Graphs](http://curb.cs.uni-freiburg.de/) developed by Elias Greve : [robot-learning-freiburg/CURB-SG](https://github.com/robot-learning-freiburg/CURB-SG)
 
 ## Nodelets
 ***hdl_graph_slam*** consists of four nodelets.
