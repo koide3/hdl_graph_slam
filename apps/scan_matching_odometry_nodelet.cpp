@@ -129,6 +129,7 @@ private:
 
     read_until->frame_id = "/filtered_points";
     read_until_pub.publish(read_until);
+    // std::cout << "PointCloud2ConstPtr ..." << std::endl;
   }
 
   void msf_pose_callback(const geometry_msgs::PoseWithCovarianceStampedConstPtr& pose_msg, bool after_update) {

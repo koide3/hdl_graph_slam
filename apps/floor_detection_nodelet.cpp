@@ -70,6 +70,7 @@ private:
    * @param cloud_msg  point cloud msg
    */
   void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg) {
+    std::cout << "floor" << std::endl;
     pcl::PointCloud<PointT>::Ptr cloud(new pcl::PointCloud<PointT>());
     pcl::fromROSMsg(*cloud_msg, *cloud);
 

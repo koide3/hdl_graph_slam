@@ -11,11 +11,11 @@
   <!-- ***** map -> odom -> base_link -> velodyne ***** -->
   <!-- these can be named in the following -->
   <!-- topic for hdl to find velodyne points -->
-  <arg name="points_topic" default="/velodyne_points" />
+  <arg name="points_topic" default="/D435_head_camera/depth/color/points" />
   <!-- what should the map frame be called -->
   <arg name="map_frame_id" default="map" />
   <!-- what should the base link frame be called -->
-  <arg name="base_link_frame_id" default="base_link" />
+  <arg name="base_link_frame_id" default="pelvis" />
   <!-- what should the odom frame be called -->
   <arg name="lidar_odom_frame_id" default="odom" />
 
@@ -28,7 +28,7 @@
   <arg name="robot_odom_frame_id" default="robot_odom" />
 
   <!-- transformation between lidar and base_link -->
-  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 $(arg base_link_frame_id) velodyne 10" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 0 0 0 0 $(arg base_link_frame_id) D435_head_camera_link 10" /> -->
 
   <!-- in case you use velodyne_driver, comment out the following line -->
    <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/> 
@@ -92,6 +92,7 @@
     <param name="use_normal_filtering" value="true" />
     <param name="normal_filter_thresh" value="20.0" />
   </node>
+
 
   <!-- hdl_graph_slam_nodelet -->
   <node pkg="nodelet" type="nodelet" name="hdl_graph_slam_nodelet" args="load hdl_graph_slam/HdlGraphSlamNodelet $(arg nodelet_manager)">
@@ -173,4 +174,5 @@
      <param name="map_frame_id" value="$(arg map_frame_id)" />
      <param name="odom_frame_id" value="$(arg lidar_odom_frame_id)" />
   </node>
+
 </launch>

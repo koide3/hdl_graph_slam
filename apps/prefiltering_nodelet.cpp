@@ -135,6 +135,7 @@ private:
     points_pub.publish(*filtered);
   }
 
+
   pcl::PointCloud<PointT>::ConstPtr downsample(const pcl::PointCloud<PointT>::ConstPtr& cloud) const {
     if(!downsample_filter) {
       return cloud;
